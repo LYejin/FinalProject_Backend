@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.EmployeeDao">
+    <select id="userSelect" resultType="com.example.demo.dto.UserDTO">
+        SELECT *
+        FROM Employee_Roll
+        WHERE USERNAME = #{username}
+    </select>
+
+    <insert id="employeesave" parameterType="string">
+        INSERT INTO Employee (EMP_CD, CO_CD, DIV_CD, USR_YN, USE_FG, USERNAME, PASSWORD, KOR_NM, EMAL_ADD, TEL, GENDER_FG, JOIN_DT, RTR_DT, RSRG_ADD, PIC_FILE_ID)
+        VALUES ('E5', 'com1', 'DIV1', '1', '4', 'aaa', #{password}, 'John Doe', 'john@example.com', '123-456-7890', 'M', '20230801', NULL, '123 Main St, City', NULL)
+    </insert>
+
+</mapper>
