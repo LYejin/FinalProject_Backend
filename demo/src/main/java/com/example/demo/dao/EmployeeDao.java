@@ -12,14 +12,14 @@ public interface EmployeeDao {
     public UserDTO userSelect(String userName);
     public void employeesave(EmployeeDTO employeeDTO);
 
-    //전체 사원 리스트 출력
-    public List<EmployeeDTO> employeeSelectAll();
+    //사원 리스트 출력
+    public List<EmployeeDTO> employeeSearchList(EmployeeDTO employee);
 
     //사원 상세 테이터 1건 출력
     public EmployeeDTO employeeDetail();
 
     //신규 사원 데이터 1건 입력
-    public void employeeInsert();
+    public int employeeInsert(EmployeeDTO employeeDTO);
 
     //특정 사원 데이터 비 활성화
     public void employeeRemove();
