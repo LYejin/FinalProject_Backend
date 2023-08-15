@@ -8,7 +8,7 @@
     </select>
 
     <insert id="employeesave" parameterType="string">
-        INSERT INTO Employee (EMP_CD, CO_CD, DIV_CD, USR_YN, USE_FG, USERNAME, PASSWORD, KOR_NM, EMAL_ADD, TEL, GENDER_FG, JOIN_DT, RTR_DT, RSRG_ADD, PIC_FILE_ID)
+        INSERT INTO Employee (EMP_CD, CO_CD, DIV_CD, USER_YN, USE_FG, USERNAME, PASSWORD, KOR_NM, EMAL_ADD, TEL, GENDER_FG, JOIN_DT, RTR_DT, RSRG_ADD, PIC_FILE_ID)
         VALUES ('E5', 'com1', 'DIV1', '1', '4', 'aaa', #{password}, 'John Doe', 'john@example.com', '123-456-7890', 'M', '20230801', NULL, '123 Main St, City', NULL)
     </insert>
 
@@ -17,7 +17,7 @@
         SELECT
             EMP_CD,
             CO_CD,
-            USR_YN,
+            USER_YN,
             USERNAME,
             PASSWORD,
             KOR_NM,
@@ -25,6 +25,7 @@
             RTR_DT
         FROM Employee
         <where>
+            USER_YN = '1'
             <if test="CO_CD != null">
                 AND CO_CD = #{CO_CD}
             </if>
@@ -40,12 +41,12 @@
     </select>
 
     <!-- 사원 상세 테이터 1건 출력 -->
-    <select id="employeeOneSelectList" parameterType="com.example.demo.dto.EmployeeDTO" resultType="com.example.demo.dto.EmployeeDTO">
+    <select id="employeeDetail" parameterType="com.example.demo.dto.EmployeeDTO" resultType="com.example.demo.dto.EmployeeDTO">
         SELECT
             EMP_CD,
             CO_CD,
             DIV_CD,
-            USR_YN,
+            USER_YN,
             USE_FG,
             USERNAME,
             PASSWORD,
@@ -68,7 +69,8 @@
             ADDR_NUM
         FROM Employee
         WHERE
-            KOR_NM = #{KOR_NM}
+            USER_YN = '1'
+            AND KOR_NM = #{KOR_NM}
             AND USERNAME = #{USERNAME}
     </select>
 
@@ -79,7 +81,7 @@
             EMP_CD,
             CO_CD,
             DIV_CD,
-            USR_YN,
+            USER_YN,
             USE_FG,
             USERNAME,
             PASSWORD,
@@ -131,4 +133,73 @@
         )
     </insert>
 
+    <!-- 특정 사원 데이터 비 활성화 -->
+    <update id="employeeRemove" parameterType="com.example.demo.dto.EmployeeDTO">
+        UPDATE Employee
+             SET USER_YN = '0'
+        WHERE
+            KOR_NM = #{KOR_NM}
+            AND USERNAME = #{USERNAME}
+    </update>
+
+    <!-- 특정 사원 데이터 정보 갱신 -->
+    <update id="employeeUpdate" parameterType="com.example.demo.dto.EmployeeDTO">
+        UPDATE Employee
+        <set>
+            <if test="PASSWORD != null">
+                PASSWORD = #{PASSWORD},
+            </if>
+            <if test="KOR_NM != null">
+                KOR_NM = #{KOR_NM},
+            </if>
+            <if test="TEL != null">
+                TEL = #{TEL},
+            </if>
+            <if test="GENDER_FG != null">
+                GENDER_FG = #{GENDER_FG},
+            </if>
+            <if test="JOIN_DT != null">
+                JOIN_DT = #{JOIN_DT},
+            </if>
+            <if test="RTR_DT != null">
+                RTR_DT = #{RTR_DT},
+            </if>
+            <if test="RSRG_ADD != null">
+                RSRG_ADD = #{RSRG_ADD},
+            </if>
+            <if test="PIC_FILE_ID != null">
+                PIC_FILE_ID = #{PIC_FILE_ID},
+            </if>
+            <if test="ENRL_FG != null">
+                ENRL_FG = #{ENRL_FG},
+            </if>
+            <if test="PERSONAL_MAIL != null">
+                PERSONAL_MAIL = #{PERSONAL_MAIL},
+            </if>
+            <if test="PERSONAL_MAIL_CP != null">
+                PERSONAL_MAIL_CP = #{PERSONAL_MAIL_CP},
+            </if>
+            <if test="SALARY_MAIL != null">
+                SALARY_MAIL = #{SALARY_MAIL},
+            </if>
+            <if test="SALARY_MAIL_CP != null">
+                SALARY_MAIL_CP = #{SALARY_MAIL_CP},
+            </if>
+            <if test="HOME_TEL != null">
+                HOME_TEL = #{HOME_TEL},
+            </if>
+            <if test="ZIPCODE != null">
+                ZIPCODE = #{ZIPCODE},
+            </if>
+            <if test="ADDR != null">
+                ADDR = #{ADDR},
+            </if>
+            <if test="ADDR_NUM != null">
+                ADDR_NUM = #{ADDR_NUM},
+            </if>
+        </set>
+        WHERE
+            KOR_NM = #{KOR_NM}
+            AND USERNAME = #{USERNAME}
+    </update>
 </mapper>

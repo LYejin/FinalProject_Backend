@@ -8,7 +8,7 @@ public class EmployeeDTO {
     private String EMP_CD; // 사원계정
     private String CO_CD; // 회사코드
     private String DIV_CD; // 사업장코드
-    private String USR_YN; // 사용여부
+    private String USER_YN; // 사용여부
     private String USE_FG; // 조회권한
     private String USERNAME; // 아이디
     private String PASSWORD; // 비밀번호

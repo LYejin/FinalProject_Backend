@@ -59,8 +59,9 @@ public class EmployeeService {
     }
 
     //사원 상세 테이터 1건 출력
-    public EmployeeDTO employeeDetail() {
-        return null;
+    public EmployeeDTO employeeDetail(EmployeeDTO employeeDTO) {
+        EmployeeDTO employeeInfo = employeeDao.employeeDetail(employeeDTO);
+        return employeeInfo;
     }
 
     //신규 사원 데이터 1건 입력
@@ -71,14 +72,16 @@ public class EmployeeService {
     }
 
     //특정 사원 데이터 비 활성화
-    public void employeeRemove() {
-
+    public void employeeRemove(EmployeeDTO employeeDTO) {
+        System.out.println("employeeRemove 실행");
+        int row = employeeDao.employeeRemove(employeeDTO);
+        System.out.println("입력된 행 " + row);
     }
 
     //특정 사원 데이터 정보 갱신
-    public void employeeUpdate() {
-
+    public void employeeUpdate(EmployeeDTO employeeDTO) {
+        System.out.println("employeeUpdate 실행");
+        int row = employeeDao.employeeUpdate(employeeDTO);
+        System.out.println("입력된 행 " + row);
     }
-
-
 }
