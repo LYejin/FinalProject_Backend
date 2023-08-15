@@ -16,14 +16,15 @@ public interface EmployeeDao {
     public List<EmployeeDTO> employeeSearchList(EmployeeDTO employee);
 
     //사원 상세 테이터 1건 출력
-    public EmployeeDTO employeeDetail();
+    public EmployeeDTO employeeDetail(EmployeeDTO employeeDTO);
 
     //신규 사원 데이터 1건 입력
     public int employeeInsert(EmployeeDTO employeeDTO);
 
     //특정 사원 데이터 비 활성화
-    public void employeeRemove();
+    public int employeeRemove(EmployeeDTO employeeDTO);
 
     //특정 사원 데이터 정보 갱신
-    public void employeeUpdate();
+    public int employeeUpdate(EmployeeDTO employeeDTO);
+
 }
