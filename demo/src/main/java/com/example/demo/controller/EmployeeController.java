@@ -39,11 +39,35 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeList, HttpStatus.OK);
     }
 
-    // 전체 사원 리스트 출력 및 검색 결과 출력
+    // 사원 상세 테이터 1건 출력
+    @PostMapping("empDetail")
+    public ResponseEntity<EmployeeDTO> employeeDetail(@RequestBody EmployeeDTO employeeDTO) {
+        System.out.println("employeeDetail 출력");
+        EmployeeDTO employeeInfo = employeeService.employeeDetail(employeeDTO);
+        return new ResponseEntity<>(employeeInfo, HttpStatus.OK);
+    }
+
+    // 신규 사원 데이터 1건 입력
     @PostMapping("empInsert")
     public ResponseEntity<String> employeeInsert(@RequestBody EmployeeDTO employeeDTO) {
         System.out.println("employeeInsertController 출력");
         employeeService.employeeInsert(employeeDTO);
+        return new ResponseEntity<>("입력완료", HttpStatus.OK);
+    }
+
+    // 특정 사원 데이터 비 활성화
+    @PostMapping("empRemove")
+    public ResponseEntity<String> employeeRemove(@RequestBody EmployeeDTO employeeDTO) {
+        System.out.println("employeeRemoveController 출력");
+        employeeService.employeeRemove(employeeDTO);
+        return new ResponseEntity<>("입력완료", HttpStatus.OK);
+    }
+
+    // 특정 사원 데이터 정보 갱신
+    @PostMapping("empUpdate")
+    public ResponseEntity<String> employeeUpdate(@RequestBody EmployeeDTO employeeDTO) {
+        System.out.println("employeeUpdateController 출력");
+        employeeService.employeeUpdate(employeeDTO);
         return new ResponseEntity<>("입력완료", HttpStatus.OK);
     }
 }
