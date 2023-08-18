@@ -1,11 +1,11 @@
 package com.example.demo.config.auto;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import com.example.demo.dto.UserDTO;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 
@@ -57,6 +57,7 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        System.out.println(user.getRoleList());
         user.getRoleList().forEach(r -> {
             authorities.add(() -> {
                 return r;

@@ -1,9 +1,18 @@
 package com.example.demo.config.jwt;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Date;
+import com.example.demo.config.auto.PrincipalDetails;
+import com.example.demo.dto.UserDTO;
+import com.example.demo.service.EmployeeService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
@@ -11,23 +20,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.example.demo.dto.UserDTO;
-import com.example.demo.service.EmployeeService;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
-import com.example.demo.config.auto.PrincipalDetails;
-
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Date;
 
 
 
@@ -45,11 +41,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         System.out.println("토큰 인증");
-
-
+        System.out.println();
 
         String header = request.getHeader(JwtProperties.HEADER_STRING);
-            header = URLDecoder.decode(header, "UTF-8");
+        header = URLDecoder.decode(header, "UTF-8");
+
 
         System.out.println(JwtProperties.HEADER_STRING);
         System.out.println("header : " + header);
@@ -58,7 +54,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
             return;
         }
-       
+
+
 
         String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
         System.out.println("dfsfdsf"+token);

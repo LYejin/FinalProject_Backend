@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class WorkplaceService {
@@ -17,24 +18,29 @@ public class WorkplaceService {
     @Autowired
     private WorkplaceDao workplaceDao;
 
-    //검색
-    public List<WorkplaceDTO> select(){
-        return null;
+    //사업장목록
+    public List<WorkplaceDTO> selectWorkplaceSearch(Map<String, String> map){
+        System.out.println("서비스^^");
+        return workplaceDao.selectWorkplaceSearch(map);
     }
 
-    //추가
-    public void save(){
-
+    //사업장 정보
+    public WorkplaceDTO selectWorkplaceInfoByDIVCD(String divCd){
+        return workplaceDao.selectWorkplaceInfoByDIVCD(divCd);
     }
 
-    //갱신
-    public void update(){
-
+    //사업장추가
+    public int insertWorkplace(WorkplaceDTO workplaceDTO){
+        return workplaceDao.insertWorkplace(workplaceDTO);
     }
 
-    //삭제
-    public void delete(){
+    //수정
+    public int updateWorkplace(WorkplaceDTO workplaceDTO){
+        return workplaceDao.updateWorkplace(workplaceDTO);
+    }
 
+    public int deleteWorkplace(String DIV_CD){
+        return workplaceDao.deleteWorkplace(DIV_CD);
     }
 
 }
