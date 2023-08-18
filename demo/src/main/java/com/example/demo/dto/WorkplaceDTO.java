@@ -4,21 +4,19 @@ import lombok.Data;
 
 @Data
 public class WorkplaceDTO {
-    private String coCd;
-    private String useYn;
-    private String coNm;
-    private String coNmk;
-    private String business;
-    private String jongmok;
-    private String regNb;
-    private String hoFax;
-    private String ceoNm;
-    private String hoZip;
-    private String hoAddr;
-    private String hoAddr1;
-    private String coFg;
-    private String coNb;
-    private String estDt;
-    private String openDt;
-    private String closeDt;
+    private String DIV_CD;
+    private String CO_CD;
+    private String DIV_YN;
+    private String FILL_YN;
+    private String DIV_NM;
+    private String DIV_ADDR;
+    private String DIV_TEL;
+    private String REG_NB;
+    private String DIV_TO_CD;
+    private String DIV_NMK;
+    private String BUSINESS;
+    private String JONGMOK;
+    private String OPEN_DT;
+    private String CLOSE_DT;
+    private String MAS_NM;
 }

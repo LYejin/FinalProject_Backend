@@ -44,9 +44,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 	private final AuthenticationManager authenticationManager;
 
-	
-
-	
 	// Authentication 객체 만들어서 리턴 => 의존 : AuthenticationManager
 	// 인증 요청시에 실행되는 URL => /login  
 	@Override
