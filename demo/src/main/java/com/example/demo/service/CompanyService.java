@@ -18,22 +18,55 @@ public class CompanyService {
     private CompanyDao companyDao;
 
     //검색
-    public List<CompanyDTO> select(){
-        return null;
+    public List<CompanyDTO> companySelectAll(){
+        List<CompanyDTO> companyDTOS = null;
+        try {
+            companyDTOS = companyDao.companySelectAll();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+        return companyDTOS;
+    }
+
+    public  CompanyDTO companyDetail(String co_CD){
+        CompanyDTO companyDTO = null;
+        try {
+            companyDTO = companyDao.companyDetail(co_CD);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+        return companyDTO;
     }
 
     //추가
-    public void save(){
-
+    public void companyInsert(CompanyDTO companyDTO){
+        try {
+            companyDao.companyInsert(companyDTO);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     //갱신
-    public void update(){
+    public void companyUpdate(CompanyDTO companyDTO){
 
+        try {
+            companyDao.companyInsert(companyDTO);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     //삭제
-    public void delete(){
+    public void companyRemove(String CO_CD){
+
+        try {
+            companyDao.companyRemove(CO_CD);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
 
     }
 

@@ -4,10 +4,13 @@ import com.example.demo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
+
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -18,14 +21,17 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import com.example.demo.config.jwt.JwtAuthenticationFilter;
 import com.example.demo.config.jwt.JwtAuthorizationFilter;
-
-
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 
 // https://github.com/spring-projects/spring-security/issues/10822 참고
 @Configuration
 @EnableWebSecurity // 시큐리티 활성화 -> 기본 스프링 필터체인에 등록
-public class SecurityConfig {
+public class SecurityConfig  {
+
+
 
 	@Autowired
 	private EmployeeService employeeService;
@@ -37,6 +43,20 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+	@Bean
+	public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
+		StrictHttpFirewall firewall = new StrictHttpFirewall();
+		firewall.setAllowUrlEncodedSlash(true);
+		return firewall;
+	}
+
+	@Bean
+	public HttpFirewall customHttpFirewall() {
+		DefaultHttpFirewall firewall = new DefaultHttpFirewall();
+		firewall.setAllowUrlEncodedSlash(true);
+		return firewall;
+	}
 
 	//SecurityFilterChain : 기본적으로 주어지는  ==> 베이직 시큐리티 필터
 	@Bean
@@ -57,7 +77,6 @@ public class SecurityConfig {
 		
 		;// 추가적인 => 커스텀 필터 등록 => 기존 시큐리티 설정을 사용안하고
 		http.apply(new MyCustomDsl());
-
 
 
 		http.authorizeHttpRequests(authroize -> 
@@ -90,7 +109,11 @@ public class SecurityConfig {
 					//토큰을 이용하여 인증 객체를 생성하여 설정함
 					//토큰을 인증하여 유저 객체를 생성함
 					.addFilter(new JwtAuthorizationFilter(authenticationManager, employeeService));
+
 		}
 	}
+
+
+
 
 }

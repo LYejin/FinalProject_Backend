@@ -2,5 +2,46 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.dao.CompanyDao">
 
+    <select id="companySelectAll" resultType="com.example.demo.dto.CompanyDTO">
+        SELECT CO_CD, CO_NM, CO_FG, CEO_NM
+        FROM Company
+        WHERE USE_YN = 1;
+    </select>
 
+    <select id="companyDetail"  parameterType="String" resultType="com.example.demo.dto.CompanyDTO">
+        SELECT CO_CD, USE_YN, CO_NM, CO_NMK, BUSINESS, JONGMOK, REG_NB, CEO_NM, HO_FAX, CEO_TEL, PPL_NB, HO_ZIP, HO_ADDR, HO_ADDR1, CO_FG, CO_NB, EST_DT, OPEN_DT, CLOSE_DT, PIC_FILE_ID, ACCT_FG
+        FROM Company
+        WHERE CO_CD = #{co_CD}
+    </select>
+
+    <insert id="companyInsert" parameterType="com.example.demo.dto.CompanyDTO">
+        INSERT INTO Company (
+            CO_CD, USE_YN, CO_NM, CO_NMK, BUSINESS, JONGMOK, REG_NB,
+            CEO_NM, HO_FAX, CEO_TEL, PPL_NB, HO_ZIP, HO_ADDR, HO_ADDR1,
+            CO_FG, CO_NB, EST_DT, OPEN_DT, CLOSE_DT, PIC_FILE_ID, ACCT_FG
+        )
+        VALUES (
+            #{CO_CD}, #{USE_YN}, #{CO_NM}, #{CO_NMK}, #{BUSINESS}, #{JONGMOK}, #{REG_NB},
+            #{CEO_NM}, #{HO_FAX}, #{CEO_TEL}, #{PPL_NB}, #{HO_ZIP}, #{HO_ADDR}, #{HO_ADDR1},
+            #{CO_FG}, #{CO_NB}, #{EST_DT}, #{OPEN_DT}, #{CLOSE_DT}, #{PIC_FILE_ID}, #{ACCT_FG}
+        )
+    </insert>
+
+    <update id="companyUpdate" parameterType="com.example.demo.dto.CompanyDTO">
+        UPDATE Company
+        SET
+        WHERE CO_CD = #{CO_CD}
+    </update>
+
+
+    <update id="companyRemove">
+        UPDATE Company
+        SET USE_YN = "0"
+        WHERE CO_CD = #{CO_CD}
+    </update>
+
+
+
+
+    
 </mapper>
