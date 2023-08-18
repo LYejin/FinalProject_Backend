@@ -49,6 +49,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
 
         String header = request.getHeader(JwtProperties.HEADER_STRING);
+        System.out.println("[검증]"+header);
+        if (header != null) {
+            header = URLDecoder.decode(header , "UTF-8");
+        }
 
         System.out.println(JwtProperties.HEADER_STRING);
         System.out.println("header : " + header);
@@ -57,7 +61,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
             return;
         }
-       
+
+
 
         String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
         System.out.println("dfsfdsf"+token);
