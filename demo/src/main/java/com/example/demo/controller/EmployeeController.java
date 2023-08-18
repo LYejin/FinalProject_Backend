@@ -9,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("system/user/groupManage/")
+@RequestMapping("system/user/groupManage/employee")
 @CrossOrigin("http://localhost:3000")
 public class EmployeeController {
     @Autowired
@@ -18,14 +20,55 @@ public class EmployeeController {
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
-
+    // 회원가입 추후 삭제 예정
     @PostMapping ("join")
     public ResponseEntity<?> join(@RequestBody EmployeeDTO employeeDTO) {
         System.out.println("회원가입");
-        employeeDTO.setPassword("aaa");
-        employeeDTO.setPassword(bCryptPasswordEncoder.encode(employeeDTO.getPassword()));
+        employeeDTO.setPASSWORD("aaa");
+        employeeDTO.setPASSWORD(bCryptPasswordEncoder.encode(employeeDTO.getPASSWORD()));
         //사용자 권한 데이를 세팅
         employeeService.save(employeeDTO);
         return new ResponseEntity<>("회원가입완료", HttpStatus.OK);
+    }
+
+    // 전체 사원 리스트 출력 및 검색 결과 출력
+    @PostMapping("getList")
+    public ResponseEntity<List<EmployeeDTO>> employeeSearchList(@RequestBody EmployeeDTO employeeDTO) {
+        System.out.println("리스트 출력");
+        List<EmployeeDTO> employeeList = employeeService.employeeSearchList(employeeDTO);
+        return new ResponseEntity<>(employeeList, HttpStatus.OK);
+    }
+
+    // 사원 상세 테이터 1건 출력
+    @PostMapping("empDetail")
+    public ResponseEntity<EmployeeDTO> employeeDetail(@RequestBody EmployeeDTO employeeDTO) {
+        System.out.println("employeeDetail 출력");
+        System.out.println("employeeDTO : " + employeeDTO);
+        EmployeeDTO employeeInfo = employeeService.employeeDetail(employeeDTO);
+        return new ResponseEntity<>(employeeInfo, HttpStatus.OK);
+    }
+
+    // 신규 사원 데이터 1건 입력
+    @PostMapping("empInsert")
+    public ResponseEntity<String> employeeInsert(@RequestBody EmployeeDTO employeeDTO) {
+        System.out.println("employeeInsertController 출력");
+        employeeService.employeeInsert(employeeDTO);
+        return new ResponseEntity<>("입력완료", HttpStatus.OK);
+    }
+
+    // 특정 사원 데이터 비 활성화
+    @PostMapping("empRemove")
+    public ResponseEntity<String> employeeRemove(@RequestBody EmployeeDTO employeeDTO) {
+        System.out.println("employeeRemoveController 출력");
+        employeeService.employeeRemove(employeeDTO);
+        return new ResponseEntity<>("입력완료", HttpStatus.OK);
+    }
+
+    // 특정 사원 데이터 정보 갱신
+    @PostMapping("empUpdate")
+    public ResponseEntity<String> employeeUpdate(@RequestBody EmployeeDTO employeeDTO) {
+        System.out.println("employeeUpdateController 출력");
+        employeeService.employeeUpdate(employeeDTO);
+        return new ResponseEntity<>("입력완료", HttpStatus.OK);
     }
 }
