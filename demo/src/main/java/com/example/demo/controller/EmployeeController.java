@@ -43,6 +43,7 @@ public class EmployeeController {
     @PostMapping("empDetail")
     public ResponseEntity<EmployeeDTO> employeeDetail(@RequestBody EmployeeDTO employeeDTO) {
         System.out.println("employeeDetail 출력");
+        System.out.println("employeeDTO : " + employeeDTO);
         EmployeeDTO employeeInfo = employeeService.employeeDetail(employeeDTO);
         return new ResponseEntity<>(employeeInfo, HttpStatus.OK);
     }

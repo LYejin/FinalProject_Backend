@@ -60,7 +60,9 @@ public class EmployeeService {
 
     //사원 상세 테이터 1건 출력
     public EmployeeDTO employeeDetail(EmployeeDTO employeeDTO) {
+        System.out.println("employeeDetailService");
         EmployeeDTO employeeInfo = employeeDao.employeeDetail(employeeDTO);
+        System.out.println(employeeInfo);
         return employeeInfo;
     }
 
