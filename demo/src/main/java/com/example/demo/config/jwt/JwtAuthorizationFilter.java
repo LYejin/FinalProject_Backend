@@ -49,6 +49,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
 
         String header = request.getHeader(JwtProperties.HEADER_STRING);
+            header = URLDecoder.decode(header, "UTF-8");
 
         System.out.println(JwtProperties.HEADER_STRING);
         System.out.println("header : " + header);
