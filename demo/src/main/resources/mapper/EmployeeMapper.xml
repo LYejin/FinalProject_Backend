@@ -75,62 +75,33 @@
     </select>
 
     <!-- 신규 사원 데이터 1건 입력 -->
-    <insert id="employeeInsert" parameterType="com.example.demo.dto.EmployeeDTO" >
-        INSERT INTO Employee (
-        <trim suffixOverrides=",">
-            EMP_CD,
-            CO_CD,
-            DIV_CD,
-            USER_YN,
-            USE_FG,
-            USERNAME,
-            PASSWORD,
-            KOR_NM,
-            EMAIL_ADD,
-            GENDER_FG,
-            JOIN_DT,
-            ENRL_FG,
-            <if test="TEL != null">TEL,</if>
-            <if test="RTR_DT != null">RTR_DT,</if>
-            <if test="RSRG_ADD != null">RSRG_ADD,</if>
-            <if test="PIC_FILE_ID != null">PIC_FILE_ID,</if>
-            <if test="PERSONAL_MAIL != null">PERSONAL_MAIL,</if>
-            <if test="PERSONAL_MAIL_CP != null">PERSONAL_MAIL_CP,</if>
-            <if test="SALARY_MAIL != null">SALARY_MAIL,</if>
-            <if test="SALARY_MAIL_CP != null">SALARY_MAIL_CP,</if>
-            <if test="HOME_TEL != null">HOME_TEL,</if>
-            <if test="ZIPCODE != null">ZIPCODE,</if>
-            <if test="ADDR != null">ADDR,</if>
-            <if test="ADDR_NUM != null">ADDR_NUM,</if>
-        </trim>
-    ) VALUES (
-        <trim suffixOverrides=",">
+    <insert id="employeeInsert" parameterType="com.example.demo.dto.EmployeeDTO" statementType="CALLABLE">
+    { CALL InsertEmployeeWithRollProcedure(
         #{EMP_CD},
         'com1',
-            'DIV1',
-            '1',
+        'DIV1',
+        '1',
         '1',
         #{USERNAME},
         #{PASSWORD},
         #{KOR_NM},
         #{EMAIL_ADD},
+        #{TEL},
         #{GENDER_FG},
         #{JOIN_DT},
-        #{ENRL_FG},
-        <if test="TEL != null">#{TEL},</if>
-        <if test="RTR_DT != null">#{RTR_DT},</if>
-        <if test="RSRG_ADD != null">#{RSRG_ADD},</if>
-        <if test="PIC_FILE_ID != null">#{PIC_FILE_ID},</if>
-        <if test="PERSONAL_MAIL != null">#{PERSONAL_MAIL},</if>
-        <if test="PERSONAL_MAIL_CP != null">#{PERSONAL_MAIL_CP},</if>
-        <if test="SALARY_MAIL != null">#{SALARY_MAIL},</if>
-        <if test="SALARY_MAIL_CP != null">#{SALARY_MAIL_CP},</if>
-        <if test="HOME_TEL != null">#{HOME_TEL},</if>
-        <if test="ZIPCODE != null">#{ZIPCODE},</if>
-        <if test="ADDR != null">#{ADDR},</if>
-        <if test="ADDR_NUM != null">#{ADDR_NUM},</if>
-        </trim>
-        )
+        '',
+        'jjj',
+        '0',
+        #{PERSONAL_MAIL},
+        #{PERSONAL_MAIL_CP},
+        #{SALARY_MAIL},
+        #{SALARY_MAIL_CP},
+        #{HOME_TEL},
+        #{ZIPCODE},
+        #{ADDR},
+        #{ADDR_NUM},
+        #{ROLE_NAME}
+    ) }
     </insert>
 
     <!-- 특정 사원 데이터 비 활성화 -->
