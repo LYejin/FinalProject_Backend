@@ -27,9 +27,44 @@
         )
     </insert>
 
+
+<!--    <update id="companyUpdate" parameterType="com.example.demo.dto.CompanyDTO">-->
+<!--        UPDATE Company-->
+<!--        <set>-->
+<!--            <foreach item="field" collection="fields" separator=",">-->
+<!--                <choose>-->
+<!--                    <when test="field.name != 'CO_CD' and field.value != null">-->
+<!--                        ${field.name} = #{field.value}-->
+<!--                    </when>-->
+<!--                </choose>-->
+<!--            </foreach>-->
+<!--        </set>-->
+<!--        WHERE CO_CD = #{CO_CD}-->
+<!--    </update>-->
+
+<!--    <update id="companyUpdate" parameterType="com.example.demo.dto.CompanyDTO">-->
+<!--        UPDATE Company-->
+<!--        <set>-->
+<!--            <foreach item="fieldName" index="index" collection="fields" separator=",">-->
+<!--                <choose>-->
+<!--                    <when test="fieldName != 'CO_CD' and fieldName != 'PPL_NB' and fieldName != 'CEO_TEL' and fieldName != 'CO_NB'">-->
+<!--                        ${fieldName} = #{${fieldName}}-->
+<!--                    </when>-->
+<!--                </choose>-->
+<!--            </foreach>-->
+<!--        </set>-->
+<!--        WHERE CO_CD = #{CO_CD}-->
+<!--    </update>-->
+
     <update id="companyUpdate" parameterType="com.example.demo.dto.CompanyDTO">
         UPDATE Company
-        SET
+        <set>
+            <foreach collection="columnsToUpdate" item="column" separator=",">
+                <if test="column != 'CO_CD'"> <!-- Exclude CO_CD column -->
+                    ${column} = #{${column}}
+                </if>
+            </foreach>
+        </set>
         WHERE CO_CD = #{CO_CD}
     </update>
 

@@ -4,6 +4,7 @@ import com.example.demo.dto.CompanyDTO;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.UserDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 

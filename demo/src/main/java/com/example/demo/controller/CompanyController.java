@@ -36,7 +36,7 @@ public class CompanyController {
     public ResponseEntity<?> companyDetail(@PathVariable String co_CD){
         System.out.println(co_CD);
         CompanyDTO companyDTO = companyService.companyDetail(co_CD);
-
+        System.out.println("상세"+companyDTO);
 
         return new ResponseEntity<CompanyDTO>(companyDTO, HttpStatus.OK);
     }
@@ -45,22 +45,15 @@ public class CompanyController {
     @PostMapping(value = "CompanyInsert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> companyInsert(CompanyDTO companyDTO) {
 
-        int index = companyDTO.getPIC_FILE_ID().indexOf("data");
-        String data = companyDTO.getPIC_FILE_ID().substring(index);
 
-        if(index != -1){
-            companyDTO.setPIC_FILE_ID(data);
-        }
-
-        System.out.println(index+"이미지확인"+data);
         companyService.companyInsert(companyDTO);
 
         return new ResponseEntity<String>("데이터 입력 성공", HttpStatus.OK);
     }
-    @PutMapping("CompanyUpdate")
-    public ResponseEntity<?> companyUpdate(@RequestBody CompanyDTO companyDTO){
+    @PutMapping(value = "CompanyUpdate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> companyUpdate(CompanyDTO companyDTO){
 
-
+        System.out.println("dfdf"+companyDTO);
         companyService.companyUpdate(companyDTO);
 
         return  new ResponseEntity<String>("데이터 갱신 성공", HttpStatus.OK);

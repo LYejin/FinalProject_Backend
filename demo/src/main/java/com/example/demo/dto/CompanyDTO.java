@@ -1,7 +1,10 @@
 package com.example.demo.dto;
 
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Data
 public class CompanyDTO {
@@ -30,5 +33,11 @@ public class CompanyDTO {
     //private MultipartFile PIC_FILE_ID; //byte처리 전 데이터
 
 
+    private List<String> columnsToUpdate;
 
+    public void setColumnsToUpdate(List<String> columnsToUpdate) {
+        this.columnsToUpdate = columnsToUpdate;
+    }
 }
+
+
