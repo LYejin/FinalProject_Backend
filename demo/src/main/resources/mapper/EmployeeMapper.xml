@@ -17,12 +17,28 @@
         SELECT
             EMP_CD,
             CO_CD,
+            DIV_CD,
             USER_YN,
+            USE_FG,
             USERNAME,
             PASSWORD,
             KOR_NM,
+            EMAIL_ADD,
+            TEL,
+            GENDER_FG,
             JOIN_DT,
-            RTR_DT
+            RTR_DT,
+            RSRG_ADD,
+            PIC_FILE_ID,
+            ENRL_FG,
+            PERSONAL_MAIL,
+            PERSONAL_MAIL_CP,
+            SALARY_MAIL,
+            SALARY_MAIL_CP,
+            HOME_TEL,
+            ZIPCODE,
+            ADDR,
+            ADDR_NUM
         FROM Employee
         <where>
             USER_YN = '1'
@@ -90,7 +106,7 @@
         #{GENDER_FG},
         #{JOIN_DT},
         '',
-        'jjj',
+        #{PIC_FILE_ID},
         '0',
         #{PERSONAL_MAIL},
         #{PERSONAL_MAIL_CP},
