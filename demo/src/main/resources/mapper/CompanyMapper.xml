@@ -28,34 +28,6 @@
     </insert>
 
 
-<!--    <update id="companyUpdate" parameterType="com.example.demo.dto.CompanyDTO">-->
-<!--        UPDATE Company-->
-<!--        <set>-->
-<!--            <foreach item="field" collection="fields" separator=",">-->
-<!--                <choose>-->
-<!--                    <when test="field.name != 'CO_CD' and field.value != null">-->
-<!--                        ${field.name} = #{field.value}-->
-<!--                    </when>-->
-<!--                </choose>-->
-<!--            </foreach>-->
-<!--        </set>-->
-<!--        WHERE CO_CD = #{CO_CD}-->
-<!--    </update>-->
-
-<!--    <update id="companyUpdate" parameterType="com.example.demo.dto.CompanyDTO">-->
-<!--        UPDATE Company-->
-<!--        <set>-->
-<!--            <foreach item="fieldName" index="index" collection="fields" separator=",">-->
-<!--                <choose>-->
-<!--                    <when test="fieldName != 'CO_CD' and fieldName != 'PPL_NB' and fieldName != 'CEO_TEL' and fieldName != 'CO_NB'">-->
-<!--                        ${fieldName} = #{${fieldName}}-->
-<!--                    </when>-->
-<!--                </choose>-->
-<!--            </foreach>-->
-<!--        </set>-->
-<!--        WHERE CO_CD = #{CO_CD}-->
-<!--    </update>-->
-
     <update id="companyUpdate" parameterType="com.example.demo.dto.CompanyDTO">
         UPDATE Company
         <set>
@@ -68,15 +40,26 @@
         WHERE CO_CD = #{CO_CD}
     </update>
 
-
-    <update id="companyRemove">
+    <update id="companyRemove" parameterType="string">
         UPDATE Company
-        SET USE_YN = "0"
+        SET USE_YN = '0'
         WHERE CO_CD = #{CO_CD}
+        AND USE_YN = '1'
+    </update>
+
+    <update id="workplaceRemove"  parameterType="string">
+        UPDATE Workplace
+        SET DIV_YN = '0'
+        WHERE CO_CD = #{CO_CD}
+        AND DIV_YN = '1'
+    </update>
+
+    <update id="employeeRemove"  parameterType="string">
+        UPDATE Employee
+        SET USER_YN = '0'
+        WHERE CO_CD = #{CO_CD}
+        AND USER_YN = '1'
     </update>
 
 
-
-
-    
 </mapper>

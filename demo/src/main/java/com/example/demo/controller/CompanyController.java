@@ -61,7 +61,8 @@ public class CompanyController {
 
     @PutMapping("CompanyRemove/{CO_CD}")
     public ResponseEntity<?> companyRemove(@PathVariable(value = "CO_CD") String CO_CD){
-
+        System.out.println("삭제:"+CO_CD);
+        companyService.companyRemove(CO_CD);
         return new ResponseEntity<String>("데이터 비활성화 성공", HttpStatus.OK);
 
     }

@@ -8,6 +8,7 @@ import com.example.demo.dto.UserDTO;
 import com.example.demo.dto.WorkplaceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -74,10 +75,13 @@ public class CompanyService {
     }
 
     //삭제
+    @Transactional
     public void companyRemove(String CO_CD){
 
         try {
             companyDao.companyRemove(CO_CD);
+            companyDao.workplaceRemove(CO_CD);
+            companyDao.employeeRemove(CO_CD);
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
