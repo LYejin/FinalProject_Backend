@@ -77,8 +77,16 @@ public class EmployeeController {
 
     // 특정 사원 데이터 정보 갱신
     @PostMapping("empUpdate")
-    public ResponseEntity<String> employeeUpdate(@RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<String> employeeUpdate(@RequestPart(value = "image", required=false) MultipartFile image, @RequestPart(value = "userData") EmployeeDTO employeeDTO) throws IOException {
         System.out.println("employeeUpdateController 출력");
+        String photoImg = null;
+        if (image != null) {
+            Base64.Encoder encoder = Base64.getEncoder();
+            byte[] photoEncode = encoder.encode(image.getBytes());
+            photoImg = new String(photoEncode, "UTF8");
+        }
+        System.out.println(photoImg);
+        employeeDTO.setPIC_FILE_ID(photoImg);
         employeeService.employeeUpdate(employeeDTO);
         return new ResponseEntity<>("입력완료", HttpStatus.OK);
     }
