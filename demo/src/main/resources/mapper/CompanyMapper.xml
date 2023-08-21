@@ -27,21 +27,39 @@
         )
     </insert>
 
+
     <update id="companyUpdate" parameterType="com.example.demo.dto.CompanyDTO">
         UPDATE Company
-        SET
+        <set>
+            <foreach collection="columnsToUpdate" item="column" separator=",">
+                <if test="column != 'CO_CD'"> <!-- Exclude CO_CD column -->
+                    ${column} = #{${column}}
+                </if>
+            </foreach>
+        </set>
         WHERE CO_CD = #{CO_CD}
     </update>
 
-
-    <update id="companyRemove">
+    <update id="companyRemove" parameterType="string">
         UPDATE Company
-        SET USE_YN = "0"
+        SET USE_YN = '0'
         WHERE CO_CD = #{CO_CD}
+        AND USE_YN = '1'
+    </update>
+
+    <update id="workplaceRemove"  parameterType="string">
+        UPDATE Workplace
+        SET DIV_YN = '0'
+        WHERE CO_CD = #{CO_CD}
+        AND DIV_YN = '1'
+    </update>
+
+    <update id="employeeRemove"  parameterType="string">
+        UPDATE Employee
+        SET USER_YN = '0'
+        WHERE CO_CD = #{CO_CD}
+        AND USER_YN = '1'
     </update>
 
 
-
-
-    
 </mapper>
