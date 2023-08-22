@@ -56,6 +56,13 @@
         </where>
     </select>
 
+    <!-- SelectBox 내 companyList   -->
+    <select id="companySearchList" parameterType="com.example.demo.dto.CompanyDTO" resultType="com.example.demo.dto.CompanyDTO">
+        SELECT CO_CD, USE_YN, CO_NM
+        FROM Company
+        WHERE USE_YN = 1
+    </select>
+
     <!-- 사원 상세 테이터 1건 출력 -->
     <select id="employeeDetail" parameterType="com.example.demo.dto.EmployeeDTO" resultType="com.example.demo.dto.EmployeeDTO">
         SELECT
@@ -123,7 +130,7 @@
     <!-- 특정 사원 데이터 비 활성화 -->
     <update id="employeeRemove" parameterType="com.example.demo.dto.EmployeeDTO">
         UPDATE Employee
-             SET USER_YN = '0'
+             SET USER_YN = '0', USE_FG = '0', ENRL_FG = '2'
         WHERE
             KOR_NM = #{KOR_NM}
             AND USERNAME = #{USERNAME}

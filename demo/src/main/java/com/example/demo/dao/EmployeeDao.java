@@ -1,5 +1,6 @@
 package com.example.demo.dao;
 
+import com.example.demo.dto.CompanyDTO;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.UserDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -27,4 +28,6 @@ public interface EmployeeDao {
     //특정 사원 데이터 정보 갱신
     public int employeeUpdate(EmployeeDTO employeeDTO);
 
+    // 회사 리스트
+    List<CompanyDTO> companySearchList();
 }

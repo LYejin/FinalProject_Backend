@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.dto.CompanyDTO;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,14 @@ public class EmployeeController {
         System.out.println("리스트 출력");
         List<EmployeeDTO> employeeList = employeeService.employeeSearchList(employeeDTO);
         return new ResponseEntity<>(employeeList, HttpStatus.OK);
+    }
+
+    // 전체 사원 리스트 출력 및 검색 결과 출력
+    @GetMapping("getCompanyList")
+    public ResponseEntity<List<CompanyDTO>> employeeSearchList() {
+        System.out.println("리스트 출력");
+        List<CompanyDTO> companyList = employeeService.companySearchList();
+        return new ResponseEntity<>(companyList, HttpStatus.OK);
     }
 
     // 사원 상세 테이터 1건 출력
@@ -86,6 +95,7 @@ public class EmployeeController {
             photoImg = new String(photoEncode, "UTF8");
         }
         System.out.println(photoImg);
+        System.out.println(employeeDTO);
         employeeDTO.setPIC_FILE_ID(photoImg);
         employeeService.employeeUpdate(employeeDTO);
         return new ResponseEntity<>("입력완료", HttpStatus.OK);

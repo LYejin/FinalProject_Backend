@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dao.EmployeeDao;
+import com.example.demo.dto.CompanyDTO;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +55,15 @@ public class EmployeeService {
         System.out.println("employeeSearchListService 실행");
         System.out.println(employeeDTO.getUSERNAME());
         List<EmployeeDTO> employeeList = employeeDao.employeeSearchList(employeeDTO);
-        System.out.println(employeeList);
+        //System.out.println(employeeList);
         return employeeList;
+    }
+
+    //회사 리스트 출력
+    public List<CompanyDTO> companySearchList() {
+        System.out.println("employeeSearchListService 실행");
+        List<CompanyDTO> companyList = employeeDao.companySearchList();
+        return companyList;
     }
 
     //사원 상세 테이터 1건 출력
@@ -83,6 +91,7 @@ public class EmployeeService {
     //특정 사원 데이터 정보 갱신
     public void employeeUpdate(EmployeeDTO employeeDTO) {
         System.out.println("employeeUpdate 실행");
+        System.out.println("service"+ employeeDTO);
         int row = employeeDao.employeeUpdate(employeeDTO);
         System.out.println("입력된 행 " + row);
     }
