@@ -3,18 +3,22 @@ package com.example.demo.dao;
 import com.example.demo.dto.CompanyDTO;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.UserDTO;
+import com.example.demo.dto.WorkplaceDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface EmployeeDao {
 
     public UserDTO userSelect(String userName);
-    public void employeesave(EmployeeDTO employeeDTO);
 
     //사원 리스트 출력
-    public List<EmployeeDTO> employeeSearchList(EmployeeDTO employee);
+    public List<EmployeeDTO> employeeSearchList(Map<String,Object> map);
+
+    //사업장 목록 가져오기
+    public List<WorkplaceDTO> selectWorkplaceSearch(String CO_CD);
 
     //사원 상세 테이터 1건 출력
     public EmployeeDTO employeeDetail(EmployeeDTO employeeDTO);

@@ -4,10 +4,12 @@ import com.example.demo.dao.EmployeeDao;
 import com.example.demo.dto.CompanyDTO;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.UserDTO;
+import com.example.demo.dto.WorkplaceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmployeeService {
@@ -21,47 +23,28 @@ public class EmployeeService {
         //사용자 계정 정보 확인
         UserDTO loginUserDTO = employeeDao.userSelect(username);
         //loginUserDTO.setPASSWORD(this.bCryptPasswordEncoder.encode(loginUserDTO.getPASSWORD()));
-
-
         return loginUserDTO;
-    }
-    //검색
-    public List<EmployeeDTO> select(){
-        return null;
-    }
-
-    //추가
-    public void save(EmployeeDTO employeeDTO){
-
-        try{
-            employeeDao.employeesave(employeeDTO);
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-    }
-
-    //갱신
-    public void update(){
-
-    }
-
-    //삭제
-    public void delete(){
-
     }
 
     //사원 리스트 출력
-    public List<EmployeeDTO> employeeSearchList(EmployeeDTO employeeDTO) {
+    public List<EmployeeDTO> employeeSearchList(Map<String, Object> map) {
         System.out.println("employeeSearchListService 실행");
-        System.out.println(employeeDTO.getUSERNAME());
-        List<EmployeeDTO> employeeList = employeeDao.employeeSearchList(employeeDTO);
-        //System.out.println(employeeList);
+        List<EmployeeDTO> employeeList = employeeDao.employeeSearchList(map);
+        System.out.println(employeeList);
         return employeeList;
+    }
+
+    //사업장 리스트 출력
+    public List<WorkplaceDTO> selectWorkplaceSearch(String CO_CD) {
+        System.out.println("selectWorkplaceSearchService 실행");
+        List<WorkplaceDTO> workplaceList = employeeDao.selectWorkplaceSearch(CO_CD);
+        System.out.println(workplaceList);
+        return workplaceList;
     }
 
     //회사 리스트 출력
     public List<CompanyDTO> companySearchList() {
-        System.out.println("employeeSearchListService 실행");
+        System.out.println("companySearchListService 실행");
         List<CompanyDTO> companyList = employeeDao.companySearchList();
         return companyList;
     }
@@ -70,7 +53,6 @@ public class EmployeeService {
     public EmployeeDTO employeeDetail(EmployeeDTO employeeDTO) {
         System.out.println("employeeDetailService");
         EmployeeDTO employeeInfo = employeeDao.employeeDetail(employeeDTO);
-        System.out.println(employeeInfo);
         return employeeInfo;
     }
 

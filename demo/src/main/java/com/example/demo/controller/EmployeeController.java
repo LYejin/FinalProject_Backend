@@ -3,6 +3,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.CompanyDTO;
 import com.example.demo.dto.EmployeeDTO;
+import com.example.demo.dto.WorkplaceDTO;
 import com.example.demo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,8 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("system/user/groupManage/employee")
@@ -24,24 +24,80 @@ public class EmployeeController {
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
-    // 회원가입 추후 삭제 예정
-    @PostMapping ("join")
-    public ResponseEntity<?> join(@RequestBody EmployeeDTO employeeDTO) {
-        System.out.println("회원가입");
-        employeeDTO.setPASSWORD("aaa");
-        employeeDTO.setPASSWORD(bCryptPasswordEncoder.encode(employeeDTO.getPASSWORD()));
-        //사용자 권한 데이를 세팅
-        employeeService.save(employeeDTO);
-        return new ResponseEntity<>("회원가입완료", HttpStatus.OK);
-    }
+//    // 전체 사원 리스트 출력 및 검색 결과 출력
+//    @PostMapping("getList")
+//    public ResponseEntity<List<EmployeeDTO>> employeeSearchList(@RequestBody EmployeeSearchDTO employeeSearchDTO) {
+//        System.out.println("리스트 출력");
+//        System.out.println(employeeSearchDTO);
+//        String[] enrlList = new String[employeeSearchDTO.getENRL_FG().length + 1];
+//        if (employeeSearchDTO.getENRL_FG() != null) {
+//            System.out.println("ernlList " + enrlList);
+//            for (String enrl : Arrays.asList(employeeSearchDTO.getENRL_FG())) {
+//                if (enrl == "재직") {
+//                    enrlList[enrlList.length] = "0";
+//                } else if (enrl == "휴직") {
+//                    enrlList[enrlList.length] = "1";
+//                } else if (enrl == "퇴직") {
+//                    enrlList[enrlList.length] = "2";
+//                }
+//            }
+//        }
+//        System.out.println("eeeeeeeeeee" + enrlList);
+//        employeeSearchDTO.setENRL_FG(enrlList);
+//        List<EmployeeDTO> employeeList = employeeService.employeeSearchList(employeeSearchDTO);
+//        return new ResponseEntity<>(employeeList, HttpStatus.OK);
+//    }
 
     // 전체 사원 리스트 출력 및 검색 결과 출력
-    @PostMapping("getList")
-    public ResponseEntity<List<EmployeeDTO>> employeeSearchList(@RequestBody EmployeeDTO employeeDTO) {
+    @GetMapping("getList")
+    public ResponseEntity<List<EmployeeDTO>> employeeSearchList(
+            @RequestParam(name = "CO_CD", required = false) String CO_CD,
+            @RequestParam(name = "ENRL_FG", required = false) String[] ENRL_FG,
+            @RequestParam(name = "NAME", required = false) String NAME) {
         System.out.println("리스트 출력");
-        List<EmployeeDTO> employeeList = employeeService.employeeSearchList(employeeDTO);
+        Map<String,Object> map = new HashMap<>();
+        map.put("CO_CD",CO_CD);
+        map.put("NAME",NAME);
+       System.out.println("ENRL"+ ENRL_FG);
+        System.out.println("CO_CD"+ CO_CD);
+        System.out.println("NAME"+ NAME);
+        if (ENRL_FG != null) {
+            String[] enrlList = new String[ENRL_FG.length];
+            System.out.println("ernlList " + enrlList);
+            for (int i = 0; i < ENRL_FG.length; i++) {
+                String enrl = ENRL_FG[i];
+                System.out.println("eeeee"+ enrl);
+                if (enrl.equals("재직")) {
+                    enrlList[i] = "0";
+                } else if (enrl.equals("휴직")) {
+                    enrlList[i] = "1";
+                } else if (enrl.equals("퇴직")) {
+                    enrlList[i] = "2";
+                }
+            }
+            for (String enrl : enrlList) {
+                System.out.println("ERNNNNNNNNNN"+enrlList.toString());
+            }
+            map.put("ENRL_FG",enrlList);
+        } else {
+           map.put("ENRL_FG",ENRL_FG);
+        }
+
+        List<EmployeeDTO> employeeList = employeeService.employeeSearchList(map);
         return new ResponseEntity<>(employeeList, HttpStatus.OK);
     }
+
+
+    @GetMapping("getWorkplace")
+    //사업장 리스트 출력
+    public List<WorkplaceDTO> selectWorkplaceSearch(@RequestParam(value="CO_CD", required = false) String CO_CD) {
+        System.out.println("selectWorkplaceSearchController 실행");
+        System.out.println(CO_CD);
+        List<WorkplaceDTO> workplaceList = employeeService.selectWorkplaceSearch(CO_CD);
+        System.out.println(workplaceList);
+        return workplaceList;
+    }
+
 
     // 전체 사원 리스트 출력 및 검색 결과 출력
     @GetMapping("getCompanyList")
@@ -55,7 +111,6 @@ public class EmployeeController {
     @PostMapping("empDetail")
     public ResponseEntity<EmployeeDTO> employeeDetail(@RequestBody EmployeeDTO employeeDTO) {
         System.out.println("employeeDetail 출력");
-        System.out.println("employeeDTO : " + employeeDTO);
         EmployeeDTO employeeInfo = employeeService.employeeDetail(employeeDTO);
         return new ResponseEntity<>(employeeInfo, HttpStatus.OK);
     }
@@ -64,13 +119,17 @@ public class EmployeeController {
     @PostMapping("empInsert")
     @ResponseBody
     public ResponseEntity<String> employeeInsert(@RequestPart(value = "image", required=false) MultipartFile image, @RequestPart(value = "userData") EmployeeDTO employeeDTO) throws IOException {
-        System.out.println("employeeInsertController 출력");
+        System.out.println("employeeInsertController 출력"+employeeDTO);
         String photoImg = null;
         if (image != null) {
             Base64.Encoder encoder = Base64.getEncoder();
-            byte[] photoEncode = encoder.encode(image.getBytes());
-            photoImg = new String(photoEncode, "UTF8");
+            byte[] photoBytes = image.getBytes();
+            String base64Image = encoder.encodeToString(photoBytes);  // 이미지를 Base64로 인코딩
+            String mimeType = image.getContentType();  // 이미지의 MIME 타입 가져오기
+            String dataUri = "data:" + mimeType + ";base64," + base64Image;  // "data:" URI 스킴을 포함한 Base64 데이터 생성
+            photoImg = dataUri;
         }
+        System.out.println(photoImg);
         employeeDTO.setPIC_FILE_ID(photoImg);
         employeeService.employeeInsert(employeeDTO);
         return new ResponseEntity<>("입력완료", HttpStatus.OK);
@@ -91,8 +150,11 @@ public class EmployeeController {
         String photoImg = null;
         if (image != null) {
             Base64.Encoder encoder = Base64.getEncoder();
-            byte[] photoEncode = encoder.encode(image.getBytes());
-            photoImg = new String(photoEncode, "UTF8");
+            byte[] photoBytes = image.getBytes();
+            String base64Image = encoder.encodeToString(photoBytes);  // 이미지를 Base64로 인코딩
+            String mimeType = image.getContentType();  // 이미지의 MIME 타입 가져오기
+            String dataUri = "data:" + mimeType + ";base64," + base64Image;  // "data:" URI 스킴을 포함한 Base64 데이터 생성
+            photoImg = dataUri;
         }
         System.out.println(photoImg);
         System.out.println(employeeDTO);

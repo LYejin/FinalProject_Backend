@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.dao.EmployeeDao">
+
     <select id="userSelect" resultType="com.example.demo.dto.UserDTO">
         SELECT *
         FROM Employee_Roll
         WHERE USERNAME = #{username}
     </select>
 
-    <insert id="employeesave" parameterType="string">
-        INSERT INTO Employee (EMP_CD, CO_CD, DIV_CD, USER_YN, USE_FG, USERNAME, PASSWORD, KOR_NM, EMAL_ADD, TEL, GENDER_FG, JOIN_DT, RTR_DT, RSRG_ADD, PIC_FILE_ID)
-        VALUES ('E5', 'com1', 'DIV1', '1', '4', 'aaa', #{password}, 'John Doe', 'john@example.com', '123-456-7890', 'M', '20230801', NULL, '123 Main St, City', NULL)
-    </insert>
-
     <!-- EmployeeSearchList   -->
-    <select id="employeeSearchList" parameterType="com.example.demo.dto.EmployeeDTO" resultType="com.example.demo.dto.EmployeeDTO">
+    <select id="employeeSearchList" parameterType="hashmap" resultType="com.example.demo.dto.EmployeeDTO">
         SELECT
             EMP_CD,
             CO_CD,
@@ -41,20 +37,54 @@
             ADDR_NUM
         FROM Employee
         <where>
-            USER_YN = '1'
+            <choose>
+                <when test="ENRL_FG != null and ENRL_FG.length > 0">
+                    USER_YN IN (0,1)
+                </when>
+                <otherwise>
+                    USER_YN='1'
+                </otherwise>
+            </choose>
             <if test="CO_CD != null">
                 AND CO_CD = #{CO_CD}
             </if>
-            <if test="ENRL_FG != null">
-                AND ENRL_FG = #{ENRL_FG}
+            <if test="ENRL_FG != null and ENRL_FG.length > 0">
+                AND (
+                <foreach collection="ENRL_FG" item="enrlFg" separator="OR">
+                    ENRL_FG = #{enrlFg}
+                </foreach>
+                )
             </if>
-            <if test="KOR_NM != null or USERNAME != null or EMAIL_ADD != null">
-                AND (KOR_NM LIKE CONCAT('%', #{KOR_NM}, '%')
-                OR USERNAME LIKE CONCAT('%', #{USERNAME}, '%')
-                OR EMAIL_ADD LIKE CONCAT('%', #{EMAIL_ADD}, '%'))
+            <if test="NAME != null">
+                AND (USERNAME LIKE CONCAT('%', #{NAME}, '%')
+                OR KOR_NM LIKE CONCAT('%', #{NAME}, '%')
+                OR EMAIL_ADD LIKE CONCAT('%', #{NAME}, '%'))
             </if>
         </where>
     </select>
+
+    <!--사업장 전체목록 가져오기-->
+    <select id="selectWorkplaceSearch" resultType="com.example.demo.dto.WorkplaceDTO">
+        SELECT
+        DIV_CD,
+        CO_CD,
+        DIV_YN,
+        FILL_YN,
+        DIV_NM,
+        DIV_ADDR,
+        DIV_TEL,
+        REG_NB,
+        DIV_TO_CD,
+        DIV_NMK,
+        BUSINESS,
+        JONGMOK,
+        OPEN_DT,
+        CLOSE_DT,
+        MAS_NM
+        FROM Workplace
+        WHERE CO_CD = #{CO_CD}
+    </select>
+
 
     <!-- SelectBox 내 companyList   -->
     <select id="companySearchList" parameterType="com.example.demo.dto.CompanyDTO" resultType="com.example.demo.dto.CompanyDTO">
@@ -99,7 +129,7 @@
 
     <!-- 신규 사원 데이터 1건 입력 -->
     <insert id="employeeInsert" parameterType="com.example.demo.dto.EmployeeDTO" statementType="CALLABLE">
-    { CALL InsertEmployeeWithRollProcedure(
+    { CALL InsertEmployeeRollProcedure(
         #{EMP_CD},
         'com1',
         'DIV1',
@@ -132,8 +162,7 @@
         UPDATE Employee
              SET USER_YN = '0', USE_FG = '0', ENRL_FG = '2'
         WHERE
-            KOR_NM = #{KOR_NM}
-            AND USERNAME = #{USERNAME}
+            USERNAME = #{USERNAME}
     </update>
 
     <!-- 특정 사원 데이터 정보 갱신 -->
@@ -193,7 +222,6 @@
             </if>
         </set>
         WHERE
-            KOR_NM = #{KOR_NM}
-            AND USERNAME = #{USERNAME}
+            USERNAME = #{USERNAME}
     </update>
 </mapper>
