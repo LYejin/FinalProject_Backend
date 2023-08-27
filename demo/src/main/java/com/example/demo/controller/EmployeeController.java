@@ -24,49 +24,20 @@ public class EmployeeController {
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
-//    // 전체 사원 리스트 출력 및 검색 결과 출력
-//    @PostMapping("getList")
-//    public ResponseEntity<List<EmployeeDTO>> employeeSearchList(@RequestBody EmployeeSearchDTO employeeSearchDTO) {
-//        System.out.println("리스트 출력");
-//        System.out.println(employeeSearchDTO);
-//        String[] enrlList = new String[employeeSearchDTO.getENRL_FG().length + 1];
-//        if (employeeSearchDTO.getENRL_FG() != null) {
-//            System.out.println("ernlList " + enrlList);
-//            for (String enrl : Arrays.asList(employeeSearchDTO.getENRL_FG())) {
-//                if (enrl == "재직") {
-//                    enrlList[enrlList.length] = "0";
-//                } else if (enrl == "휴직") {
-//                    enrlList[enrlList.length] = "1";
-//                } else if (enrl == "퇴직") {
-//                    enrlList[enrlList.length] = "2";
-//                }
-//            }
-//        }
-//        System.out.println("eeeeeeeeeee" + enrlList);
-//        employeeSearchDTO.setENRL_FG(enrlList);
-//        List<EmployeeDTO> employeeList = employeeService.employeeSearchList(employeeSearchDTO);
-//        return new ResponseEntity<>(employeeList, HttpStatus.OK);
-//    }
-
     // 전체 사원 리스트 출력 및 검색 결과 출력
     @GetMapping("getList")
     public ResponseEntity<List<EmployeeDTO>> employeeSearchList(
             @RequestParam(name = "CO_CD", required = false) String CO_CD,
             @RequestParam(name = "ENRL_FG", required = false) String[] ENRL_FG,
             @RequestParam(name = "NAME", required = false) String NAME) {
-        System.out.println("리스트 출력");
+        System.out.println("사원 리스트 출력");
         Map<String,Object> map = new HashMap<>();
         map.put("CO_CD",CO_CD);
         map.put("NAME",NAME);
-       System.out.println("ENRL"+ ENRL_FG);
-        System.out.println("CO_CD"+ CO_CD);
-        System.out.println("NAME"+ NAME);
         if (ENRL_FG != null) {
             String[] enrlList = new String[ENRL_FG.length];
-            System.out.println("ernlList " + enrlList);
             for (int i = 0; i < ENRL_FG.length; i++) {
                 String enrl = ENRL_FG[i];
-                System.out.println("eeeee"+ enrl);
                 if (enrl.equals("재직")) {
                     enrlList[i] = "0";
                 } else if (enrl.equals("휴직")) {
@@ -74,9 +45,6 @@ public class EmployeeController {
                 } else if (enrl.equals("퇴직")) {
                     enrlList[i] = "2";
                 }
-            }
-            for (String enrl : enrlList) {
-                System.out.println("ERNNNNNNNNNN"+enrlList.toString());
             }
             map.put("ENRL_FG",enrlList);
         } else {
@@ -111,6 +79,7 @@ public class EmployeeController {
     @PostMapping("empDetail")
     public ResponseEntity<EmployeeDTO> employeeDetail(@RequestBody EmployeeDTO employeeDTO) {
         System.out.println("employeeDetail 출력");
+        System.out.println(employeeDTO);
         EmployeeDTO employeeInfo = employeeService.employeeDetail(employeeDTO);
         return new ResponseEntity<>(employeeInfo, HttpStatus.OK);
     }

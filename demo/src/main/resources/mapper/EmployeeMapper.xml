@@ -131,8 +131,8 @@
     <insert id="employeeInsert" parameterType="com.example.demo.dto.EmployeeDTO" statementType="CALLABLE">
     { CALL InsertEmployeeRollProcedure(
         #{EMP_CD},
-        'com1',
-        'DIV1',
+        #{CO_CD},
+        #{DIV_CD},
         '1',
         '1',
         #{USERNAME},
