@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("system/user/groupManage/employee")
@@ -31,9 +34,9 @@ public class EmployeeController {
             @RequestParam(name = "ENRL_FG", required = false) String[] ENRL_FG,
             @RequestParam(name = "NAME", required = false) String NAME) {
         System.out.println("사원 리스트 출력");
-        Map<String,Object> map = new HashMap<>();
-        map.put("CO_CD",CO_CD);
-        map.put("NAME",NAME);
+        Map<String, Object> map = new HashMap<>();
+        map.put("CO_CD", CO_CD);
+        map.put("NAME", NAME);
         if (ENRL_FG != null) {
             String[] enrlList = new String[ENRL_FG.length];
             for (int i = 0; i < ENRL_FG.length; i++) {
@@ -46,19 +49,20 @@ public class EmployeeController {
                     enrlList[i] = "2";
                 }
             }
-            map.put("ENRL_FG",enrlList);
+            map.put("ENRL_FG", enrlList);
         } else {
-           map.put("ENRL_FG",ENRL_FG);
+            map.put("ENRL_FG", ENRL_FG);
         }
 
         List<EmployeeDTO> employeeList = employeeService.employeeSearchList(map);
+        System.out.println("0000-=-=-=-=-=-=-" + employeeList);
         return new ResponseEntity<>(employeeList, HttpStatus.OK);
     }
 
 
     @GetMapping("getWorkplace")
     //사업장 리스트 출력
-    public List<WorkplaceDTO> selectWorkplaceSearch(@RequestParam(value="CO_CD", required = false) String CO_CD) {
+    public List<WorkplaceDTO> selectWorkplaceSearch(@RequestParam(value = "CO_CD", required = false) String CO_CD) {
         System.out.println("selectWorkplaceSearchController 실행");
         System.out.println(CO_CD);
         List<WorkplaceDTO> workplaceList = employeeService.selectWorkplaceSearch(CO_CD);
@@ -66,6 +70,40 @@ public class EmployeeController {
         return workplaceList;
     }
 
+    // 사업장별 사원 사번 존재 여부
+    @GetMapping("getEmpCDInWorkplace")
+    public ResponseEntity<Boolean> employeeEmpCDInWorkplace(
+            @RequestParam(name = "CO_CD") String CO_CD,
+            @RequestParam(name = "EMP_CD") String EMP_CD) {
+        System.out.println("사업장별 사원 사번 존재 여부 출력");
+        Map<String, String> map = new HashMap<>();
+        map.put("CO_CD", CO_CD);
+        map.put("EMP_CD", EMP_CD);
+
+        Boolean employeeEmpCD = employeeService.employeeEmpCDInWorkplace(map);
+        System.out.println("-------------------" + employeeEmpCD);
+        return new ResponseEntity<>(employeeEmpCD, HttpStatus.OK);
+    }
+
+    // 회사 내 사원 로그인ID 존재 여부
+    @GetMapping("getUsernameInCompany")
+    public ResponseEntity<Boolean> employeeUsernameInCompany(
+            @RequestParam(name = "USERNAME") String username) {
+        System.out.println("사업장별 사원 사번 존재 여부 출력");
+
+        Boolean employeeUsernameYN = employeeService.employeeUsernameInCompany(username);
+        return new ResponseEntity<>(employeeUsernameYN, HttpStatus.OK);
+    }
+
+    // 회사 내 EmailID 존재 여부
+    @GetMapping("getEmailInCompany")
+    public ResponseEntity<Boolean> employeeEmailInCompany(
+            @RequestParam(name = "EMAIL_ADD") String EmailID) {
+        System.out.println("사업장별 사원 사번 존재 여부 출력");
+
+        Boolean employeeEmailID = employeeService.employeeEmailInCompany(EmailID);
+        return new ResponseEntity<>(employeeEmailID, HttpStatus.OK);
+    }
 
     // 전체 사원 리스트 출력 및 검색 결과 출력
     @GetMapping("getCompanyList")
@@ -87,8 +125,13 @@ public class EmployeeController {
     // 신규 사원 데이터 1건 입력
     @PostMapping("empInsert")
     @ResponseBody
-    public ResponseEntity<String> employeeInsert(@RequestPart(value = "image", required=false) MultipartFile image, @RequestPart(value = "userData") EmployeeDTO employeeDTO) throws IOException {
-        System.out.println("employeeInsertController 출력"+employeeDTO);
+    public ResponseEntity<String> employeeInsert(@RequestPart(value = "image", required = false) MultipartFile image, @RequestPart(value = "userData") EmployeeDTO employeeDTO) throws IOException {
+        System.out.println("employeeInsertController 출력" + employeeDTO);
+
+        // 비밀번호 암호화 bCrypt
+        String password = bCryptPasswordEncoder.encode(employeeDTO.getPASSWORD());
+        employeeDTO.setPASSWORD(password);
+
         String photoImg = null;
         if (image != null) {
             Base64.Encoder encoder = Base64.getEncoder();
@@ -114,8 +157,15 @@ public class EmployeeController {
 
     // 특정 사원 데이터 정보 갱신
     @PostMapping("empUpdate")
-    public ResponseEntity<String> employeeUpdate(@RequestPart(value = "image", required=false) MultipartFile image, @RequestPart(value = "userData") EmployeeDTO employeeDTO) throws IOException {
+    public ResponseEntity<String> employeeUpdate(@RequestPart(value = "image", required = false) MultipartFile image, @RequestPart(value = "userData") EmployeeDTO employeeDTO) throws IOException {
         System.out.println("employeeUpdateController 출력");
+
+        if (employeeDTO.getPASSWORD() != null) {
+            // 비밀번호 암호화 bCrypt
+            String password = bCryptPasswordEncoder.encode(employeeDTO.getPASSWORD());
+            employeeDTO.setPASSWORD(password);
+        }
+
         String photoImg = null;
         if (image != null) {
             Base64.Encoder encoder = Base64.getEncoder();

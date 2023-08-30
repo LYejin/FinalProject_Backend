@@ -34,4 +34,12 @@ public interface EmployeeDao {
 
     // 회사 리스트
     List<CompanyDTO> companySearchList();
+
+    void employeeRollUpdate(EmployeeDTO employeeDTO);
+
+    String employeeEmpCDInWorkplace(Map<String, String> map);
+
+    String employeeUsernameInCompany(String username);
+
+    String employeeEmailInCompany(String emailID);
 }

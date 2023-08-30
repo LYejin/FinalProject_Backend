@@ -18,7 +18,6 @@ public class EmployeeService {
     @Autowired
     private EmployeeDao employeeDao;
 
-
     public UserDTO findByUsername(String username) {
         //사용자 계정 정보 확인
         UserDTO loginUserDTO = employeeDao.userSelect(username);
@@ -56,6 +55,39 @@ public class EmployeeService {
         return employeeInfo;
     }
 
+    // 사업장별 사원 사번 존재 여부
+    public Boolean employeeEmpCDInWorkplace(Map<String, String> map) {
+        System.out.println("employeeEmpCDInWorkplaceService");
+        String employeeEmpCD = employeeDao.employeeEmpCDInWorkplace(map);
+        if (employeeEmpCD != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // 회사내 사원 로그인ID 존재 여부
+    public Boolean employeeUsernameInCompany(String username) {
+        System.out.println("employeeUsernameInCompanyService");
+        String employeeUsername = employeeDao.employeeUsernameInCompany(username);
+        if (employeeUsername != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // 회사내 EmailID 존재 여부
+    public Boolean employeeEmailInCompany(String EmailID) {
+        System.out.println("employeeEmailInCompanyService");
+        String employeeEmailID = employeeDao.employeeEmailInCompany(EmailID);
+        if (employeeEmailID != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     //신규 사원 데이터 1건 입력
     public void employeeInsert(EmployeeDTO employeeDTO) {
         System.out.println("employeeInsertService 실행");
@@ -76,5 +108,8 @@ public class EmployeeService {
         System.out.println("service"+ employeeDTO);
         int row = employeeDao.employeeUpdate(employeeDTO);
         System.out.println("입력된 행 " + row);
+        if (employeeDTO.getPASSWORD() != null) {
+            employeeDao.employeeRollUpdate(employeeDTO);
+        }
     }
 }

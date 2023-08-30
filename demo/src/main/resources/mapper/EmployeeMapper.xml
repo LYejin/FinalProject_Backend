@@ -127,6 +127,30 @@
             AND USERNAME = #{USERNAME}
     </select>
 
+    <!-- 사업장별 사번 유효성 검사 -->
+    <select id="employeeEmpCDInWorkplace" parameterType="hashmap" resultType="String">
+        SELECT
+            EMP_CD
+        FROM Employee
+        WHERE CO_CD = #{CO_CD} AND EMP_CD=#{EMP_CD}
+    </select>
+
+    <!-- 로그인ID 회사 전체 내 유효성 검사 -->
+    <select id="employeeUsernameInCompany" resultType="String">
+        SELECT
+            USERNAME
+        FROM Employee
+        WHERE USERNAME=#{USERNAME}
+    </select>
+
+    <!-- 메일ID 회사 전체 내 유효성 검사 -->
+    <select id="employeeEmailInCompany" resultType="String">
+        SELECT
+         EMAIL_ADD
+        FROM Employee
+        WHERE EMAIL_ADD=#{EMAIL_ADD}
+    </select>
+
     <!-- 신규 사원 데이터 1건 입력 -->
     <insert id="employeeInsert" parameterType="com.example.demo.dto.EmployeeDTO" statementType="CALLABLE">
     { CALL InsertEmployeeRollProcedure(
@@ -144,7 +168,7 @@
         #{JOIN_DT},
         '',
         #{PIC_FILE_ID},
-        '0',
+        #{ENRL_FG},
         #{PERSONAL_MAIL},
         #{PERSONAL_MAIL_CP},
         #{SALARY_MAIL},
@@ -169,6 +193,9 @@
     <update id="employeeUpdate" parameterType="com.example.demo.dto.EmployeeDTO">
         UPDATE Employee
         <set>
+            <if test="DIV_CD != null">
+                DIV_CD = #{DIV_CD},
+            </if>
             <if test="PASSWORD != null">
                 PASSWORD = #{PASSWORD},
             </if>
@@ -223,5 +250,13 @@
         </set>
         WHERE
             USERNAME = #{USERNAME}
+    </update>
+
+
+    <!-- 비밀번호 업데이트 시 권한 정보 갱신 -->
+    <update id="employeeRollUpdate" parameterType="com.example.demo.dto.EmployeeDTO">
+        UPDATE Employee_Roll
+        set PASSWORD=#{PASSWORD}
+        WHERE USERNAME = #{USERNAME}
     </update>
 </mapper>
