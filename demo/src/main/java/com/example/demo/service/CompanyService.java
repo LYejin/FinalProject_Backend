@@ -6,6 +6,7 @@ import com.example.demo.dto.CompanyDTO;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.dto.WorkplaceDTO;
+import com.example.demo.util.AESUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,21 +23,37 @@ public class CompanyService {
     private CompanyDao companyDao;
 
     //검색
-    public List<CompanyDTO> companySelectAll(){
+    public List<CompanyDTO> companySelect(CompanyDTO companyDTO){
         List<CompanyDTO> companyDTOS = null;
         try {
-            companyDTOS = companyDao.companySelectAll();
+            System.out.println("검색된 데이터"+ companyDTO.getColumnsToUpdate());
+
+            findByInputColumns(companyDTO);
+            companyDTOS = companyDao.companySelect(companyDTO);
+            System.out.println(companyDTO);
+
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
-
         return companyDTOS;
+    }
+
+    public String companyNameSelect(String CO_CD){
+        String CO_NM = null;
+        try {
+            CO_NM = companyDao.companyNameSelect(CO_CD);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return  CO_NM;
     }
 
     public  CompanyDTO companyDetail(String co_CD){
         CompanyDTO companyDTO = null;
         try {
             companyDTO = companyDao.companyDetail(co_CD);
+            System.out.println(companyDTO);
+            companyDTO.setPPL_NB(AESUtil.decrypt(companyDTO.getPPL_NB()));
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -46,17 +63,18 @@ public class CompanyService {
 
     //추가
     public void companyInsert(CompanyDTO companyDTO){
+        System.out.println("시잔"+(companyDTO.getPIC_FILE_ID() != ""));
 
-        int index = companyDTO.getPIC_FILE_ID().indexOf("data");
-        String data = companyDTO.getPIC_FILE_ID().substring(index);
-
-        if(index != -1){
-            companyDTO.setPIC_FILE_ID(data);
+        if(!companyDTO.getPIC_FILE_ID().isEmpty()) {
+            int index = companyDTO.getPIC_FILE_ID().indexOf("data");
+            String data = companyDTO.getPIC_FILE_ID().substring(index);
+                companyDTO.setPIC_FILE_ID(data);
+                System.out.println(index+"이미지확인"+data);
         }
 
-        System.out.println(index+"이미지확인"+data);
-
         try {
+            findByInputColumns(companyDTO);
+            companyDTO.setPPL_NB(AESUtil.encrypt(companyDTO.getPPL_NB()));
             companyDao.companyInsert(companyDTO);
         }catch (Exception e){
             System.out.println(e.getMessage());
@@ -67,11 +85,17 @@ public class CompanyService {
     public void companyUpdate(CompanyDTO companyDTO){
 
         try {
+            if(companyDTO.getPPL_NB() != null){
+                companyDTO.setPPL_NB(AESUtil.encrypt(companyDTO.getPPL_NB()));
+                System.out.println("업데이트!!!"+AESUtil.encrypt(companyDTO.getPPL_NB()));
+            }
             findByInputColumns(companyDTO);  //데이터 입력된 필드 확인해주는 함수
+            System.out.println(companyDTO.getColumnsToUpdate());
             companyDao.companyUpdate(companyDTO);
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
+        System.out.println("[][][][][][][][][탔냐?0");
     }
 
     //삭제
@@ -86,6 +110,31 @@ public class CompanyService {
             System.out.println(e.getMessage());
         }
 
+    }
+    public String companyDup(CompanyDTO companyDTO) {
+        String dup= null;
+
+        try {
+            if(companyDTO.getPPL_NB() != null){
+                companyDTO.setPPL_NB(AESUtil.encrypt(companyDTO.getPPL_NB()));
+            }
+
+            findByInputColumns(companyDTO);
+            dup = companyDao.companyDup(companyDTO);
+
+            if(dup.contains("==")){
+                dup = AESUtil.decrypt(dup);
+            }
+
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+        if(dup != null){
+            return dup;
+        }else{
+            return null;
+        }
     }
 
 
