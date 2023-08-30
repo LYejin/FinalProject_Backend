@@ -2,10 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.dao.CompanyDao">
 
-    <select id="companySelectAll" resultType="com.example.demo.dto.CompanyDTO">
+    <select id="companySelect"  parameterType="com.example.demo.dto.CompanyDTO" resultType="com.example.demo.dto.CompanyDTO">
         SELECT CO_CD, CO_NM, CO_FG, CEO_NM
         FROM Company
-        WHERE USE_YN = 1;
+        <where>
+            <foreach collection="columnsToUpdate" item="column" separator="AND">
+                ${column} LIKE CONCAT('%', #{${column}}, '%')
+            </foreach>
+        </where>
+    </select>
+
+    <select id="companyNameSelect"  resultType="String">
+        SELECT CO_NM
+        FROM Company
+        WHERE CO_CD = #{CO_CD}
     </select>
 
     <select id="companyDetail"  parameterType="String" resultType="com.example.demo.dto.CompanyDTO">
@@ -15,33 +25,75 @@
     </select>
 
     <insert id="companyInsert" parameterType="com.example.demo.dto.CompanyDTO">
+<!--        INSERT INTO Company (-->
+<!--            CO_CD, USE_YN, CO_NM, CO_NMK, BUSINESS, JONGMOK, REG_NB,-->
+<!--            CEO_NM, HO_FAX, CEO_TEL, PPL_NB, HO_ZIP, HO_ADDR, HO_ADDR1,-->
+<!--            CO_FG, CO_NB, EST_DT, OPEN_DT, CLOSE_DT, PIC_FILE_ID, ACCT_FG-->
+<!--        )-->
+<!--        VALUES (-->
+<!--            #{CO_CD}, #{USE_YN}, #{CO_NM}, #{CO_NMK}, #{BUSINESS}, #{JONGMOK}, #{REG_NB},-->
+<!--            #{CEO_NM}, #{HO_FAX}, #{CEO_TEL}, #{PPL_NB}, #{HO_ZIP}, #{HO_ADDR}, #{HO_ADDR1},-->
+<!--            #{CO_FG}, #{CO_NB}, #{EST_DT}, #{OPEN_DT}, #{CLOSE_DT}, #{PIC_FILE_ID}, #{ACCT_FG}-->
+<!--        )-->
         INSERT INTO Company (
-            CO_CD, USE_YN, CO_NM, CO_NMK, BUSINESS, JONGMOK, REG_NB,
-            CEO_NM, HO_FAX, CEO_TEL, PPL_NB, HO_ZIP, HO_ADDR, HO_ADDR1,
-            CO_FG, CO_NB, EST_DT, OPEN_DT, CLOSE_DT, PIC_FILE_ID, ACCT_FG
+        <foreach collection="columnsToUpdate" item="column" separator=",">
+            ${column}
+        </foreach>
         )
         VALUES (
-            #{CO_CD}, #{USE_YN}, #{CO_NM}, #{CO_NMK}, #{BUSINESS}, #{JONGMOK}, #{REG_NB},
-            #{CEO_NM}, #{HO_FAX}, #{CEO_TEL}, #{PPL_NB}, #{HO_ZIP}, #{HO_ADDR}, #{HO_ADDR1},
-            #{CO_FG}, #{CO_NB}, #{EST_DT}, #{OPEN_DT}, #{CLOSE_DT}, #{PIC_FILE_ID}, #{ACCT_FG}
+        <foreach collection="columnsToUpdate" item="column" separator=",">
+            #{${column}}
+        </foreach>
         )
     </insert>
 
     <update id="companyUpdate" parameterType="com.example.demo.dto.CompanyDTO">
         UPDATE Company
-        SET
+        <set>
+            <foreach collection="columnsToUpdate" item="column" separator=",">
+                <if test="column != 'CO_CD'"> <!-- Exclude CO_CD column -->
+                    ${column} = #{${column}}
+                </if>
+            </foreach>
+        </set>
         WHERE CO_CD = #{CO_CD}
     </update>
 
-
-    <update id="companyRemove">
+    <update id="companyRemove" parameterType="string">
         UPDATE Company
-        SET USE_YN = "0"
+        SET USE_YN = '0'
         WHERE CO_CD = #{CO_CD}
+        AND USE_YN = '1'
     </update>
 
+    <update id="workplaceRemove"  parameterType="string">
+        UPDATE Workplace
+        SET DIV_YN = '0'
+        WHERE CO_CD = #{CO_CD}
+        AND DIV_YN = '1'
+    </update>
+
+    <update id="employeeRemove"  parameterType="string">
+        UPDATE Employee
+        SET USER_YN = '0'
+        WHERE CO_CD = #{CO_CD}
+        AND USER_YN = '1'
+    </update>
+
+    <select id="companyDup"  parameterType="com.example.demo.dto.CompanyDTO" resultType="String">
+        SELECT
+        <foreach collection="columnsToUpdate" item="column" separator=",">
+            ${column}
+        </foreach>
+        FROM Company
+        <where>
+            <foreach collection="columnsToUpdate" item="column" separator=",">
+                    ${column} = #{${column}}
+            </foreach>
+        </where>
+    </select>
 
 
 
-    
+
 </mapper>
