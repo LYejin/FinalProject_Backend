@@ -12,7 +12,8 @@ import java.util.List;
 public interface CompanyDao {
 
     //전체 회사 리스트 출력
-    public List<CompanyDTO> companySelectAll();
+    public List<CompanyDTO> companySelect(CompanyDTO companyDTO);
+    public String companyNameSelect(String CO_CD);
 
     //회사 상세 테이터 1건 출력
     public CompanyDTO companyDetail(String co_CD);
@@ -27,4 +28,8 @@ public interface CompanyDao {
 
     //특정 회사 데이터 정보 갱신
     public void companyUpdate(CompanyDTO companyDTO);
+
+    public String companyDup(CompanyDTO companyDTO);
+
+    public List<CompanyDTO> CompanySearch(CompanyDTO companyDTO);
 }

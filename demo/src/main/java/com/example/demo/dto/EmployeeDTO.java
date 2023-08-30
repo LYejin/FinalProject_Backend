@@ -19,7 +19,7 @@ public class EmployeeDTO {
     private String JOIN_DT; // 입사일
     private String RTR_DT; // 퇴사일
     private String RSRG_ADD; // 주소지
-    private byte[] PIC_FILE_ID; // 사진파일명
+    private String PIC_FILE_ID; // 사진파일명
     private String ENRL_FG; // 재직구분
     private String PERSONAL_MAIL; // 개인메일ID
     private String PERSONAL_MAIL_CP; // 개인메일회사
@@ -29,4 +29,5 @@ public class EmployeeDTO {
     private String ZIPCODE; // 우편번호
     private String ADDR; // 주소
     private String ADDR_NUM; // 번지
+    private String ROLE_NAME = "ROLE_USER";
 }
