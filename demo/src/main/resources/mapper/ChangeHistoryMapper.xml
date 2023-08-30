@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.ChangeHistoryDao">
+
+    <insert id="changeHistoryInset" parameterType="com.example.demo.dto.ChangeHistoryDTO">
+        INSERT INTO Change_History (
+            EMP_CD, CH_CATEGORY, CH_DT, CH_DIVISION,
+            CH_IM, CU_NM, CU_IP, DIV_NM, CO_NM
+        )
+        VALUES (
+            #{EMP_CD}, #{CH_CATEGORY}, #{CH_DT}, #{CH_DIVISION},
+            #{CH_IM}, #{CU_NM}, #{CU_IP}, #{DIV_NM}, #{CO_NM}
+        )
+    </insert>
+
+    <select id="getEMP_CDAndDIV_NM" resultType="java.util.HashMap">
+        SELECT
+            e.EMP_CD,
+            w.DIV_NM
+        FROM
+            Employee e
+        JOIN
+            Workplace w ON e.CO_CD = w.CO_CD AND e.DIV_CD = w.DIV_CD
+        WHERE
+           e.USERNAME = #{USERNAME}
+    </select>
+
+
+</mapper>
