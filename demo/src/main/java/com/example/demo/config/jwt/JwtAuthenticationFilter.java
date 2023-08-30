@@ -1,9 +1,16 @@
 package com.example.demo.config.jwt;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Date;
-import java.util.Map;
+import com.example.demo.config.auto.PrincipalDetails;
+import com.example.demo.dto.LoginRequestDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
@@ -11,27 +18,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.catalina.startup.UserDatabase;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import com.example.demo.config.auto.PrincipalDetails;
-import com.example.demo.config.auto.PrincipalDetailsService;
-
-import com.example.demo.dto.LoginRequestDto;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.Map;
 
 //JwtAuthenticationFilter에 대한 생성자 함수를 만들어서 
 //final로 멤버 필드로 정의된 AuthenticationManager객체의 자동 생성할 수 있게 하는것
