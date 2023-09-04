@@ -55,8 +55,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-
-
         String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
         System.out.println("dfsfdsf"+token);
 
@@ -75,6 +73,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
             if (jwtAccessTokenIsExpired(token)) {
                 handleExpiredAccessToken(request, response);
+                return;
             } else {
                 processValidAccessToken(username);
             }
