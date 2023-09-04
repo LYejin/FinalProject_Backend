@@ -13,7 +13,6 @@ public interface CompanyDao {
 
     //전체 회사 리스트 출력
     public List<CompanyDTO> companySelect(CompanyDTO companyDTO);
-    public String companyNameSelect(String CO_CD);
 
     //회사 상세 테이터 1건 출력
     public CompanyDTO companyDetail(String co_CD);

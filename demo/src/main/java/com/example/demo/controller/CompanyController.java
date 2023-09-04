@@ -37,7 +37,7 @@ public class CompanyController {
 
     @GetMapping("CompanyDetail/{co_CD}")
     public ResponseEntity<?> companyDetail(@PathVariable String co_CD){
-        System.out.println(co_CD);
+
         CompanyDTO companyDTO = companyService.companyDetail(co_CD);
         //System.out.println("상세"+companyDTO);
 
