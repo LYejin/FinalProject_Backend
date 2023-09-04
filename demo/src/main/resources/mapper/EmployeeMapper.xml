@@ -123,7 +123,6 @@
         FROM Employee
         WHERE
             USER_YN = '1'
-            AND KOR_NM = #{KOR_NM}
             AND USERNAME = #{USERNAME}
     </select>
 
