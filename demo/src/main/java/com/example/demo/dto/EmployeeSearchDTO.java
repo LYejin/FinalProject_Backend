@@ -1,10 +1,9 @@
 package com.example.demo.dto;
 
-
 import lombok.Data;
 
 @Data
-public class EmployeeDTO {
+public class EmployeeSearchDTO {
     private String EMP_CD; // 사원계정
     private String CO_CD; // 회사코드
     private String DIV_CD; // 사업장코드
@@ -20,7 +19,7 @@ public class EmployeeDTO {
     private String RTR_DT; // 퇴사일
     private String RSRG_ADD; // 주소지
     private String PIC_FILE_ID; // 사진파일명
-    private String ENRL_FG; // 재직구분
+    private String[] ENRL_FG; // 재직구분
     private String PERSONAL_MAIL; // 개인메일ID
     private String PERSONAL_MAIL_CP; // 개인메일회사
     private String SALARY_MAIL; // 급여메일ID

@@ -4,6 +4,7 @@ import com.example.demo.dto.CompanyDTO;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.UserDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
 public interface CompanyDao {
 
     //전체 회사 리스트 출력
-    public List<CompanyDTO> companySelectAll();
+    public List<CompanyDTO> companySelect(CompanyDTO companyDTO);
 
     //회사 상세 테이터 1건 출력
     public CompanyDTO companyDetail(String co_CD);
@@ -21,7 +22,13 @@ public interface CompanyDao {
 
     //특정 회사 데이터 비 활성화
     public void companyRemove(String CO_CD);
+    public void workplaceRemove(String CO_CD);
+    public void employeeRemove(String CO_CD);
 
     //특정 회사 데이터 정보 갱신
     public void companyUpdate(CompanyDTO companyDTO);
+
+    public String companyDup(CompanyDTO companyDTO);
+
+    public List<CompanyDTO> CompanySearch(CompanyDTO companyDTO);
 }

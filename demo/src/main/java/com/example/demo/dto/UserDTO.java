@@ -13,6 +13,8 @@ public class UserDTO {
     private String EMP_CD; //사원코드
     private String USERNAME; //계정 ID
     private String PASSWORD; //계정 비번
+    private String DIV_CD; //
+    private String CO_CD;
 
 
     public List<String> getRoleList() {

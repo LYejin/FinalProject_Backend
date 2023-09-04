@@ -1,43 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.dao.EmployeeDao">
+
     <select id="userSelect" resultType="com.example.demo.dto.UserDTO">
         SELECT *
         FROM Employee_Roll
         WHERE USERNAME = #{username}
     </select>
 
-    <insert id="employeesave" parameterType="string">
-        INSERT INTO Employee (EMP_CD, CO_CD, DIV_CD, USER_YN, USE_FG, USERNAME, PASSWORD, KOR_NM, EMAL_ADD, TEL, GENDER_FG, JOIN_DT, RTR_DT, RSRG_ADD, PIC_FILE_ID)
-        VALUES ('E5', 'com1', 'DIV1', '1', '4', 'aaa', #{password}, 'John Doe', 'john@example.com', '123-456-7890', 'M', '20230801', NULL, '123 Main St, City', NULL)
-    </insert>
-
     <!-- EmployeeSearchList   -->
-    <select id="employeeSearchList" parameterType="com.example.demo.dto.EmployeeDTO" resultType="com.example.demo.dto.EmployeeDTO">
+    <select id="employeeSearchList" parameterType="hashmap" resultType="com.example.demo.dto.EmployeeDTO">
         SELECT
             EMP_CD,
             CO_CD,
+            DIV_CD,
             USER_YN,
+            USE_FG,
             USERNAME,
             PASSWORD,
             KOR_NM,
+            EMAIL_ADD,
+            TEL,
+            GENDER_FG,
             JOIN_DT,
-            RTR_DT
+            RTR_DT,
+            RSRG_ADD,
+            PIC_FILE_ID,
+            ENRL_FG,
+            PERSONAL_MAIL,
+            PERSONAL_MAIL_CP,
+            SALARY_MAIL,
+            SALARY_MAIL_CP,
+            HOME_TEL,
+            ZIPCODE,
+            ADDR,
+            ADDR_NUM
         FROM Employee
         <where>
-            USER_YN = '1'
+            <choose>
+                <when test="ENRL_FG != null and ENRL_FG.length > 0">
+                    USER_YN IN (0,1)
+                </when>
+                <otherwise>
+                    USER_YN='1'
+                </otherwise>
+            </choose>
             <if test="CO_CD != null">
                 AND CO_CD = #{CO_CD}
             </if>
-            <if test="ENRL_FG != null">
-                AND ENRL_FG = #{ENRL_FG}
+            <if test="ENRL_FG != null and ENRL_FG.length > 0">
+                AND (
+                <foreach collection="ENRL_FG" item="enrlFg" separator="OR">
+                    ENRL_FG = #{enrlFg}
+                </foreach>
+                )
             </if>
-            <if test="KOR_NM != null or USERNAME != null or EMAIL_ADD != null">
-                AND (KOR_NM LIKE CONCAT('%', #{KOR_NM}, '%')
-                OR USERNAME LIKE CONCAT('%', #{USERNAME}, '%')
-                OR EMAIL_ADD LIKE CONCAT('%', #{EMAIL_ADD}, '%'))
+            <if test="NAME != null">
+                AND (USERNAME LIKE CONCAT('%', #{NAME}, '%')
+                OR KOR_NM LIKE CONCAT('%', #{NAME}, '%')
+                OR EMAIL_ADD LIKE CONCAT('%', #{NAME}, '%'))
             </if>
         </where>
+    </select>
+
+    <!--사업장 전체목록 가져오기-->
+    <select id="selectWorkplaceSearch" resultType="com.example.demo.dto.WorkplaceDTO">
+        SELECT
+        DIV_CD,
+        CO_CD,
+        DIV_YN,
+        FILL_YN,
+        DIV_NM,
+        DIV_ADDR,
+        DIV_TEL,
+        REG_NB,
+        DIV_TO_CD,
+        DIV_NMK,
+        BUSINESS,
+        JONGMOK,
+        OPEN_DT,
+        CLOSE_DT,
+        MAS_NM
+        FROM Workplace
+        WHERE CO_CD = #{CO_CD}
+    </select>
+
+
+    <!-- SelectBox 내 companyList   -->
+    <select id="companySearchList" parameterType="com.example.demo.dto.CompanyDTO" resultType="com.example.demo.dto.CompanyDTO">
+        SELECT CO_CD, USE_YN, CO_NM
+        FROM Company
+        WHERE USE_YN = 1
     </select>
 
     <!-- 사원 상세 테이터 1건 출력 -->
@@ -74,78 +127,75 @@
             AND USERNAME = #{USERNAME}
     </select>
 
+    <!-- 사업장별 사번 유효성 검사 -->
+    <select id="employeeEmpCDInWorkplace" parameterType="hashmap" resultType="String">
+        SELECT
+            EMP_CD
+        FROM Employee
+        WHERE CO_CD = #{CO_CD} AND EMP_CD=#{EMP_CD}
+    </select>
+
+    <!-- 로그인ID 회사 전체 내 유효성 검사 -->
+    <select id="employeeUsernameInCompany" resultType="String">
+        SELECT
+            USERNAME
+        FROM Employee
+        WHERE USERNAME=#{USERNAME}
+    </select>
+
+    <!-- 메일ID 회사 전체 내 유효성 검사 -->
+    <select id="employeeEmailInCompany" resultType="String">
+        SELECT
+         EMAIL_ADD
+        FROM Employee
+        WHERE EMAIL_ADD=#{EMAIL_ADD}
+    </select>
+
     <!-- 신규 사원 데이터 1건 입력 -->
-    <insert id="employeeInsert" parameterType="com.example.demo.dto.EmployeeDTO" >
-        INSERT INTO Employee (
-        <trim suffixOverrides=",">
-            EMP_CD,
-            CO_CD,
-            DIV_CD,
-            USER_YN,
-            USE_FG,
-            USERNAME,
-            PASSWORD,
-            KOR_NM,
-            EMAIL_ADD,
-            GENDER_FG,
-            JOIN_DT,
-            ENRL_FG,
-            <if test="TEL != null">TEL,</if>
-            <if test="RTR_DT != null">RTR_DT,</if>
-            <if test="RSRG_ADD != null">RSRG_ADD,</if>
-            <if test="PIC_FILE_ID != null">PIC_FILE_ID,</if>
-            <if test="PERSONAL_MAIL != null">PERSONAL_MAIL,</if>
-            <if test="PERSONAL_MAIL_CP != null">PERSONAL_MAIL_CP,</if>
-            <if test="SALARY_MAIL != null">SALARY_MAIL,</if>
-            <if test="SALARY_MAIL_CP != null">SALARY_MAIL_CP,</if>
-            <if test="HOME_TEL != null">HOME_TEL,</if>
-            <if test="ZIPCODE != null">ZIPCODE,</if>
-            <if test="ADDR != null">ADDR,</if>
-            <if test="ADDR_NUM != null">ADDR_NUM,</if>
-        </trim>
-    ) VALUES (
-        <trim suffixOverrides=",">
+    <insert id="employeeInsert" parameterType="com.example.demo.dto.EmployeeDTO" statementType="CALLABLE">
+    { CALL InsertEmployeeRollProcedure(
         #{EMP_CD},
-        'com1',
-            'DIV1',
-            '1',
+        #{CO_CD},
+        #{DIV_CD},
+        '1',
         '1',
         #{USERNAME},
         #{PASSWORD},
         #{KOR_NM},
         #{EMAIL_ADD},
+        #{TEL},
         #{GENDER_FG},
         #{JOIN_DT},
+        '',
+        #{PIC_FILE_ID},
         #{ENRL_FG},
-        <if test="TEL != null">#{TEL},</if>
-        <if test="RTR_DT != null">#{RTR_DT},</if>
-        <if test="RSRG_ADD != null">#{RSRG_ADD},</if>
-        <if test="PIC_FILE_ID != null">#{PIC_FILE_ID},</if>
-        <if test="PERSONAL_MAIL != null">#{PERSONAL_MAIL},</if>
-        <if test="PERSONAL_MAIL_CP != null">#{PERSONAL_MAIL_CP},</if>
-        <if test="SALARY_MAIL != null">#{SALARY_MAIL},</if>
-        <if test="SALARY_MAIL_CP != null">#{SALARY_MAIL_CP},</if>
-        <if test="HOME_TEL != null">#{HOME_TEL},</if>
-        <if test="ZIPCODE != null">#{ZIPCODE},</if>
-        <if test="ADDR != null">#{ADDR},</if>
-        <if test="ADDR_NUM != null">#{ADDR_NUM},</if>
-        </trim>
-        )
+        #{PERSONAL_MAIL},
+        #{PERSONAL_MAIL_CP},
+        #{SALARY_MAIL},
+        #{SALARY_MAIL_CP},
+        #{HOME_TEL},
+        #{ZIPCODE},
+        #{ADDR},
+        #{ADDR_NUM},
+        #{ROLE_NAME}
+    ) }
     </insert>
 
     <!-- 특정 사원 데이터 비 활성화 -->
     <update id="employeeRemove" parameterType="com.example.demo.dto.EmployeeDTO">
         UPDATE Employee
-             SET USER_YN = '0'
+             SET USER_YN = '0', USE_FG = '0', ENRL_FG = '2'
         WHERE
-            KOR_NM = #{KOR_NM}
-            AND USERNAME = #{USERNAME}
+            USERNAME = #{USERNAME}
     </update>
 
     <!-- 특정 사원 데이터 정보 갱신 -->
     <update id="employeeUpdate" parameterType="com.example.demo.dto.EmployeeDTO">
         UPDATE Employee
         <set>
+            <if test="DIV_CD != null">
+                DIV_CD = #{DIV_CD},
+            </if>
             <if test="PASSWORD != null">
                 PASSWORD = #{PASSWORD},
             </if>
@@ -199,7 +249,14 @@
             </if>
         </set>
         WHERE
-            KOR_NM = #{KOR_NM}
-            AND USERNAME = #{USERNAME}
+            USERNAME = #{USERNAME}
+    </update>
+
+
+    <!-- 비밀번호 업데이트 시 권한 정보 갱신 -->
+    <update id="employeeRollUpdate" parameterType="com.example.demo.dto.EmployeeDTO">
+        UPDATE Employee_Roll
+        set PASSWORD=#{PASSWORD}
+        WHERE USERNAME = #{USERNAME}
     </update>
 </mapper>
