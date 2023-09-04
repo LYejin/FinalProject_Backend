@@ -43,7 +43,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         System.out.println("토큰 인증");
         System.out.println();
 
-        String header = request.getHeader(JwtProperties.HEADER_STRING);
+        String header =request.getHeader(JwtProperties.HEADER_STRING);
         header = URLDecoder.decode(header, "UTF-8");
 
 
