@@ -18,6 +18,7 @@
         WHERE CO_CD = #{CO_CD}
     </select>
 
+
     <select id="companyDetail"  parameterType="String" resultType="com.example.demo.dto.CompanyDTO">
         SELECT CO_CD, USE_YN, CO_NM, CO_NMK, BUSINESS, JONGMOK, REG_NB, CEO_NM, HO_FAX, CEO_TEL, PPL_NB, HO_ZIP, HO_ADDR, HO_ADDR1, CO_FG, CO_NB, EST_DT, OPEN_DT, CLOSE_DT, PIC_FILE_ID, ACCT_FG
         FROM Company

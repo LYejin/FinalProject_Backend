@@ -73,6 +73,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
             if (jwtAccessTokenIsExpired(token)) {
                 handleExpiredAccessToken(request, response);
+                return;
             } else {
                 processValidAccessToken(username);
             }

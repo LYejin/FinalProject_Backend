@@ -26,7 +26,7 @@ public class CompanyService {
     public List<CompanyDTO> companySelect(CompanyDTO companyDTO){
         List<CompanyDTO> companyDTOS = null;
         try {
-            System.out.println("검색된 데이터"+ companyDTO.getColumnsToUpdate());
+
 
             findByInputColumns(companyDTO);
             companyDTOS = companyDao.companySelect(companyDTO);
@@ -38,21 +38,13 @@ public class CompanyService {
         return companyDTOS;
     }
 
-    public String companyNameSelect(String CO_CD){
-        String CO_NM = null;
-        try {
-            CO_NM = companyDao.companyNameSelect(CO_CD);
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-        return  CO_NM;
-    }
+
 
     public  CompanyDTO companyDetail(String co_CD){
         CompanyDTO companyDTO = null;
         try {
             companyDTO = companyDao.companyDetail(co_CD);
-            System.out.println(companyDTO);
+
             companyDTO.setPPL_NB(AESUtil.decrypt(companyDTO.getPPL_NB()));
         }catch (Exception e){
             System.out.println(e.getMessage());
@@ -81,7 +73,7 @@ public class CompanyService {
         }
     }
 
-    //갱신
+    //
     public void companyUpdate(CompanyDTO companyDTO){
 
         try {
@@ -89,6 +81,7 @@ public class CompanyService {
                 companyDTO.setPPL_NB(AESUtil.encrypt(companyDTO.getPPL_NB()));
                 System.out.println("업데이트!!!"+AESUtil.encrypt(companyDTO.getPPL_NB()));
             }
+            System.out.println(companyDTO);
             findByInputColumns(companyDTO);  //데이터 입력된 필드 확인해주는 함수
             System.out.println(companyDTO.getColumnsToUpdate());
             companyDao.companyUpdate(companyDTO);
