@@ -1,21 +1,20 @@
 package com.example.demo.config.aop;//package com.example.demo.aop;
 
 import com.example.demo.config.jwt.JwtProperties;
-import com.example.demo.dto.ChangeHistoryDTO;
-import com.example.demo.dto.CompanyDTO;
-import com.example.demo.dto.EmployeeDTO;
+import com.example.demo.dao.ChangeHistoryDao;
+import com.example.demo.dto.*;
 import com.example.demo.service.ChangeHistoryService;
 import com.example.demo.service.CompanyService;
+import com.example.demo.service.EmployeeService;
+import com.example.demo.service.WorkplaceService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 
 import java.net.URLDecoder;
-import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -55,57 +53,112 @@ public class DemoCommonAspect {
     @Autowired
     private CompanyService companyService;
     @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private WorkplaceService workplaceService;
+    @Autowired
     private HttpServletRequest request;
 
 
-    @Pointcut("execution(* com.example.demo.service.CompanyService.companyRemove(..)) || " +
-            "execution(* com.example.demo.service.CompanyService.companyUpdate(..)) || " +
-            "execution(* com.example.demo.service.CompanyService.companyInsert(..))")
-    private void doExecute() {}
+    @Pointcut("execution(* com.example.demo.service.CompanyService.*(..)) || " +
+            "execution(* com.example.demo.service.EmployeeService.*(..)) || " +
+            "execution(* com.example.demo.service.WorkplaceService.*(..))")
+    public void serviceMethods() {}
 
-    @AfterReturning(pointcut = "doExecute()", returning = "result")
+    @Pointcut("execution(* *Update*(*)) || execution(* *Insert*(*)) || execution(* *Remove*(*))")
+    public void updateInsertRemoveMethods() {}
+
+    @Pointcut("execution(* *Update*(..))")
+    public void updateBefore(){}
+
+    private ChangeHistorySearchDTO changeHistorySearchDTO;
+    private ChangeHistoryDTO changeHistoryDTO ;
+
+
+    private CompanyDTO b_companyDTO;
+    private EmployeeDTO b_employeeDTO;
+    private WorkplaceDTO b_workplaceDTO;
+
+    private CompanyDTO companyDTO;
+    private EmployeeDTO employeeDTO ;
+    private WorkplaceDTO workplaceDTO ;
+
+    private String CO_CD ;
+    private String DIV_CD;
+
+
+    @Before("serviceMethods() && updateBefore()")
+    public void doUpdateBefore(JoinPoint joinPoint){
+        b_companyDTO = null;
+        b_workplaceDTO = null;
+        b_employeeDTO = null;
+        String methodName = joinPoint.getSignature().toShortString();
+        Object[] args = joinPoint.getArgs();
+        if(methodName.contains("Company")){
+            b_companyDTO = companyService.companyDetail(((CompanyDTO) joinPoint.getArgs()[0]).getCO_CD());
+        }else if(methodName.contains("Workplace")){
+            b_workplaceDTO = workplaceService.selectWorkplaceInfoByDIVCD(((WorkplaceDTO) joinPoint.getArgs()[0]).getDIV_CD());
+        }else if(methodName.contains("Employee")){
+            b_employeeDTO = employeeService.employeeDetail(((EmployeeDTO) joinPoint.getArgs()[0]));
+        }
+
+        log.info("{} is start", methodName);
+    }
+    @AfterReturning(pointcut = "serviceMethods() && updateInsertRemoveMethods()", returning = "result")
     public void doAfterReturning(JoinPoint joinPoint, Object result)  {
         String methodName = joinPoint.getSignature().toShortString();
-        CompanyDTO companyDTO = null;
-        String CO_CD = null;
-        ChangeHistoryDTO changeHistoryDTO = new ChangeHistoryDTO();
+        Object[] args = joinPoint.getArgs();
+        Claims claims = getUserInfo();
+        changeHistoryDTO = new ChangeHistoryDTO();
+
+        companyDTO =null;
+        employeeDTO = null;
+        workplaceDTO =null;
+
+        CO_CD =null;
+        DIV_CD =null;
         System.out.println("AOP★★★★★★★★★★★★★★★★★★"+methodName);
 
 
-        Object[] args = joinPoint.getArgs();
-        if (args.length > 0 && args[0] instanceof CompanyDTO){
-            companyDTO = (CompanyDTO) joinPoint.getArgs()[0];
-            changeHistoryDTO.setCO_NM(getCO_NM(companyDTO.getCO_CD()));
-        }else if(args.length > 0 && args[0] instanceof String){
-            CO_CD = (String) joinPoint.getArgs()[0];
-            changeHistoryDTO.setCO_NM(CO_CD);
-        }
-
-
+        changeHistoryDTO.setEMP_CD(String.valueOf(claims.get("EMP_CD")));
+        changeHistoryDTO.setCO_CD(String.valueOf(claims.get("CO_CD")));
         changeHistoryDTO.setCH_CATEGORY(findCH_CATEGORY(methodName));
         changeHistoryDTO.setCH_DIVISION(findCH_DIVISION(methodName));
         changeHistoryDTO.setCH_IM(getCH_IM(changeHistoryDTO.getCH_CATEGORY(), changeHistoryDTO.getCH_DIVISION()));
         changeHistoryDTO.setCH_DT(currentTime());
-        changeHistoryDTO.setCU_IP(getLoopbackIPv4());
-        changeHistoryDTO.setCU_NM(getCU_NM());
+        changeHistoryDTO.setCH_IP(getLoopbackIPv4());
+        changeHistoryDTO.setCH_NM(getCH_NM(String.valueOf(claims.get("username"))));
+
+        setChangeHistoryDTO(args, methodName);
+        Map<String, String> resultMap = getCHD_TARGET(changeHistorySearchDTO);
+        changeHistoryDTO.setCHD_TARGET_CO_NM(resultMap.get("CHD_TARGET_CO_NM"));
+        changeHistoryDTO.setCHD_TARGET_NM(resultMap.get("CHD_TARGET_NM"));
+
+        //changeHistory 데이터 사입
+        changeHistoryInsert(changeHistoryDTO);
+
+        if(changeHistoryDTO.getCH_DIVISION().equals("수정")){
+            changeHistoryDetailInsert(changeHistorySearchDTO);
+        }
 
 
-        Map<String, String> map = getEMP_CDAndDIV_NM(changeHistoryDTO.getCU_NM());
-        System.out.println(map);
-        changeHistoryDTO.setEMP_CD(map.get("EMP_CD"));
-        changeHistoryDTO.setDIV_NM(map.get("DIV_NM"));
 
 
+        log.info("companyDTO: {}", companyDTO);
+        log.info("a_companyDTO: {}", b_companyDTO);
+        log.info("employeeDTO: {}", employeeDTO);
+        log.info("workplaceDTO: {}", workplaceDTO);
 
-
-        log.info("Data: {}", companyDTO);
         log.info("CO_CD: {}", CO_CD);
         log.info("CH Data: {}",changeHistoryDTO);
+        log.info("CH Data: {}",changeHistorySearchDTO);
         log.info("{} is start", methodName);
         log.info("{} is Finish", methodName);
 
-        changeHistoryInset(changeHistoryDTO, companyDTO);
+
     }
+
+
 
     public String findCH_DIVISION(String methodName){
         String CH_CATEGORY = null;
@@ -135,7 +188,7 @@ public class DemoCommonAspect {
     }
 
     public String getCH_IM(String CH_CATEGORY, String CH_DIVISION) {
-        return CH_CATEGORY+"가 "+CH_DIVISION+"되었습니다";
+        return CH_CATEGORY+"가(이) "+CH_DIVISION+"되었습니다";
     }
 
     public String currentTime () {
@@ -149,7 +202,7 @@ public class DemoCommonAspect {
         return loopback.getHostAddress();
     }
 
-    public String getCU_NM() {
+    public Claims getUserInfo() {
         String username = null;
         try {
             String header = request.getHeader(JwtProperties.HEADER_STRING);
@@ -168,39 +221,87 @@ public class DemoCommonAspect {
             Claims claims = claimsJws.getBody();
             username = String.valueOf(claims.get("username"));
             System.out.println("이름:" + username);
-            return username;
+
+
+            return claims;
 
         } catch (Exception e) {
             System.out.println("Token validation failed: " + e.getMessage());
         }
-        return username;
+        return null;
     }
 
-    public String getCO_NM(String CO_CD){
-        String CO_NM = null;
+    public String getCH_NM(String USERNAME){
+        String CH_NM = null;
         try {
-            CO_NM = companyService.companyNameSelect(CO_CD);
+            System.out.println("aop"+USERNAME);
+            CH_NM = changeHistoryService.CH_NM_Select(USERNAME);
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
-        return CO_NM;
+        return CH_NM;
     }
 
-    public Map<String, String> getEMP_CDAndDIV_NM(String USERNAME){
+    public void setChangeHistoryDTO(Object[] args, String methodName) {
+        if (args.length > 0) {
+            Object argument = args[0];
+            if (argument instanceof CompanyDTO) {
+                companyDTO = (CompanyDTO) args[0];
+                changeHistorySearchDTO = setChangeHistoryValues("CO_CD", companyDTO.getCO_CD(), "Company", "CO_NM");
+            } else if (argument instanceof EmployeeDTO) {
+                employeeDTO = (EmployeeDTO) args[0];
+                changeHistorySearchDTO = setChangeHistoryValues("USERNAME", employeeDTO.getUSERNAME(), "Employee", "KOR_NM");
+            } else if (argument instanceof WorkplaceDTO) {
+                workplaceDTO = (WorkplaceDTO) args[0];
+                changeHistorySearchDTO = setChangeHistoryValues("DIV_CD", workplaceDTO.getDIV_CD(), "Workplace", "DIV_NM");
+            } else if (methodName.contains("Company") && argument instanceof String) {
+                CO_CD = (String) args[0];
+                changeHistorySearchDTO = setChangeHistoryValues("CO_CD", CO_CD, "Company", "CO_NM");
+            } else if (methodName.contains("Workplace") && argument instanceof String) {
+                DIV_CD = (String) args[0];
+                changeHistorySearchDTO = setChangeHistoryValues("DIV_CD",  DIV_CD, "Workplace", "DIV_NM");
+            }
+        }
+    }
 
-        Map<String, String> resultMap = new HashMap<>();
-        resultMap = changeHistoryService.getEMP_CDAndDIV_NM(USERNAME);
+    public ChangeHistorySearchDTO setChangeHistoryValues(String columnName, String identifyValue, String tableName, String chdTarget) {
+        ChangeHistorySearchDTO changeHistorySearchDTO = new ChangeHistorySearchDTO();
+        changeHistorySearchDTO.setIDENTIFY_COLUMN_NAME(columnName);
+        changeHistorySearchDTO.setIDENTIFY_VALUE(identifyValue);
+        changeHistorySearchDTO.setTABLENAME(tableName);
+        changeHistorySearchDTO.setCHD_TARGET(chdTarget);
+        changeHistorySearchDTO.setCH_DT(changeHistoryDTO.getCH_DT());
 
-        System.out.println("map데이터:"+resultMap);
+        return  changeHistorySearchDTO;
+
+    }
+
+    public Map<String, String> getCHD_TARGET(ChangeHistorySearchDTO changeHistorySearchDTO){
+        Map<String, String> resultMap = null;
+
+        resultMap = changeHistoryService.getCHD_TARGET(changeHistorySearchDTO);
+
+        log.info("검색된 데이터:"+resultMap);
 
         return  resultMap;
     }
-    public void changeHistoryInset(ChangeHistoryDTO changeHistoryDTO, CompanyDTO companyDTO){
 
-        changeHistoryService.changeHistoryInset(changeHistoryDTO);
+    public void changeHistoryInsert(ChangeHistoryDTO changeHistoryDTO){
+
+        changeHistoryService.changeHistoryInsert(changeHistoryDTO);
     }
 
+    public void changeHistoryDetailInsert(ChangeHistorySearchDTO changeHistorySearchDTO){
+        String tableName = changeHistorySearchDTO.getTABLENAME();
 
+        if(tableName.contains("Company")){
+
+        }else if(tableName.contains("Workplace")){
+
+        }else if(tableName.contains("Employee")){
+
+        }
+    }
 
 
 
