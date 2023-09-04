@@ -5,6 +5,8 @@ import com.example.demo.dao.WorkplaceDao;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.dto.WorkplaceDTO;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,8 +41,17 @@ public class WorkplaceService {
         return workplaceDao.updateWorkplace(workplaceDTO);
     }
 
-    public int deleteWorkplace(String DIV_CD){
-        return workplaceDao.deleteWorkplace(DIV_CD);
+    public int deleteWorkplace(String divCdJson) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(divCdJson);
+            String divCd = jsonNode.get("DIV_CD").asText();
+
+            return workplaceDao.deleteWorkplace(divCd);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
 }

@@ -29,4 +29,5 @@ public class EmployeeDTO {
     private String ZIPCODE; // 우편번호
     private String ADDR; // 주소
     private String ADDR_NUM; // 번지
+    private String ROLE_NAME = "ROLE_USER";
 }
