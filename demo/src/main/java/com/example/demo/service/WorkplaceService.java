@@ -32,26 +32,17 @@ public class WorkplaceService {
     }
 
     //사업장추가
-    public int insertWorkplace(WorkplaceDTO workplaceDTO){
+    public int workplaceInsert(WorkplaceDTO workplaceDTO){
         return workplaceDao.insertWorkplace(workplaceDTO);
     }
 
     //수정
-    public int updateWorkplace(WorkplaceDTO workplaceDTO){
+    public int workplaceUpdate(WorkplaceDTO workplaceDTO){
         return workplaceDao.updateWorkplace(workplaceDTO);
     }
 
-    public int deleteWorkplace(String divCdJson) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(divCdJson);
-            String divCd = jsonNode.get("DIV_CD").asText();
-
-            return workplaceDao.deleteWorkplace(divCd);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
+    public int workplaceRemove(String DIV_CD) {
+            return workplaceDao.deleteWorkplace(DIV_CD);
     }
 
 }

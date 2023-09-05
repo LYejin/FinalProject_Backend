@@ -48,19 +48,19 @@ public class WorkplaceController {
 
     @PostMapping("insert")
     public ResponseEntity<Integer> InsertWorkplace(@RequestBody WorkplaceDTO workplaceDTO) {
-        int result = workplaceService.insertWorkplace(workplaceDTO);
+        int result = workplaceService.workplaceInsert(workplaceDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PutMapping("update")
     public ResponseEntity<Integer> updateWorkplace(@RequestBody WorkplaceDTO workplaceDTO) {
-        int result = workplaceService.updateWorkplace(workplaceDTO);
-            return new ResponseEntity<>(result, HttpStatus.OK);
+        int result = workplaceService.workplaceUpdate(workplaceDTO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PutMapping("delete")
-    public ResponseEntity<Integer> deleteWorkplace(@RequestBody String DIV_CD) {
-        int result = workplaceService.deleteWorkplace(DIV_CD);
+    @PutMapping("delete/{DIV_CD}")
+    public ResponseEntity<Integer> deleteWorkplace(@PathVariable(value = "DIV_CD") String DIV_CD) {
+        int result = workplaceService.workplaceRemove(DIV_CD);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
