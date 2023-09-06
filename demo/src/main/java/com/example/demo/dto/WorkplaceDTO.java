@@ -23,4 +23,5 @@ public class WorkplaceDTO {
     private String COP_NB;
     private String ADDR_CD;
     private String ADDR_NUM;
+    private String COP_SL;
 }

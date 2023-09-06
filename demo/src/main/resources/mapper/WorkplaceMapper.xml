@@ -57,7 +57,8 @@
                DIV_FAX,
                COP_NB,
                ADDR_CD,
-               ADDR_NUM
+               ADDR_NUM,
+               COP_SL
         FROM Workplace
         WHERE DIV_CD = #{DIV_CD}
     </select>
@@ -83,7 +84,8 @@
             DIV_FAX,
             COP_NB,
             ADDR_CD,
-            ADDR_NUM
+            ADDR_NUM,
+            COP_SL
         )
         VALUES (
                    #{DIV_CD},
@@ -104,7 +106,8 @@
                    #{DIV_FAX},
                    #{COP_NB},
                    #{ADDR_CD},
-                   #{ADDR_NUM}
+                   #{ADDR_NUM},
+                   #{COP_SL}
                )
     </insert>
 
@@ -131,7 +134,8 @@
             <if test="CLOSE_DT != null">CLOSE_DT = #{CLOSE_DT},</if>
             <if test="MAS_NM != null">MAS_NM = #{MAS_NM},</if>
             <if test="DIV_FAX != null">DIV_FAX = #{DIV_FAX},</if>
-            <if test="COP_NB != null">COP_NB = #{COP_NB}</if>
+            <if test="COP_NB != null">COP_NB = #{COP_NB},</if>
+            <if test="COP_SL != null">COP_SL = #{COP_SL}</if>
         </set>
         WHERE DIV_CD = #{DIV_CD} AND CO_CD = #{CO_CD}
     </update>
