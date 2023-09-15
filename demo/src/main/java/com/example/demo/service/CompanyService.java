@@ -7,6 +7,7 @@ import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.dto.WorkplaceDTO;
 import com.example.demo.util.AESUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Service
 public class CompanyService {
 
@@ -26,14 +28,11 @@ public class CompanyService {
     public List<CompanyDTO> companySelect(CompanyDTO companyDTO){
         List<CompanyDTO> companyDTOS = null;
         try {
-
-
             findByInputColumns(companyDTO);
             companyDTOS = companyDao.companySelect(companyDTO);
-            System.out.println(companyDTO);
 
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
         return companyDTOS;
     }
@@ -47,7 +46,7 @@ public class CompanyService {
 
             companyDTO.setPPL_NB(AESUtil.decrypt(companyDTO.getPPL_NB()));
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
 
         return companyDTO;
@@ -55,13 +54,11 @@ public class CompanyService {
 
     //추가
     public void companyInsert(CompanyDTO companyDTO){
-        System.out.println("시잔"+(companyDTO.getPIC_FILE_ID() != ""));
 
         if(!companyDTO.getPIC_FILE_ID().isEmpty()) {
             int index = companyDTO.getPIC_FILE_ID().indexOf("data");
             String data = companyDTO.getPIC_FILE_ID().substring(index);
                 companyDTO.setPIC_FILE_ID(data);
-                System.out.println(index+"이미지확인"+data);
         }
 
         try {
@@ -69,7 +66,7 @@ public class CompanyService {
             companyDTO.setPPL_NB(AESUtil.encrypt(companyDTO.getPPL_NB()));
             companyDao.companyInsert(companyDTO);
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -79,16 +76,19 @@ public class CompanyService {
         try {
             if(companyDTO.getPPL_NB() != null){
                 companyDTO.setPPL_NB(AESUtil.encrypt(companyDTO.getPPL_NB()));
-                System.out.println("업데이트!!!"+AESUtil.encrypt(companyDTO.getPPL_NB()));
+                log.info("업데이트!!!"+AESUtil.encrypt(companyDTO.getPPL_NB()));
             }
-            System.out.println(companyDTO);
+            if(companyDTO.getPIC_FILE_ID() != null && companyDTO.getPIC_FILE_ID().isEmpty()){
+                companyDTO.setPIC_FILE_ID(null);
+            }
+
             findByInputColumns(companyDTO);  //데이터 입력된 필드 확인해주는 함수
-            System.out.println(companyDTO.getColumnsToUpdate());
+            log.info("갱신된 데이터", companyDTO.getColumnsToUpdate());
             companyDao.companyUpdate(companyDTO);
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
-        System.out.println("[][][][][][][][][탔냐?0");
+
     }
 
     //삭제
@@ -100,7 +100,7 @@ public class CompanyService {
             companyDao.workplaceRemove(CO_CD);
             companyDao.employeeRemove(CO_CD);
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
 
     }
@@ -120,7 +120,7 @@ public class CompanyService {
             }
 
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
 
         if(dup != null){
@@ -144,9 +144,8 @@ public class CompanyService {
             try {
                 // 각 필드마다 실제로 담긴 값 가져오기
                 Object value = field.get(companyDTO);
-
                 // 값이 null이 아닌 경우 컬럼 이름 리스트에 추가
-                if (value != null) {
+                if (value != null ) {
                     columnsToUpdate.add(field.getName());
                 }
             } catch (IllegalAccessException e) {

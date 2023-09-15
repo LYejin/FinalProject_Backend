@@ -5,118 +5,223 @@
     <!--사업장 전체목록 가져오기-->
     <select id="selectWorkplaceSearch" parameterType="hashmap" resultType="com.example.demo.dto.WorkplaceDTO">
         SELECT
-        DIV_CD,
-        CO_CD,
-        DIV_YN,
-        FILL_YN,
-        DIV_NM,
-        DIV_ADDR,
-        DIV_TEL,
-        REG_NB,
-        DIV_TO_CD,
-        DIV_NMK,
-        BUSINESS,
-        JONGMOK,
-        OPEN_DT,
-        CLOSE_DT,
-        MAS_NM
-        FROM Workplace
+            DIV_CD,
+            CO_CD,
+            DIV_YN,
+            FILL_YN,
+            DIV_NM,
+            DIV_ADDR,
+            DIV_TEL,
+            REG_NB,
+            DIV_TO_CD,
+            DIV_NMK,
+            BUSINESS,
+            JONGMOK,
+            OPEN_DT,
+            CLOSE_DT,
+            MAS_NM,
+            DIV_FAX,
+            COP_NB,
+            ADDR_CD,
+            ADDR_NUM
+        FROM
+            Workplace
         <where>
-            <if test="DIV_CD != null"> AND DIV_CD = #{DIV_CD} </if>
-            <if test="CO_CD != null"> AND CO_CD = #{CO_CD} </if>
-            <if test="DIV_YN != null"> AND DIV_YN = #{DIV_YN} </if>
+            <if test="(DIV_CD != null or DIV_NM != null)">
+                <if test="DIV_CD != null">
+                    DIV_CD LIKE CONCAT('%', #{DIV_CD}, '%')
+                </if>
+                <if test="DIV_NM != null">
+                    OR DIV_NM LIKE CONCAT('%', #{DIV_NM}, '%')
+                </if>
+            </if>
+
+            <if test="CO_CD != null">
+                AND CO_CD = #{CO_CD}
+            </if>
+
+            <if test="DIV_YN != null">
+                AND DIV_YN = #{DIV_YN}
+            </if>
         </where>
     </select>
 
+
+
     <!--사업장정보 가져오기-->
     <select id="selectWorkplaceInfoByDIVCD" resultType="com.example.demo.dto.WorkplaceDTO">
-        SELECT DIV_CD,
-               CO_CD,
-               DIV_YN,
-               FILL_YN,
-               DIV_NM,
-               DIV_ADDR,
-               DIV_TEL,
-               REG_NB,
-               DIV_TO_CD,
-               DIV_NMK,
-               BUSINESS,
-               JONGMOK,
-               OPEN_DT,
-               CLOSE_DT,
-               MAS_NM
-        FROM Workplace
-        WHERE DIV_CD = #{DIV_CD}
+       SELECT
+            DIV_CD
+            ,CO_CD
+            ,DIV_YN
+            ,FILL_YN
+            ,DIV_NM
+            ,DIV_ADDR
+            ,DIV_TEL
+            ,REG_NB
+            ,DIV_TO_CD
+            ,DIV_NMK
+            ,BUSINESS
+            ,JONGMOK
+            ,OPEN_DT
+            ,CLOSE_DT
+            ,MAS_NM
+            ,DIV_FAX
+            ,ADDR_CD
+            ,ADDR_NUM
+            ,COP_SL
+         FROM
+             Workplace
+        WHERE
+            DIV_CD = #{DIV_CD}
     </select>
 
     <!--사업장 추가하기-->
     <insert id="insertWorkplace" parameterType="com.example.demo.dto.WorkplaceDTO">
-        INSERT INTO Workplace (
-        DIV_CD,
-        CO_CD,
-        DIV_YN,
-        FILL_YN,
-        DIV_NM,
-        DIV_ADDR,
-        DIV_TEL,
-        REG_NB,
-        DIV_TO_CD,
-        DIV_NMK,
-        BUSINESS,
-        JONGMOK,
-        OPEN_DT,
-        CLOSE_DT,
-        MAS_NM
-        )
-        VALUES (
-        <trim suffixOverrides=",">
-            <if test="divCd != null">#{divCd},</if>
-            <if test="coCd != null">#{coCd},</if>
-            <if test="divYn != null">#{divYn},</if>
-            <if test="fillYn != null">#{fillYn},</if>
-            <if test="divNm != null">#{divNm},</if>
-            <if test="divAddr != null">#{divAddr},</if>
-            <if test="divTel != null">#{divTel},</if>
-            <if test="regNb != null">#{regNb},</if>
-            <if test="divToCd != null">#{divToCd},</if>
-            <if test="divNmk != null">#{divNmk},</if>
-            <if test="business != null">#{business},</if>
-            <if test="jongmok != null">#{jongmok},</if>
-            <if test="openDt != null">#{openDt},</if>
-            <if test="closeDt != null">#{closeDt},</if>
-            <if test="masNm != null">#{masNm}</if>
-        </trim>
-        )
+        INSERT INTO
+            Workplace (
+                       DIV_CD
+                      ,CO_CD
+                      ,DIV_YN
+                      ,FILL_YN
+                      ,DIV_NM
+                      ,DIV_ADDR
+                      ,DIV_TEL
+                      ,REG_NB
+                      ,DIV_TO_CD
+                      ,DIV_NMK
+                      ,BUSINESS
+                      ,JONGMOK
+                      ,OPEN_DT
+                      ,CLOSE_DT
+                      ,MAS_NM
+                      ,DIV_FAX
+                      ,COP_NB
+                      ,ADDR_CD
+                      ,ADDR_NUM
+                      ,COP_SL
+        ) VALUES (
+                     #{DIV_CD}
+                 ,#{CO_CD}
+                 ,#{DIV_YN}
+                 ,#{FILL_YN}
+                 ,#{DIV_NM}
+                 ,#{DIV_ADDR}
+                 ,#{DIV_TEL}
+                 ,#{REG_NB}
+                 ,#{DIV_TO_CD}
+                 ,#{DIV_NMK}
+                 ,#{BUSINESS}
+                 ,#{JONGMOK}
+                 ,#{OPEN_DT}
+                 ,#{CLOSE_DT}
+                 ,#{MAS_NM}
+                 ,#{DIV_FAX}
+                 ,#{COP_NB}
+                 ,#{ADDR_CD}
+                 ,#{ADDR_NUM}
+                 ,#{COP_SL}
+                 )
     </insert>
 
-<!--    사업장 정보 수정-->
+
+
+
+    <!--    사업장 정보 수정-->
     <update id="updateWorkplace" parameterType="com.example.demo.dto.WorkplaceDTO">
-        UPDATE Workplace
+        UPDATE
+            Workplace
         <set>
-            <if test="divCd != null">DIV_CD = #{divCd},</if>
-            <if test="coCd != null">CO_CD = #{coCd},</if>
-            <if test="divYn != null">DIV_YN = #{divYn},</if>
-            <if test="fillYn != null">FILL_YN = #{fillYn},</if>
-            <if test="divNm != null">DIV_NM = #{divNm},</if>
-            <if test="divAddr != null">DIV_ADDR = #{divAddr},</if>
-            <if test="divTel != null">DIV_TEL = #{divTel},</if>
-            <if test="regNb != null">REG_NB = #{regNb},</if>
-            <if test="divToCd != null">DIV_TO_CD = #{divToCd},</if>
-            <if test="divNmk != null">DIV_NMK = #{divNmk},</if>
-            <if test="business != null">BUSINESS = #{business},</if>
-            <if test="jongmok != null">JONGMOK = #{jongmok},</if>
-            <if test="openDt != null">OPEN_DT = #{openDt},</if>
-            <if test="closeDt != null">CLOSE_DT = #{closeDt},</if>
-            <if test="masNm != null">MAS_NM = #{masNm}</if>
+            <if test="DIV_CD != null">
+                DIV_CD = #{DIV_CD}
+            </if>
+
+            <if test="DIV_YN != null">
+                ,DIV_YN = #{DIV_YN}
+            </if>
+
+            <if test="FILL_YN != null">
+                ,FILL_YN = #{FILL_YN}
+            </if>
+
+            <if test="DIV_NM != null">
+                ,DIV_NM = #{DIV_NM}
+            </if>
+
+            <if test="DIV_ADDR != null">
+                ,DIV_ADDR = #{DIV_ADDR}
+            </if>
+
+            <if test="ADDR_CD != null">
+                ,ADDR_CD = #{ADDR_CD}
+            </if>
+
+            <if test="ADDR_NUM != null">
+                ,ADDR_NUM = #{ADDR_NUM}
+            </if>
+
+            <if test="DIV_TEL != null">
+                ,DIV_TEL = #{DIV_TEL}
+            </if>
+
+            <if test="REG_NB != null">
+                ,REG_NB = #{REG_NB}
+            </if>
+
+            <if test="DIV_TO_CD != null">
+                ,DIV_TO_CD = #{DIV_TO_CD}
+            </if>
+
+            <if test="DIV_NMK != null">
+                ,DIV_NMK = #{DIV_NMK}
+            </if>
+
+            <if test="BUSINESS != null">
+                ,BUSINESS = #{BUSINESS}
+            </if>
+
+            <if test="JONGMOK != null">
+                ,JONGMOK = #{JONGMOK}
+            </if>
+
+            <if test="OPEN_DT != null">
+                ,OPEN_DT = #{OPEN_DT}
+            </if>
+
+            <if test="CLOSE_DT != null">
+                ,CLOSE_DT = #{CLOSE_DT}
+            </if>
+
+            <if test="MAS_NM != null">
+                ,MAS_NM = #{MAS_NM}
+            </if>
+
+            <if test="DIV_FAX != null">
+                ,DIV_FAX = #{DIV_FAX}
+            </if>
+
+            <if test="COP_NB != null">
+                ,COP_NB = #{COP_NB}
+            </if>
+
+            <if test="COP_SL != null">
+                ,COP_SL = #{COP_SL}
+            </if>
+
         </set>
-        WHERE DIV_CD = #{divCd}
+        WHERE
+            DIV_CD = #{DIV_CD}
+          AND CO_CD = #{CO_CD}
     </update>
 
     <!--사업장 삭제 처리-->
     <update id="deleteWorkplace">
-        UPDATE Workplace
-        SET DIV_YN = '0'
-        WHERE DIV_CD = #{divCd}
+       UPDATE
+           Workplace
+          SET
+            DIV_YN = '0'
+        WHERE
+            DIV_CD = #{DIV_CD}
     </update>
 
 </mapper>

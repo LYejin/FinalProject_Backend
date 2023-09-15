@@ -18,6 +18,7 @@ public class UserDTO {
     private String CO_CD;    // 회사코드
 
 
+
     public List<String> getRoleList() {
         if (!this.ROLE_NAME.isEmpty()) {
             return Arrays.asList(this.ROLE_NAME.split(","));

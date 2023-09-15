@@ -25,4 +25,5 @@ public interface WorkplaceDao {
 
     //사업장 삭제
     public int deleteWorkplace(String DIV_CD);
+
 }
