@@ -5,6 +5,8 @@ import com.example.demo.dao.WorkplaceDao;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.dto.WorkplaceDTO;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,16 +32,16 @@ public class WorkplaceService {
     }
 
     //사업장추가
-    public int insertWorkplace(WorkplaceDTO workplaceDTO){
+    public int workplaceInsert(WorkplaceDTO workplaceDTO){
         return workplaceDao.insertWorkplace(workplaceDTO);
     }
 
     //수정
-    public int updateWorkplace(WorkplaceDTO workplaceDTO){
+    public int workplaceUpdate(WorkplaceDTO workplaceDTO){
         return workplaceDao.updateWorkplace(workplaceDTO);
     }
 
-    public int deleteWorkplace(String DIV_CD){
+    public int workplaceRemove(String DIV_CD) {
         return workplaceDao.deleteWorkplace(DIV_CD);
     }
 

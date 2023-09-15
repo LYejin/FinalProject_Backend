@@ -3,7 +3,11 @@
 <mapper namespace="com.example.demo.dao.CompanyDao">
 
     <select id="companySelect"  parameterType="com.example.demo.dto.CompanyDTO" resultType="com.example.demo.dto.CompanyDTO">
-        SELECT CO_CD, CO_NM, CO_FG, CEO_NM
+        SELECT
+            CO_CD
+            ,CO_NM
+            ,CO_FG
+            ,CEO_NM
         FROM Company
         <where>
             <foreach collection="columnsToUpdate" item="column" separator="AND">
@@ -20,31 +24,42 @@
 
 
     <select id="companyDetail"  parameterType="String" resultType="com.example.demo.dto.CompanyDTO">
-        SELECT CO_CD, USE_YN, CO_NM, CO_NMK, BUSINESS, JONGMOK, REG_NB, CEO_NM, HO_FAX, CEO_TEL, PPL_NB, HO_ZIP, HO_ADDR, HO_ADDR1, CO_FG, CO_NB, EST_DT, OPEN_DT, CLOSE_DT, PIC_FILE_ID, ACCT_FG
+        SELECT
+            CO_CD
+            ,USE_YN
+            ,CO_NM
+            ,CO_NMK
+            ,BUSINESS
+            ,JONGMOK
+            ,REG_NB
+            ,CEO_NM
+            ,HO_FAX
+            ,CEO_TEL
+            ,PPL_NB
+            ,HO_ZIP
+            ,HO_ADDR
+            ,HO_ADDR1
+            ,CO_FG
+            ,CO_NB
+            ,EST_DT
+            ,OPEN_DT
+            ,CLOSE_DT
+            ,PIC_FILE_ID
+            ,ACCT_FG
         FROM Company
         WHERE CO_CD = #{co_CD}
     </select>
 
     <insert id="companyInsert" parameterType="com.example.demo.dto.CompanyDTO">
-<!--        INSERT INTO Company (-->
-<!--            CO_CD, USE_YN, CO_NM, CO_NMK, BUSINESS, JONGMOK, REG_NB,-->
-<!--            CEO_NM, HO_FAX, CEO_TEL, PPL_NB, HO_ZIP, HO_ADDR, HO_ADDR1,-->
-<!--            CO_FG, CO_NB, EST_DT, OPEN_DT, CLOSE_DT, PIC_FILE_ID, ACCT_FG-->
-<!--        )-->
-<!--        VALUES (-->
-<!--            #{CO_CD}, #{USE_YN}, #{CO_NM}, #{CO_NMK}, #{BUSINESS}, #{JONGMOK}, #{REG_NB},-->
-<!--            #{CEO_NM}, #{HO_FAX}, #{CEO_TEL}, #{PPL_NB}, #{HO_ZIP}, #{HO_ADDR}, #{HO_ADDR1},-->
-<!--            #{CO_FG}, #{CO_NB}, #{EST_DT}, #{OPEN_DT}, #{CLOSE_DT}, #{PIC_FILE_ID}, #{ACCT_FG}-->
-<!--        )-->
-        INSERT INTO Company (
-        <foreach collection="columnsToUpdate" item="column" separator=",">
-            ${column}
-        </foreach>
-        )
-        VALUES (
-        <foreach collection="columnsToUpdate" item="column" separator=",">
-            #{${column}}
-        </foreach>
+        INSERT INTO
+            Company (
+            <foreach collection="columnsToUpdate" item="column" separator=",">
+                ${column}
+            </foreach>
+        ) VALUES (
+            <foreach collection="columnsToUpdate" item="column" separator=",">
+                #{${column}}
+            </foreach>
         )
     </insert>
 

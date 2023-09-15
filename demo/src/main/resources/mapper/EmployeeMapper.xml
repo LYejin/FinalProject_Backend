@@ -121,10 +121,7 @@
             ADDR,
             ADDR_NUM
         FROM Employee
-        WHERE
-            USER_YN = '1'
-            AND KOR_NM = #{KOR_NM}
-            AND USERNAME = #{USERNAME}
+        WHERE USERNAME = #{USERNAME}
     </select>
 
     <!-- 사업장별 사번 유효성 검사 -->

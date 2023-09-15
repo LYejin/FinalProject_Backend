@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.demo.dao.ChangeHistoryDao">
 
+<mapper namespace="com.example.demo.dao.ChangeHistoryDao">
 
     <select id="CH_NM_Select" resultType="String">
         SELECT CONCAT(KOR_NM, '(', USERNAME, ')') AS CH_NM
@@ -15,31 +15,98 @@
                 SELECT c.CO_NM AS CHD_TARGET_NM
             </when>
             <when test="TABLENAME == 'Employee'">
-                SELECT CONCAT(${CHD_TARGET}, '(', USERNAME, ')') AS CHD_TARGET_NM, c.CO_NM AS CHD_TARGET_CO_NM
+                SELECT
+                    CONCAT(${CHD_TARGET}, '(', USERNAME, ')') AS CHD_TARGET_NM
+                    ,c.CO_NM AS CHD_TARGET_CO_NM
             </when>
             <otherwise>
-                SELECT f.${CHD_TARGET} AS CHD_TARGET_NM, c.CO_NM AS CHD_TARGET_CO_NM
+                SELECT
+                    f.${CHD_TARGET} AS CHD_TARGET_NM
+                    ,c.CO_NM AS CHD_TARGET_CO_NM
             </otherwise>
         </choose>
-        FROM ${TABLENAME} f JOIN Company c on f.CO_CD = c.CO_CD
+        FROM ${TABLENAME} f
+        JOIN Company c
+            ON f.CO_CD = c.CO_CD
         WHERE f.${IDENTIFY_COLUMN_NAME} = #{IDENTIFY_VALUE}
     </select>
 
 
     <insert id="changeHistoryInset" parameterType="com.example.demo.dto.ChangeHistoryDTO">
-        INSERT INTO Change_History (
-        EMP_CD, CO_CD, CH_CATEGORY, CH_DT, CH_DIVISION,
-        CH_IM, CH_NM, CH_IP, CHD_TARGET_NM, CHD_TARGET_CO_NM
-        )
-        VALUES (
-        #{EMP_CD}, #{CO_CD}, #{CH_CATEGORY}, #{CH_DT}, #{CH_DIVISION},
-        #{CH_IM}, #{CH_NM}, #{CH_IP}, #{CHD_TARGET_NM}, #{CHD_TARGET_CO_NM}
-        )
+        INSERT INTO
+            Change_History (
+                     EMP_CD
+                    ,CO_CD
+                    ,CH_CATEGORY
+                    ,CH_DT
+                    ,CH_DIVISION
+                    ,CH_IM
+                    ,CH_NM
+                    ,CH_IP
+                    ,CHD_TARGET_NM
+                    ,CHD_TARGET_CO_NM
+        ) VALUES (
+                    #{EMP_CD}
+                    ,#{CO_CD}
+                    ,#{CH_CATEGORY}
+                    ,#{CH_DT}
+                    ,#{CH_DIVISION}
+                    ,#{CH_IM}
+                    ,#{CH_NM}
+                    ,#{CH_IP}
+                    ,#{CHD_TARGET_NM}
+                    ,#{CHD_TARGET_CO_NM}
+        );
+    </insert>
+
+    <insert id="changeHistoryDetailInset" parameterType="java.util.Map">
+        <selectKey order="BEFORE" keyProperty="CH_CD" resultType="int">
+            SELECT CH_CD
+            FROM Change_History
+            WHERE CH_DIVISION = #{changeHistoryDTO.CH_DIVISION}
+            AND CH_CATEGORY = #{changeHistoryDTO.CH_CATEGORY}
+            AND CH_DT = #{changeHistoryDTO.CH_DT}
+            AND CH_NM = #{changeHistoryDTO.CH_NM}
+            AND CHD_TARGET_NM = #{changeHistoryDTO.CHD_TARGET_NM}
+<!--            <if test="changeHistoryDTO.CH_NM != null">-->
+<!--            AND CHD_TARGET_CO_NM = #{changeHistoryDTO.CHD_TARGET_CO_NM}-->
+<!--            </if>-->
+        </selectKey>
+
+        <foreach collection="changeHistoryDetailList" item="detail" separator=";">
+            INSERT INTO
+                Change_History_Detail (
+                    CH_CD
+                    ,EMP_CD
+                    ,CO_CD
+                    ,CHD_ITEM
+                    ,CHD_BT
+                    ,CHD_AT
+                    ,CHD_DT,CHD_PIC_AT
+                    ,CHD_PIC_BT
+            ) VALUES (
+                    #{CH_CD}
+                    ,#{detail.EMP_CD}
+                    ,#{detail.CO_CD}
+                    ,#{detail.CHD_ITEM}
+                    ,#{detail.CHD_BT}
+                    ,#{detail.CHD_AT}
+                    ,#{detail.CHD_DT}
+                    ,#{detail.CHD_PIC_AT}
+                    ,#{detail.CHD_PIC_BT}
+            )
+        </foreach>
     </insert>
 
 
     <select id="ChangeHistorySelect" resultType="com.example.demo.dto.ChangeHistoryDTO">
-        SELECT CH_DT, CH_DIVISION, CH_IM, CHD_TARGET_NM, CH_NM, CH_IP, CHD_TARGET_CO_NM
+        SELECT
+            CH_DT
+            ,CH_DIVISION
+            ,CH_IM
+            ,CHD_TARGET_NM
+            ,CH_NM, CH_IP
+            ,CHD_TARGET_CO_NM
         FROM Change_History
         WHERE CH_CATEGORY = #{CH_CATEGORY}
         ORDER BY CH_CD DESC

@@ -8,6 +8,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,7 +28,8 @@ import java.util.Date;
 
 
 
-// 인가 필터 : 인증-정보(JWT 토큰)를 확인하는 코드  
+// 인가 필터 : 인증-정보(JWT 토큰)를 확인하는 코드
+@Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final EmployeeService employeeService;
@@ -40,15 +42,15 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        System.out.println("토큰 인증");
-        System.out.println();
+        log.info("토큰 인증");
+       
 
-        String header = request.getHeader(JwtProperties.HEADER_STRING);
+        String header =request.getHeader(JwtProperties.HEADER_STRING);
         header = URLDecoder.decode(header, "UTF-8");
 
 
-        System.out.println(JwtProperties.HEADER_STRING);
-        System.out.println("header : " + header);
+        log.info(JwtProperties.HEADER_STRING);
+        log.info("header : " + header);
 
         if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
             chain.doFilter(request, response);
@@ -56,7 +58,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
         String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
-        System.out.println("dfsfdsf"+token);
+        log.info("가져온 토큰"+token);
 
         SecretKey key = Keys.hmacShaKeyFor(JwtProperties.getSecretKey());
 
@@ -68,8 +70,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
             Claims claims = claimsJws.getBody();
             String username = String.valueOf(claims.get("username"));
-            System.out.println("이름:" + username);
-            System.out.println(jwtAccessTokenIsExpired(token));
+            log.info("사용자명 이름:" + username);
+            log.info("정보"+String.valueOf(claims.get("DEPT_CD")));
+            log.info("유효값"+ jwtAccessTokenIsExpired(token));
 
             if (jwtAccessTokenIsExpired(token)) {
                 handleExpiredAccessToken(request, response);
@@ -82,7 +85,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             handleExpiredAccessToken(request, response);
         } catch (Exception e) {
             // Token validation failed, continue without setting authentication
-            System.out.println("Token validation failed: " + e.getMessage());
+            log.error("Token validation failed: " + e.getMessage());
         }
 
         chain.doFilter(request, response);
@@ -113,7 +116,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     //리플레쉬 토큰 유효성 검사
     private boolean jwtRefreshTokenIsValid(String refreshToken) {
-    	System.out.println("접근");
         try {
             SecretKey key = Keys.hmacShaKeyFor(JwtProperties.getSecretKey());
             Jwts.parserBuilder()
@@ -122,7 +124,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 .parseClaimsJws(refreshToken);
             return true;
         } catch (Exception e) {
-        	System.out.println("리프레위 오류:"+e.getMessage());
+            log.error("리프레쉬 오류:"+e.getMessage());
             return false;
         }
     }
@@ -152,12 +154,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     //리플레쉬 토큰 발급 유무 확인
     private void handleExpiredAccessToken(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
         String refreshToken = URLDecoder.decode(extractRefreshToken(request), "UTF-8").replace("Bearer ", "");
-        System.out.println("엑세스 토큰" + refreshToken);
+        log.info("리플레쉬 토큰" + refreshToken);
 
         if (refreshToken != null && jwtRefreshTokenIsValid(refreshToken)) {
             
             String newAccessToken = generateNewAccessTokenFromRefreshToken(refreshToken);
-            System.out.println("★뉴토큰★"+newAccessToken);
+            log.info("★뉴토큰★"+newAccessToken);
             response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + newAccessToken);
             return ;
         }
