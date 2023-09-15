@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +27,7 @@ import java.util.Map;
 //JwtAuthenticationFilter에 대한 생성자 함수를 만들어서
 //final로 멤버 필드로 정의된 AuthenticationManager객체의 자동 생성할 수 있게 하는것
 //로그인 객체로 데이터를 가져와 => 인증 작업을 처리하여 토큰을 발급해준다.
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
 
@@ -40,7 +42,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 
-		System.out.println("JwtAuthenticationFilter : 진입");
+		log.info("JwtAuthenticationFilter : 진입");
 
 		// request에 있는 username과 password를 파싱해서 자바 Object로 받기
 		//ObjectMapper : 오브젝트를 객체로 변화해준다.
@@ -56,14 +58,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			e.printStackTrace();
 		}
 
-		System.out.println("JwtAuthenticationFilter : "+loginRequestDto);
+		log.info("JwtAuthenticationFilter : "+loginRequestDto);
 
 		// 유저네임패스워드 토큰 생성
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 						loginRequestDto.getUsername(),
 						loginRequestDto.getPassword());
 
-		System.out.println("JwtAuthenticationFilter : 토큰생성완료");
+		log.info("JwtAuthenticationFilter : 토큰생성완료");
 
 		// authenticate() 함수가 호출 되면 인증 프로바이더가 PrincipalDetailsService의
 		// loadUserByUsername(토큰의 첫번째 파라메터) 를 호출하고
@@ -79,7 +81,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		//PrincipalDetails객체는 로그인 요청을 한 유저의 모든 데이터가 들어가 있음
 
 		PrincipalDetails principalDetailis = (PrincipalDetails) authentication.getPrincipal();
-		System.out.println("Authentication : "+principalDetailis.getUser().getUSERNAME());
+		log.info("Authentication : "+principalDetailis.getUser().getUSERNAME());
 		return authentication;
 	}
 
@@ -89,12 +91,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 
-		System.out.println("JwtAuthenticationFilter : successfulAuthentication() 호출");
+		log.info("JwtAuthenticationFilter : successfulAuthentication() 호출");
 		//인증된 사용자 객체 얻기
 		PrincipalDetails principalDetailis = (PrincipalDetails) authResult.getPrincipal();
 
-		System.out.println(principalDetailis.getUser().getEMP_CD());
-		System.out.println(principalDetailis.getUser().getUSERNAME());
+		log.info(principalDetailis.getUser().getEMP_CD());
+		log.info(principalDetailis.getUser().getUSERNAME());
 
 		//인증키 생성
 		SecretKey key = Keys.hmacShaKeyFor(JwtProperties.getSecretKey());
@@ -103,6 +105,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 				.setClaims(Map.of("username", principalDetailis.getUser().getUSERNAME()
 						, "EMP_CD", principalDetailis.getUser().getEMP_CD()
 						,"DIV_CD", principalDetailis.getUser().getDIV_CD()
+						,"DEPT_CD", principalDetailis.getUser().getDEPT_CD()
 						,"CO_CD", principalDetailis.getUser().getCO_CD()))
 				//토큰의 사용 기간을 설정한다
 				.setExpiration(new Date(System.currentTimeMillis()+JwtProperties.ACCESS_EXPIRATION_TIME))
@@ -112,13 +115,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 				.setClaims(Map.of("username", principalDetailis.getUser().getUSERNAME()
 						, "EMP_CD", principalDetailis.getUser().getEMP_CD()
 						,"DIV_CD", principalDetailis.getUser().getDIV_CD()
+						,"DEPT_CD", principalDetailis.getUser().getDEPT_CD()
 						,"CO_CD", principalDetailis.getUser().getCO_CD()))
 				//토큰의 사용 기간을 설정한다
 				.setExpiration(new Date(System.currentTimeMillis()+JwtProperties.REFRESH_EXPIRATION_TIME))
 				.signWith(key) //암호화용 키 : 원본데이터+암호화용 키로 => 암호화
 				.compact();
 
-		System.out.println("첫토큰:"+jwtAccessToken);
+		log.info("첫토큰:"+jwtAccessToken);
 
 		String e_JwtRefreshToken = URLEncoder.encode(jwtRefreshToken, "UTF-8");
         String cookieName = "refreshToken";

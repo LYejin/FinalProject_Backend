@@ -27,8 +27,7 @@ public class PrincipalDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		System.out.println("PrincipalDetailsService : 진입"+username);
 		UserDTO user = employeeService.findByUsername(username);
-		System.out.println(user);
-		//세션을 사용할때는 아래 코드 사용하여 추가함s 
+		//세션을 사용할때는 아래 코드 사용하여 추가함
 		// session.setAttribute("loginUser", user);
 		return new PrincipalDetails(user);
 	}
