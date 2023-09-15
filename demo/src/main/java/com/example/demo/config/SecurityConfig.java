@@ -1,26 +1,19 @@
 package com.example.demo.config;
 
+import com.example.demo.config.jwt.JwtAuthenticationFilter;
+import com.example.demo.config.jwt.JwtAuthorizationFilter;
 import com.example.demo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-
-
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import com.example.demo.config.jwt.JwtAuthenticationFilter;
-import com.example.demo.config.jwt.JwtAuthorizationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
@@ -30,8 +23,6 @@ import org.springframework.security.web.firewall.StrictHttpFirewall;
 @Configuration
 @EnableWebSecurity // 시큐리티 활성화 -> 기본 스프링 필터체인에 등록
 public class SecurityConfig  {
-
-
 
 	@Autowired
 	private EmployeeService employeeService;
@@ -81,7 +72,7 @@ public class SecurityConfig  {
 
 		http.authorizeHttpRequests(authroize -> 
 			authroize
-			.antMatchers("/system/user/**") //인증 처리를 수행할 요청-주소(URL)를 설정
+			.antMatchers("/system/user/**","/accounting/user/**") //인증 처리를 수행할 요청-주소(URL)를 설정
 			.hasAnyAuthority("ROLE_USER", "ROLE_MANAGER", "ROLE_ADMIN") //여러개의 권한 중 하나라도 있으면 성공
 			.antMatchers("/system/manager/**")
 			.hasAnyAuthority("ROLE_MANAGER","ROLE_ADMIN")
@@ -112,8 +103,4 @@ public class SecurityConfig  {
 
 		}
 	}
-
-
-
-
 }
