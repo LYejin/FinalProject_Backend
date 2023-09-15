@@ -5,36 +5,37 @@
     <select id="userSelect" resultType="com.example.demo.dto.UserDTO">
         SELECT *
         FROM Employee_Roll
-        WHERE USERNAME = #{username}
+        WHERE
+            USERNAME = #{username}
     </select>
 
     <!-- EmployeeSearchList   -->
     <select id="employeeSearchList" parameterType="hashmap" resultType="com.example.demo.dto.EmployeeDTO">
         SELECT
-            EMP_CD,
-            CO_CD,
-            DIV_CD,
-            USER_YN,
-            USE_FG,
-            USERNAME,
-            PASSWORD,
-            KOR_NM,
-            EMAIL_ADD,
-            TEL,
-            GENDER_FG,
-            JOIN_DT,
-            RTR_DT,
-            RSRG_ADD,
-            PIC_FILE_ID,
-            ENRL_FG,
-            PERSONAL_MAIL,
-            PERSONAL_MAIL_CP,
-            SALARY_MAIL,
-            SALARY_MAIL_CP,
-            HOME_TEL,
-            ZIPCODE,
-            ADDR,
-            ADDR_NUM
+            EMP_CD
+            ,CO_CD
+            ,DIV_CD
+            ,USER_YN
+            ,USE_FG
+            ,USERNAME
+            ,PASSWORD
+            ,KOR_NM
+            ,EMAIL_ADD
+            ,TEL
+            ,GENDER_FG
+            ,JOIN_DT
+            ,RTR_DT
+            ,RSRG_ADD
+            ,PIC_FILE_ID
+            ,ENRL_FG
+            ,PERSONAL_MAIL
+            ,PERSONAL_MAIL_CP
+            ,SALARY_MAIL
+            ,SALARY_MAIL_CP
+            ,HOME_TEL
+            ,ZIPCODE
+            ,ADDR
+            ,ADDR_NUM
         FROM Employee
         <where>
             <choose>
@@ -66,62 +67,68 @@
     <!--사업장 전체목록 가져오기-->
     <select id="selectWorkplaceSearch" resultType="com.example.demo.dto.WorkplaceDTO">
         SELECT
-        DIV_CD,
-        CO_CD,
-        DIV_YN,
-        FILL_YN,
-        DIV_NM,
-        DIV_ADDR,
-        DIV_TEL,
-        REG_NB,
-        DIV_TO_CD,
-        DIV_NMK,
-        BUSINESS,
-        JONGMOK,
-        OPEN_DT,
-        CLOSE_DT,
-        MAS_NM
+            DIV_CD
+            ,CO_CD
+            ,DIV_YN
+            ,FILL_YN
+            ,DIV_NM
+            ,DIV_ADDR
+            ,DIV_TEL
+            ,REG_NB
+            ,DIV_TO_CD
+            ,DIV_NMK
+            ,BUSINESS
+            ,JONGMOK
+            ,OPEN_DT
+            ,CLOSE_DT
+            ,MAS_NM
         FROM Workplace
-        WHERE CO_CD = #{CO_CD}
+        WHERE
+            CO_CD = #{CO_CD}
     </select>
 
 
     <!-- SelectBox 내 companyList   -->
     <select id="companySearchList" parameterType="com.example.demo.dto.CompanyDTO" resultType="com.example.demo.dto.CompanyDTO">
-        SELECT CO_CD, USE_YN, CO_NM
+        SELECT
+            CO_CD
+            ,USE_YN
+            ,CO_NM
         FROM Company
-        WHERE USE_YN = 1
+        WHERE
+            USE_YN = 1
     </select>
 
     <!-- 사원 상세 테이터 1건 출력 -->
     <select id="employeeDetail" parameterType="com.example.demo.dto.EmployeeDTO" resultType="com.example.demo.dto.EmployeeDTO">
         SELECT
-            EMP_CD,
-            CO_CD,
-            DIV_CD,
-            USER_YN,
-            USE_FG,
-            USERNAME,
-            PASSWORD,
-            KOR_NM,
-            EMAIL_ADD,
-            TEL,
-            GENDER_FG,
-            JOIN_DT,
-            RTR_DT,
-            RSRG_ADD,
-            PIC_FILE_ID,
-            ENRL_FG,
-            PERSONAL_MAIL,
-            PERSONAL_MAIL_CP,
-            SALARY_MAIL,
-            SALARY_MAIL_CP,
-            HOME_TEL,
-            ZIPCODE,
-            ADDR,
-            ADDR_NUM
+            EMP_CD
+            ,CO_CD
+            ,DIV_CD
+            ,USER_YN
+            ,USE_FG
+            ,USERNAME
+            ,PASSWORD
+            ,KOR_NM
+            ,EMAIL_ADD
+            ,TEL
+            ,GENDER_FG
+            ,JOIN_DT
+            ,RTR_DT
+            ,RSRG_ADD
+            ,PIC_FILE_ID
+            ,ENRL_FG
+            ,PERSONAL_MAIL
+            ,PERSONAL_MAIL_CP
+            ,SALARY_MAIL
+            ,SALARY_MAIL_CP
+            ,HOME_TEL
+            ,ZIPCODE
+            ,ADDR
+            ,ADDR_NUM
         FROM Employee
-        WHERE USERNAME = #{USERNAME}
+        WHERE
+            USERNAME = #{USERNAME}
     </select>
 
     <!-- 사업장별 사번 유효성 검사 -->
@@ -129,7 +136,9 @@
         SELECT
             EMP_CD
         FROM Employee
-        WHERE CO_CD = #{CO_CD} AND EMP_CD=#{EMP_CD}
+        WHERE
+            CO_CD = #{CO_CD}
+          AND EMP_CD=#{EMP_CD}
     </select>
 
     <!-- 로그인ID 회사 전체 내 유효성 검사 -->
@@ -137,111 +146,125 @@
         SELECT
             USERNAME
         FROM Employee
-        WHERE USERNAME=#{USERNAME}
+        WHERE
+            USERNAME=#{USERNAME}
     </select>
 
     <!-- 메일ID 회사 전체 내 유효성 검사 -->
     <select id="employeeEmailInCompany" resultType="String">
         SELECT
-         EMAIL_ADD
+            EMAIL_ADD
         FROM Employee
-        WHERE EMAIL_ADD=#{EMAIL_ADD}
+        WHERE
+            EMAIL_ADD=#{EMAIL_ADD}
     </select>
 
     <!-- 신규 사원 데이터 1건 입력 -->
     <insert id="employeeInsert" parameterType="com.example.demo.dto.EmployeeDTO" statementType="CALLABLE">
     { CALL InsertEmployeeRollProcedure(
-        #{EMP_CD},
-        #{CO_CD},
-        #{DIV_CD},
-        '1',
-        '1',
-        #{USERNAME},
-        #{PASSWORD},
-        #{KOR_NM},
-        #{EMAIL_ADD},
-        #{TEL},
-        #{GENDER_FG},
-        #{JOIN_DT},
-        '',
-        #{PIC_FILE_ID},
-        #{ENRL_FG},
-        #{PERSONAL_MAIL},
-        #{PERSONAL_MAIL_CP},
-        #{SALARY_MAIL},
-        #{SALARY_MAIL_CP},
-        #{HOME_TEL},
-        #{ZIPCODE},
-        #{ADDR},
-        #{ADDR_NUM},
-        #{ROLE_NAME}
-    ) }
+            #{EMP_CD}
+            ,#{CO_CD}
+            ,#{DIV_CD}
+            ,#{DEPT_CD}
+            ,'1'
+            ,'1'
+            ,#{USERNAME}
+            ,#{PASSWORD}
+            ,#{KOR_NM}
+            ,#{EMAIL_ADD}
+            ,#{TEL}
+            ,#{GENDER_FG}
+            ,#{JOIN_DT}
+            ,''
+            ,#{PIC_FILE_ID}
+            ,#{ENRL_FG}
+            ,#{PERSONAL_MAIL}
+            ,#{PERSONAL_MAIL_CP}
+            ,#{SALARY_MAIL}
+            ,#{SALARY_MAIL_CP}
+            ,#{HOME_TEL}
+            ,#{ZIPCODE}
+            ,#{ADDR}
+            ,#{ADDR_NUM}
+            ,#{ROLE_NAME}
+        ) }
     </insert>
 
     <!-- 특정 사원 데이터 비 활성화 -->
     <update id="employeeRemove" parameterType="com.example.demo.dto.EmployeeDTO">
-        UPDATE Employee
-             SET USER_YN = '0', USE_FG = '0', ENRL_FG = '2'
+        UPDATE
+            Employee
+        SET
+            USER_YN = '0'
+            ,USE_FG = '0'
+            ,ENRL_FG = '2'
         WHERE
             USERNAME = #{USERNAME}
     </update>
 
     <!-- 특정 사원 데이터 정보 갱신 -->
     <update id="employeeUpdate" parameterType="com.example.demo.dto.EmployeeDTO">
-        UPDATE Employee
+        UPDATE
+            Employee
         <set>
-            <if test="DIV_CD != null">
+            <if test="DIV_CD != null and !DIV_CD.equals('')">
                 DIV_CD = #{DIV_CD},
             </if>
-            <if test="PASSWORD != null">
+            <if test="USE_FG != null and !USE_FG.equals('')">
+                USE_FG = #{USE_FG},
+            </if>
+            <if test="USER_YN != null and !USER_YN.equals('')">
+                USER_YN = #{USER_YN},
+            </if>
+            <if test="PASSWORD != null and !PASSWORD.equals('')">
                 PASSWORD = #{PASSWORD},
             </if>
-            <if test="KOR_NM != null">
+            <if test="KOR_NM != null and !KOR_NM.equals('')">
                 KOR_NM = #{KOR_NM},
             </if>
-            <if test="TEL != null">
+            <if test="TEL != null and !TEL.equals('')">
                 TEL = #{TEL},
             </if>
-            <if test="GENDER_FG != null">
+            <if test="GENDER_FG != null and !GENDER_FG.equals('')">
                 GENDER_FG = #{GENDER_FG},
             </if>
-            <if test="JOIN_DT != null">
+            <if test="JOIN_DT != null and !JOIN_DT.equals('')">
                 JOIN_DT = #{JOIN_DT},
             </if>
-            <if test="RTR_DT != null">
+            <if test="RTR_DT != null and !RTR_DT.equals('')">
                 RTR_DT = #{RTR_DT},
             </if>
-            <if test="RSRG_ADD != null">
+            <if test="RSRG_ADD != null and !RSRG_ADD.equals('')">
                 RSRG_ADD = #{RSRG_ADD},
             </if>
-            <if test="PIC_FILE_ID != null">
+            <if test="PIC_FILE_ID != null and !PIC_FILE_ID.equals('')">
                 PIC_FILE_ID = #{PIC_FILE_ID},
             </if>
-            <if test="ENRL_FG != null">
-                ENRL_FG = #{ENRL_FG},
+            <if test="ENRL_FG != null and !ENRL_FG.equals('')">
+                ENRL_FG = #{ENRL_FG, jdbcType=NUMERIC},
             </if>
-            <if test="PERSONAL_MAIL != null">
+            <if test="PERSONAL_MAIL != null and !PERSONAL_MAIL.equals('')">
                 PERSONAL_MAIL = #{PERSONAL_MAIL},
             </if>
-            <if test="PERSONAL_MAIL_CP != null">
+            <if test="PERSONAL_MAIL_CP != null and !PERSONAL_MAIL_CP.equals('')">
                 PERSONAL_MAIL_CP = #{PERSONAL_MAIL_CP},
             </if>
-            <if test="SALARY_MAIL != null">
+            <if test="SALARY_MAIL != null and !SALARY_MAIL.equals('')">
                 SALARY_MAIL = #{SALARY_MAIL},
             </if>
-            <if test="SALARY_MAIL_CP != null">
+            <if test="SALARY_MAIL_CP != null and !SALARY_MAIL_CP.equals('')">
                 SALARY_MAIL_CP = #{SALARY_MAIL_CP},
             </if>
-            <if test="HOME_TEL != null">
+            <if test="HOME_TEL != null and !HOME_TEL.equals('')">
                 HOME_TEL = #{HOME_TEL},
             </if>
-            <if test="ZIPCODE != null">
+            <if test="ZIPCODE != null and !ZIPCODE.equals('')">
                 ZIPCODE = #{ZIPCODE},
             </if>
-            <if test="ADDR != null">
+            <if test="ADDR != null and !ADDR.equals('')">
                 ADDR = #{ADDR},
             </if>
-            <if test="ADDR_NUM != null">
+            <if test="ADDR_NUM != null and !ADDR_NUM.equals('')">
                 ADDR_NUM = #{ADDR_NUM},
             </if>
         </set>
@@ -252,8 +275,11 @@
 
     <!-- 비밀번호 업데이트 시 권한 정보 갱신 -->
     <update id="employeeRollUpdate" parameterType="com.example.demo.dto.EmployeeDTO">
-        UPDATE Employee_Roll
-        set PASSWORD=#{PASSWORD}
-        WHERE USERNAME = #{USERNAME}
+        UPDATE
+            Employee_Roll
+        set
+            PASSWORD=#{PASSWORD}
+        WHERE
+            USERNAME = #{USERNAME}
     </update>
 </mapper>
