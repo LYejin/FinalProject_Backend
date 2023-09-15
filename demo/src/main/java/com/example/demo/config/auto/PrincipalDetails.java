@@ -1,6 +1,7 @@
 package com.example.demo.config.auto;
 
 import com.example.demo.dto.UserDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -9,6 +10,7 @@ import java.util.Collection;
 
 
 
+@Slf4j
 //UserDetails 내장 인터페이스
 public class PrincipalDetails implements UserDetails {
 
@@ -57,7 +59,7 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        System.out.println(user.getRoleList());
+        log.info("권한"+user.getRoleList());
         user.getRoleList().forEach(r -> {
             authorities.add(() -> {
                 return r;

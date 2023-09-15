@@ -14,6 +14,7 @@ public interface ChangeHistoryDao {
     public Map<String, String>  CHD_TARGET_select(ChangeHistorySearchDTO changeHistorySearchDTO);
     public void changeHistoryInset(ChangeHistoryDTO changeHistoryDTO);
 
+    public void changeHistoryDetailInset(Map<String, Object> params);
 
     public List<ChangeHistoryDTO> ChangeHistorySelect(String CH_CATEGORY);
 }
