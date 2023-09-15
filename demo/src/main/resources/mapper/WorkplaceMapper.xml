@@ -5,25 +5,25 @@
     <!--사업장 전체목록 가져오기-->
     <select id="selectWorkplaceSearch" parameterType="hashmap" resultType="com.example.demo.dto.WorkplaceDTO">
         SELECT
-            DIV_CD,
-            CO_CD,
-            DIV_YN,
-            FILL_YN,
-            DIV_NM,
-            DIV_ADDR,
-            DIV_TEL,
-            REG_NB,
-            DIV_TO_CD,
-            DIV_NMK,
-            BUSINESS,
-            JONGMOK,
-            OPEN_DT,
-            CLOSE_DT,
-            MAS_NM,
-            DIV_FAX,
-            COP_NB,
-            ADDR_CD,
-            ADDR_NUM
+            DIV_CD
+            ,CO_CD
+            ,DIV_YN
+            ,FILL_YN
+            ,DIV_NM
+            ,DIV_ADDR
+            ,DIV_TEL
+            ,REG_NB
+            ,DIV_TO_CD
+            ,DIV_NMK
+            ,BUSINESS
+            ,JONGMOK
+            ,OPEN_DT
+            ,CLOSE_DT
+            ,MAS_NM
+            ,DIV_FAX
+            ,COP_NB
+            ,ADDR_CD
+            ,ADDR_NUM
         FROM
             Workplace
         <where>

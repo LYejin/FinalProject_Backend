@@ -55,7 +55,7 @@ public class WorkplaceController {
         try {
             WorkplaceDTO wpInfo = workplaceService.selectWorkplaceInfoByDIVCD(divCd);
             //log.info("Get Workplace Detail Controller", divCd, wpInfo);
-            log.info("Get Workplace Detail Controller");
+            log.info("Get Workplace Detail Controller" + divCd);
             return new ResponseEntity<>(wpInfo, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Error while fetching workplace info for DIV_CD {}: ", divCd, e);
