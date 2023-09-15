@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.DepartmentDao">
+
+        <!-- 부서 계층 구조를 가져오는 쿼리 -->
+    <select id="getDepartmentHierarchy" resultType="com.example.demo.dto.DepartmentDTO">
+        SELECT
+            d.DEPT_CD
+            ,d.CO_CD
+            ,d.DIV_CD
+            ,d.CALL_YN
+            ,d.Field2
+            ,d.CALL_NM
+            ,d.DEPT_CT
+            ,d.DEPT_NM
+            ,d.DEPT_NMK
+            ,d.APPR_NM
+            ,d.MGR_NM
+            ,d.DEPT_YN
+            ,d.MGR_YN
+            ,d.SHOW_YN
+            ,d.SORT_YN
+            ,d.MDEPT_CD
+            ,c.CO_NM
+            ,w.DIV_NM
+        FROM Department d
+    LEFT JOIN Company c
+           ON d.CO_CD = c.CO_CD
+    LEFT JOIN Workplace w
+           ON d.DIV_CD = w.DIV_CD
+       WHERE
+           d.CO_CD=#{CO_CD}
+    </select>
+
+    </mapper>
