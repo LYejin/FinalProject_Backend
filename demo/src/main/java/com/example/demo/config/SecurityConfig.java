@@ -79,16 +79,16 @@ public class SecurityConfig  {
 		http.apply(new MyCustomDsl());
 
 
-		http.authorizeHttpRequests(authroize -> 
+	http.authorizeHttpRequests(authroize ->
 			authroize
-			.antMatchers("/system/user/**") //인증 처리를 수행할 요청-주소(URL)를 설정
-			.hasAnyAuthority("ROLE_USER", "ROLE_MANAGER", "ROLE_ADMIN") //여러개의 권한 중 하나라도 있으면 성공
-			.antMatchers("/system/manager/**")
-			.hasAnyAuthority("ROLE_MANAGER","ROLE_ADMIN")
-			.antMatchers("/system/admin/**")
-			.hasAuthority("ROLE_ADMIN") //반드시 해당 권한만 허가  
-			.anyRequest().permitAll() //비회원도 사용 할 수 있게 설정
-		);
+					.antMatchers("/system/user/**","/accounting/user/**") //인증 처리를 수행할 요청-주소(URL)를 설정
+					.hasAnyAuthority("ROLE_USER", "ROLE_MANAGER", "ROLE_ADMIN") //여러개의 권한 중 하나라도 있으면 성공
+					.antMatchers("/system/manager/**")
+					.hasAnyAuthority("ROLE_MANAGER","ROLE_ADMIN")
+					.antMatchers("/system/admin/**")
+					.hasAuthority("ROLE_ADMIN") //반드시 해당 권한만 허가
+					.anyRequest().permitAll() //비회원도 사용 할 수 있게 설정
+	);
 		
 		return http.build();
 		//기본적인 보안설정(SecurityFilterChain) 끝나고 추가적으로 커스텀 필터가 실행해 보안설정 적용됨
