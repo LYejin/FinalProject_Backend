@@ -30,4 +30,33 @@ public class AcashFixService {
             return null;
         }
     }
+
+
+    // 고정자금 등록
+    public int AcashFixInsert(AcashFixDTO acashFixDTO) {
+        try {
+            int insertResult = acashFixDao.insertAcashFix(acashFixDTO);
+            //log.info("Insert AcashFix Service", insertResult, acashFixDTO);
+            log.info("Insert AcashFix Service", insertResult);
+            return insertResult;
+        } catch (Exception e) {
+            log.error("Error while inserting workplace: ", e);
+            return 0;
+        }
+    }
+
+    // 고정자금 수정
+    public int AcashFixUpdate(AcashFixDTO acashFixDTO) {
+        try {
+            int updateResult = acashFixDao.updateAcashFix(acashFixDTO);
+            //log.info("Update AcashFix Service", updateResult, acashFixDTO);
+            log.info("Update AcashFix Service", updateResult);
+            return updateResult;
+        } catch (Exception e) {
+            log.error("Error while updating workplace: ", e);
+            return 0;
+        }
+    }
+
+
 }

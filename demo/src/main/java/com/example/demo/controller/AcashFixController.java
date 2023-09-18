@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.AcashFixDTO;
+import com.example.demo.dto.WorkplaceDTO;
 import com.example.demo.service.AcashFixService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,34 @@ public class AcashFixController {
             return new ResponseEntity<>(list, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Error while fetching all AcashFix: ", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // 고정자금 추가
+    @PostMapping("insert")
+    public ResponseEntity<Integer> AcashFixInsert(@RequestBody AcashFixDTO acashFixDTO) {
+        try {
+            int result = acashFixService.AcashFixInsert(acashFixDTO);
+            //log.info("Inserted AcashFix Controller", acashFixDTO, result);
+            log.info("Insert AcashFix Controller");
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error while inserting AcashFix: ", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //고정자금 수정
+    @PutMapping("update")
+    public ResponseEntity<Integer> AcashFixUpdate(@RequestBody AcashFixDTO acashFixDTO) {
+        try {
+            int result = acashFixService.AcashFixUpdate(acashFixDTO);
+            //log.info("Update AcashFix Controller", acashFixDTO, result);
+            log.info("Update AcashFix Controller");
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error while updating AcashFix: ", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
