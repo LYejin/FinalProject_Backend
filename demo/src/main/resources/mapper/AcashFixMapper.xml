@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.AcashFixDao">
+
+    <!--고정자금 전체목록 가져오기-->
+    <select id="selectAcashFixSearch" parameterType="hashmap" resultType="com.example.demo.dto.AcashFixDTO">
+        SELECT
+        DIV_CD,
+        DEAL_DD,
+        RMK_DC,
+        CASH_AM,
+        FR_DT,
+        TO_DT,
+        PJT_CD,
+        DEAL_PD,
+        DEAL_MM,
+        DISP_SQ,
+        CASH_CD,
+        TR_CD,
+        EMP_CD,
+        FTR_CD
+        FROM
+        AcashFix
+        <where>
+            DIV_CD=#{DIV_CD}
+            AND DISP_SQ=#{DISP_SQ}
+            <if test="TR_CD != null">
+                AND TR_CD = #{TR_CD}
+            </if>
+            <if test="FTR_CD != null">
+                AND FTR_CD = #{FTR_CD}
+            </if>
+            <!-- 날짜 범위에 대한 조건 추가 -->
+            <if test="FR_DT1 != null and FR_DT2 != null">
+                AND FR_DT BETWEEN #{FR_DT1} AND #{FR_DT2}
+            </if>
+            <if test="TO_DT1 != null and TO_DT2 != null">
+                AND TO_DT BETWEEN #{TO_DT1} AND #{TO_DT2}
+            </if>
+        </where>
+        ORDER BY SQ_NB
+    </select>
+
+</mapper>
