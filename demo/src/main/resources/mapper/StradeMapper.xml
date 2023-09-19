@@ -9,8 +9,8 @@
                 TR_CD
             FROM StradeRollManage
             WHERE
-                CO_CD=#{CO_CD}
-             AND EMP_CD=#{EMP_CD}
+                CO_CD=#{CO_CD, jdbcType=VARCHAR}
+             AND EMP_CD=#{EMP_CD, jdbcType=VARCHAR}
             )
         OR s.VIEW_YN = '0'
     </sql>
@@ -23,6 +23,19 @@
         WHERE
             CO_CD = #{CO_CD}
           AND TR_CD = #{TR_CD}
+          AND EMP_CD IS NOT NULL
+    </sql>
+
+    <!--  해당 거래처의 권한이 있는 부서 DEPT_CD   -->
+    <sql id="deptHelpCodeEmpCD">
+        SELECT
+            DEPT_CD
+        FROM StradeRollManage
+        WHERE
+            CO_CD = #{CO_CD}
+          AND TR_CD = #{TR_CD}
+          AND DEPT_CD IS NOT NULL
+        GROUP BY DEPT_CD
     </sql>
 
     <!-- 전체 일반 거래처 데이터 및 검색 결과 처리   -->
@@ -55,19 +68,19 @@
         <where>
             <include refid="stradeRoll" />
             <if test="TR_CD != null and !TR_NM.equals('')">
-                AND s.TR_CD = #{TR_CD}
+                AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
             </if>
             <if test="TR_NM != null and !TR_NM.equals('')">
-                AND s.TR_NM = #{TR_NM}
+                AND s.TR_NM = #{TR_NM}, jdbcType=VARCHAR
             </if>
             <if test="REG_NB != null and !REG_NB.equals('')">
-                AND g.REG_NB = #{REG_NB}
+                AND g.REG_NB = #{REG_NB, jdbcType=VARCHAR}
             </if>
             <if test="PPL_NB != null and !PPL_NB.equals('')">
-                AND g.PPL_NB = #{PPL_NB}
+                AND g.PPL_NB = #{PPL_NB, jdbcType=VARCHAR}
             </if>
             <if test="USE_YN != null and !USE_YN.equals('')">
-                AND s.USE_YN = #{USE_YN}
+                AND s.USE_YN = #{USE_YN, jdbcType=VARCHAR}
             </if>
         </where>
     </select>
@@ -93,16 +106,16 @@
         <where>
             <include refid="stradeRoll" />
             <if test="TR_CD != null and !TR_NM.equals('')">
-                AND s.TR_CD = #{TR_CD}
+                AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
             </if>
             <if test="TR_NM != null and !TR_NM.equals('')">
-                AND s.TR_NM = #{TR_NM}
+                AND s.TR_NM = #{TR_NM, jdbcType=VARCHAR}
             </if>
             <if test="BA_NB_TR != null and !BA_NB_TR.equals('')">
-                AND f.BA_NB_TR = #{BA_NB_TR}
+                AND f.BA_NB_TR = #{BA_NB_TR, jdbcType=VARCHAR}
             </if>
             <if test="USE_YN != null and !USE_YN.equals('')">
-                AND s.USE_YN = #{USE_YN}
+                AND s.USE_YN = #{USE_YN, jdbcType=VARCHAR}
             </if>
         </where>
     </select>
@@ -117,12 +130,12 @@
             ,USE_YN
             ,VIEW_YN
         ) VALUES (
-            #{TR_CD}
-            ,#{CO_CD}
-            ,#{TR_NM}
-            ,#{TR_FG}
-            ,#{USE_YN}
-            ,#{VIEW_YN}
+            #{TR_CD, jdbcType=VARCHAR}
+            ,#{CO_CD, jdbcType=VARCHAR}
+            ,#{TR_NM, jdbcType=VARCHAR}
+            ,#{TR_FG, jdbcType=VARCHAR}
+            ,#{USE_YN, jdbcType=VARCHAR}
+            ,#{VIEW_YN, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -149,24 +162,24 @@
                 ,FOR_YN
                 ,LIQ_CD
         ) VALUES (
-                #{TR_CD}
-                ,#{CO_CD}
-                ,#{REG_NB}
-                ,#{PPL_NB}
-                ,#{CEO_NM}
-                ,#{BUSINESS}
-                ,#{JONGMOK}
-                ,#{ZIP}
-                ,#{ADDR}
-                ,#{ADDR_NUM}
-                ,#{PHONE_NB}
-                ,#{FAX}
-                ,#{WEBSITE}
-                ,#{EMAIL}
-                ,#{START_DT}
-                ,#{END_DT}
-                ,#{FOR_YN}
-                ,#{LIQ_CD}
+                #{TR_CD, jdbcType=VARCHAR}
+                ,#{CO_CD, jdbcType=VARCHAR}
+                ,#{REG_NB, jdbcType=VARCHAR}
+                ,#{PPL_NB, jdbcType=VARCHAR}
+                ,#{CEO_NM, jdbcType=VARCHAR}
+                ,#{BUSINESS, jdbcType=VARCHAR}
+                ,#{JONGMOK, jdbcType=VARCHAR}
+                ,#{ZIP, jdbcType=VARCHAR}
+                ,#{ADDR, jdbcType=VARCHAR}
+                ,#{ADDR_NUM, jdbcType=VARCHAR}
+                ,#{PHONE_NB, jdbcType=VARCHAR}
+                ,#{FAX, jdbcType=VARCHAR}
+                ,#{WEBSITE, jdbcType=VARCHAR}
+                ,#{EMAIL, jdbcType=VARCHAR}
+                ,#{START_DT, jdbcType=VARCHAR}
+                ,#{END_DT, jdbcType=VARCHAR}
+                ,#{FOR_YN, jdbcType=VARCHAR}
+                ,#{LIQ_CD, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -184,15 +197,15 @@
                     ,ACCOUNT_OPEN_BN
                     ,BANK_CD
         ) VALUES (
-                    #{TR_CD}
-                    ,#{CO_CD}
-                    ,#{FSTART_DT}
-                    ,#{FEND_DT}
-                    ,#{BA_NB_TR}
-                    ,#{DEPOSITOR}
-                    ,#{DEPOSIT_NM}
-                    ,#{ACCOUNT_OPEN_BN}
-                    ,#{BANK_CD}
+                    #{TR_CD, jdbcType=VARCHAR}
+                    ,#{CO_CD, jdbcType=VARCHAR}
+                    ,#{FSTART_DT, jdbcType=VARCHAR}
+                    ,#{FEND_DT, jdbcType=VARCHAR}
+                    ,#{BA_NB_TR, jdbcType=VARCHAR}
+                    ,#{DEPOSITOR, jdbcType=VARCHAR}
+                    ,#{DEPOSIT_NM, jdbcType=VARCHAR}
+                    ,#{ACCOUNT_OPEN_BN, jdbcType=VARCHAR}
+                    ,#{BANK_CD, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -224,8 +237,8 @@
             ON s.TR_CD = g.TR_CD
           AND s.CO_CD = g.CO_CD
         WHERE
-            s.CO_CD = #{CO_CD}
-          AND s.TR_CD = #{TR_CD}
+            s.CO_CD = #{CO_CD, jdbcType=VARCHAR}
+          AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
     </select>
 
     <!-- 금융 거래처 데이터 1건 출력   -->
@@ -247,8 +260,8 @@
             ON s.TR_CD = f.TR_CD
          AND s.CO_CD = f.CO_CD
         WHERE
-            s.CO_CD = #{CO_CD}
-         AND s.TR_CD = #{TR_CD}
+            s.CO_CD = #{CO_CD, jdbcType=VARCHAR}
+         AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
     </select>
 
     <!--  거래처 업데이트  -->
@@ -260,8 +273,8 @@
             ,USE_YN = IFNULL(#{USE_YN, jdbcType=VARCHAR}, USE_YN)
             ,VIEW_YN = IFNULL(#{VIEW_YN, jdbcType=VARCHAR}, VIEW_YN)
         WHERE
-            TR_CD=#{TR_CD}
-         AND CO_CD=#{CO_CD}
+            TR_CD=#{TR_CD, jdbcType=VARCHAR}
+         AND CO_CD=#{CO_CD, jdbcType=VARCHAR}
     </update>
 
     <!--  일반 거래처 업데이트  -->
@@ -286,8 +299,8 @@
             ,FOR_YN = IFNULL(#{FOR_YN, jdbcType=VARCHAR}, FOR_YN)
             ,LIQ_CD = IFNULL(#{LIQ_CD, jdbcType=VARCHAR}, LIQ_CD)
         WHERE
-            TR_CD=#{TR_CD}
-          AND CO_CD=#{CO_CD}
+            TR_CD=#{TR_CD, jdbcType=VARCHAR}
+          AND CO_CD=#{CO_CD, jdbcType=VARCHAR}
     </update>
 
     <!-- 금융 거래처 업데이트  -->
@@ -303,16 +316,19 @@
             ,ACCOUNT_OPEN_BN = IFNULL(#{ACCOUNT_OPEN_BN, jdbcType=VARCHAR}, ACCOUNT_OPEN_BN)
             ,BANK_CD = IFNULL(#{BANK_CD, jdbcType=VARCHAR}, BANK_CD)
         WHERE
-            TR_CD=#{TR_CD}
-          AND CO_CD=#{CO_CD}
+            TR_CD=#{TR_CD, jdbcType=VARCHAR}
+          AND CO_CD=#{CO_CD, jdbcType=VARCHAR}
     </update>
 
     <!--  거래처권한관리   -->
     <!--  각 거래처 권한 리스트 -->
-    <select id="stradeRollManageSearchList" parameterType="com.example.demo.dto.StradeRollManageDTO">
+    <select id="stradeRollManageSearchList" parameterType="com.example.demo.dto.StradeRollManageDTO"  resultType="com.example.demo.dto.StradeRollManageDTO">
         SELECT
             TRMG_SQ
             ,TR_CD
+            ,ROLL_FG
+            ,DEPT_CD
+            ,DEPT_NM
             ,CO_CD
             ,EMP_CD
             ,KOR_NM
@@ -321,8 +337,8 @@
             ,INSERT_DT
         FROM StradeRollManage
         WHERE
-            TR_CD = #{TR_CD}
-          AND CO_CD = #{CO_CD}
+            TR_CD = #{TR_CD, jdbcType=VARCHAR}
+          AND CO_CD = #{CO_CD, jdbcType=VARCHAR}
     </select>
 
     <!-- 거래처 권한 등록 insert  -->
@@ -332,28 +348,34 @@
                 IFNULL(MAX(TRMG_SQ), 0) + 1
             FROM StradeRollManage srm
             WHERE
-                CO_CD=#{CO_CD}
-              AND TR_CD=#{TR_CD}
+                CO_CD=#{CO_CD, jdbcType=VARCHAR}
+              AND TR_CD=#{TR_CD, jdbcType=VARCHAR}
         </selectKey>
         INSERT INTO
             StradeRollManage (
                 TRMG_SQ
                 ,TR_CD
                 ,CO_CD
+                ,DEPT_CD
+                ,DEPT_NM
                 ,EMP_CD
                 ,KOR_NM
                 ,NOTE
                 ,USE_YN
                 ,INSERT_DT
+                ,ROLL_FG
         ) VALUES (
-                #{trmgSq}
-                ,#{TR_CD}
-                ,#{CO_CD}
-                ,#{EMP_CD}
-                ,#{KOR_NM}
-                ,#{NOTE}
-                ,#{USE_YN}
+                #{trmgSq, jdbcType=INTEGER}
+                ,#{TR_CD, jdbcType=VARCHAR}
+                ,#{CO_CD, jdbcType=VARCHAR}
+                ,#{DEPT_CD, jdbcType=VARCHAR}
+                ,#{DEPT_NM, jdbcType=VARCHAR}
+                ,#{EMP_CD, jdbcType=VARCHAR}
+                ,#{KOR_NM, jdbcType=VARCHAR}
+                ,#{NOTE, jdbcType=VARCHAR}
+                ,#{USE_YN, jdbcType=VARCHAR}
                 ,NOW()
+                ,#{ROLL_FG, jdbcType=VARCHAR}
             )
     </insert>
 
@@ -368,10 +390,19 @@
             ,USE_YN = IFNULL(#{USE_YN, jdbcType=VARCHAR}, USE_YN)
             ,INSERT_DT = IFNULL(#{INSERT_DT, jdbcType=TIMESTAMP}, INSERT_DT)
         WHERE
-            TRMG_SQ = #{TRMG_SQ}
-          AND TR_CD = #{TR_CD}
-          AND CO_CD = #{CO_CD}
+            TRMG_SQ = #{TRMG_SQ, jdbcType=VARCHAR}
+          AND TR_CD = #{TR_CD, jdbcType=VARCHAR}
+          AND CO_CD = #{CO_CD, jdbcType=VARCHAR}
     </update>
+
+    <delete id="stradeRollManageDelete" parameterType="com.example.demo.dto.StradeRollManageDTO">
+        DELETE FROM StradeRollManage
+        <where>
+                <foreach collection="ENRL_FG" item="enrlFg" separator="OR">
+                    ENRL_FG = #{enrlFg}
+                </foreach>
+        </where>
+    </delete>
 
     <!--  사원코드도움 모달  -->
     <select id="empCodeHelpList" parameterType="com.example.demo.dto.EmpCodeHelpListDTO">
@@ -389,6 +420,57 @@
           AND e.CO_CD = w.CO_CD
         WHERE
             e.EMP_CD NOT IN (<include refid="empHelpCodeEmpCD" />)
+          AND e.EMP_CD IS NOT NULL
+    </select>
+
+    <!-- 부서코드도움 모달   -->
+    <select id="deptCodeHelpList" parameterType="com.example.demo.dto.DepartmentDTO" resultType="com.example.demo.dto.DepartmentDTO">
+        SELECT
+            DEPT_CD
+            ,DEPT_NM
+        FROM Department
+        WHERE
+            CO_CD = #{CO_CD, jdbcType=VARCHAR}
+          AND DEPT_CD NOT IN (<include refid="deptHelpCodeEmpCD" />)
+    </select>
+
+    <!--  거래처코드도움 모달  -->
+    <select id="stradeCodeHelpList" parameterType="com.example.demo.dto.StradeCodeHelpSearchDTO" resultType="com.example.demo.dto.StradeCodeHelpDTO">
+        SELECT
+            s.TR_CD
+            ,s.TR_NM
+            ,s.TR_FG
+            ,g.REG_NB
+            ,g.CEO_NM
+            ,f.BA_NB_TR
+        FROM Strade s
+        LEFT OUTER JOIN Gtrade g
+            ON s.TR_CD = g.TR_CD
+          AND s.CO_CD = g.CO_CD
+        LEFT OUTER JOIN Ftrade f
+            ON s.TR_CD = f.TR_CD
+          AND s.CO_CD = f.CO_CD
+        <where>
+            s.CO_CD = #{CO_CD, jdbcType=VARCHAR}
+            <choose>
+                <when test="USE_YN != null and !USE_YN.equals('') and USE_YN == 0">
+                    AND s.USE_YN IN (0, 1)
+                </when>
+                <otherwise>
+                    AND s.USE_YN = 1
+                </otherwise>
+            </choose>
+            <if test="VALUE != null and !VALUE.equals('')">
+                AND (s.TR_CD LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR s.TR_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR f.BA_NB_TR LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR g.REG_NB LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR g.CEO_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%'))
+            </if>
+            <if test="TR_FG != null and !TR_FG.equals('')">
+                AND s.TR_FG = #{TR_FG}
+            </if>
+        </where>
     </select>
 
     <!--  일반거래처 데이터 업데이트  -->

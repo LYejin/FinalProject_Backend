@@ -2,6 +2,7 @@ package com.example.demo.dao;
 
 import com.example.demo.dto.*;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -56,4 +57,10 @@ public interface StradeDao {
 
     // 사원코드도움 리스트
     List<EmpCodeHelpDTO> empCodeHelpList(EmpCodeHelpListDTO empCodeHelpDTO);
+
+    // 부서코드도움 리스트
+    List<DepartmentDTO> deptCodeHelpList(@Param("CO_CD")String CO_CD, @Param("TR_CD")String TR_CD);
+
+    // 거래처코드도움 리스트
+    List<StradeCodeHelpDTO> stradeCodeHelpList(StradeCodeHelpSearchDTO stradeCodeHelpSearchDTO);
 }
