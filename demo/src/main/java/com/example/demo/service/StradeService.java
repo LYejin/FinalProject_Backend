@@ -63,7 +63,6 @@ public class StradeService {
         return sftradeList;
     }
 
-
     // 일반 거래처 데이터 1건 조회
     public SGtradeDTO sgtradeDetail(Map<String, String> map) {
         log.info("sgtradeDetailService 실행");
@@ -147,18 +146,44 @@ public class StradeService {
     }
 
 
-    // 사원코드도움
-    // 각 거래처 권한 리스트
+    // 사원코드도움 모달창 list
     public List<EmpCodeHelpDTO> empCodeHelpList(EmpCodeHelpListDTO empCodeHelpListDTO) {
         log.info("empCodeHelpListService 실행");
         List<EmpCodeHelpDTO> empCodeHelpList = new ArrayList<>();
         try {
             empCodeHelpList = stradeDao.empCodeHelpList(empCodeHelpListDTO);
-            log.info("결과 empCodeHelpList={}", empCodeHelpList);
+            //log.info("결과 empCodeHelpList={}", empCodeHelpList);
         } catch (Exception e) {
             log.error("empCodeHelpListService Error : empCodeHelpList={}, errorMessage={}",empCodeHelpList,e.getMessage());
         }
         return empCodeHelpList;
+    }
+
+    // 부서코드도움 모달창 list
+    public List<DepartmentDTO> deptCodeHelpList(String CO_CD, String TR_CD) {
+        log.info("deptCodeHelpListService 실행");
+        List<DepartmentDTO> deptCodeHelpList = new ArrayList<>();
+        try {
+            deptCodeHelpList = stradeDao.deptCodeHelpList(CO_CD, TR_CD);
+            //log.info("결과 deptCodeHelpList={}", deptCodeHelpList);
+        } catch (Exception e) {
+            log.error("deptCodeHelpListService Error : deptCodeHelpList={}, errorMessage={}",deptCodeHelpList,e.getMessage());
+        }
+        return deptCodeHelpList;
+    }
+
+    // 거래처코드도움 모달창 list
+    public List<StradeCodeHelpDTO> stradeCodeHelpList(StradeCodeHelpSearchDTO stradeCodeHelpSearchDTO) {
+        log.info("stradeCodeHelpListService 실행");
+        List<StradeCodeHelpDTO> stradeCodeHelpList = new ArrayList<>();
+
+        try {
+            stradeCodeHelpList = stradeDao.stradeCodeHelpList(stradeCodeHelpSearchDTO);
+            //log.info("결과 stradeCodeHelpList={}", stradeCodeHelpList);
+        } catch (Exception e) {
+            log.error("StradeCodeHelpListService Error : stradeCodeHelpList={}, errorMessage={}",stradeCodeHelpList,e.getMessage());
+        }
+        return stradeCodeHelpList;
     }
 
     //    @Transactional

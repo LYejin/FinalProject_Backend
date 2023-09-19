@@ -46,7 +46,7 @@
                     USER_YN='1'
                 </otherwise>
             </choose>
-            <if test="CO_CD != null">
+            <if test="CO_CD != null and !CO_CD.equals('')">
                 AND CO_CD = #{CO_CD}
             </if>
             <if test="ENRL_FG != null and ENRL_FG.length > 0">
@@ -56,7 +56,7 @@
                 </foreach>
                 )
             </if>
-            <if test="NAME != null">
+            <if test="NAME != null and !NAME.equals('')">
                 AND (USERNAME LIKE CONCAT('%', #{NAME}, '%')
                 OR KOR_NM LIKE CONCAT('%', #{NAME}, '%')
                 OR EMAIL_ADD LIKE CONCAT('%', #{NAME}, '%'))
@@ -69,19 +69,7 @@
         SELECT
             DIV_CD
             ,CO_CD
-            ,DIV_YN
-            ,FILL_YN
             ,DIV_NM
-            ,DIV_ADDR
-            ,DIV_TEL
-            ,REG_NB
-            ,DIV_TO_CD
-            ,DIV_NMK
-            ,BUSINESS
-            ,JONGMOK
-            ,OPEN_DT
-            ,CLOSE_DT
-            ,MAS_NM
         FROM Workplace
         WHERE
             CO_CD = #{CO_CD}
