@@ -24,5 +24,5 @@ public class AcashFixDTO {
     private String TR_NM;     //일반거래처 이름
     private String FTR_NM;    //금융거래처 이름
     private String BA_NB_TR;  //계좌번호
-    private String BANK_CD; //은행이름
+    private String BANK_NAME; //은행이름
 }

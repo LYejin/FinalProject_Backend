@@ -45,7 +45,7 @@ public class AcashFixController {
             map.put("FR_DT2", FR_DT2);
 
             List<AcashFixDTO> list = acashFixService.selectAcashFixSearch(map);
-            log.info("Get AcashFix List Controller"+list);
+            log.info("Get AcashFix List Controller");
             return new ResponseEntity<>(list, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Error while fetching all AcashFix: ", e);

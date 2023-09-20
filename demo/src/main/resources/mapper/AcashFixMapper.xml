@@ -22,14 +22,15 @@
         ,A.FTR_CD
         ,D.TR_NM as FTR_NM
         ,E.BA_NB_TR
-        ,E.BANK_CD
         ,A.EMP_CD
+        ,S.BANK_NAME
         FROM
         AcashFix A
         LEFT JOIN Acashcd B ON A.CASH_CD = B.CASH_CD
         LEFT JOIN Strade C ON A.TR_CD = C.TR_CD
         LEFT JOIN Strade D ON A.FTR_CD = D.TR_CD
         LEFT JOIN Ftrade E ON A.FTR_CD = E.TR_CD
+        LEFT JOIN FINANCECODE S ON E.BANK_CD = S.FINANCE_CD
         <where>
             A.DIV_CD=#{DIV_CD}
             AND A.DISP_SQ=#{DISP_SQ}
