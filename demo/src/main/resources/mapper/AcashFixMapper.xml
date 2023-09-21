@@ -5,46 +5,55 @@
     <!--고정자금 전체목록 가져오기-->
     <select id="selectAcashFixSearch" parameterType="hashmap" resultType="com.example.demo.dto.AcashFixDTO">
         SELECT
-        A.DIV_CD
-        ,A.DEAL_DD
-        ,A.RMK_DC
-        ,A.CASH_AM
-        ,A.FR_DT
-        ,A.TO_DT
-        ,A.PJT_CD
-        ,A.DEAL_PD
-        ,A.DEAL_MM
-        ,A.DISP_SQ
-        ,A.CASH_CD
-        ,B.CASH_NM
-        ,A.TR_CD
-        ,C.TR_NM
-        ,A.FTR_CD
-        ,D.TR_NM as FTR_NM
-        ,E.BA_NB_TR
-        ,A.EMP_CD
-        ,S.BANK_NAME
+            A.SQ_NB
+            ,A.DIV_CD
+            ,A.DEAL_DD
+            ,A.RMK_DC
+            ,A.CASH_AM
+            ,A.FR_DT
+            ,A.TO_DT
+            ,A.PJT_CD
+            ,A.DEAL_PD
+            ,A.DEAL_MM
+            ,A.DISP_SQ
+            ,A.CASH_CD
+            ,B.CASH_NM
+            ,A.TR_CD
+            ,C.TR_NM
+            ,A.FTR_CD
+            ,D.TR_NM as FTR_NM
+            ,E.BA_NB_TR
+            ,A.EMP_CD
+            ,S.BANK_NAME
         FROM
         AcashFix A
-        LEFT JOIN Acashcd B ON A.CASH_CD = B.CASH_CD
-        LEFT JOIN Strade C ON A.TR_CD = C.TR_CD
-        LEFT JOIN Strade D ON A.FTR_CD = D.TR_CD
-        LEFT JOIN Ftrade E ON A.FTR_CD = E.TR_CD
-        LEFT JOIN FINANCECODE S ON E.BANK_CD = S.FINANCE_CD
+        LEFT JOIN Acashcd B
+             ON A.CASH_CD = B.CASH_CD
+        LEFT JOIN Strade C
+             ON A.TR_CD = C.TR_CD
+        LEFT JOIN Strade D
+             ON A.FTR_CD = D.TR_CD
+        LEFT JOIN Ftrade E
+             ON A.FTR_CD = E.TR_CD
+        LEFT JOIN FINANCECODE S
+             ON E.BANK_CD = S.FINANCE_CD
         <where>
             A.DIV_CD=#{DIV_CD}
             AND A.DISP_SQ=#{DISP_SQ}
-            <if test="TR_CD != null">
+            <if test="CASH_CD != null">
+                AND A.CASH_CD = #{CASH_CD}
+            </if>
+            <if test="TR_CD != null and TR_CD !=''" >
                 AND A.TR_CD = #{TR_CD}
             </if>
-            <if test="FTR_CD != null">
+            <if test="FTR_CD != null and FTR_CD !=''">
                 AND A.FTR_CD = #{FTR_CD}
             </if>
             <!-- 날짜 범위에 대한 조건 추가 -->
-            <if test="FR_DT1 != null and FR_DT2 != null">
+            <if test="FR_DT1 != null and FR_DT2 != null and FR_DT1 !='' and FR_DT2 !=''">
                 AND A.FR_DT BETWEEN #{FR_DT1} AND #{FR_DT2}
             </if>
-            <if test="TO_DT1 != null and TO_DT2 != null">
+            <if test="TO_DT1 != null and TO_DT2 != null and TO_DT1 !='' and TO_DT2 != '' ">
                 AND A.TO_DT BETWEEN #{TO_DT1} AND #{TO_DT2}
             </if>
         </where>
