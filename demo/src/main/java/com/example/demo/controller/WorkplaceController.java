@@ -50,18 +50,37 @@ public class WorkplaceController {
     }
 
     //사업장 상세
-    @GetMapping("getWorkpInfo/{divCd}")
-    public ResponseEntity<WorkplaceDTO> getWorkplaceInfo(@PathVariable String divCd) {
+//    @GetMapping("getWorkpInfo/{divCd}")
+//    public ResponseEntity<WorkplaceDTO> getWorkplaceInfo(@PathVariable String divCd) {
+//        try {
+//            WorkplaceDTO wpInfo = workplaceService.selectWorkplaceInfoByDIVCD(divCd);
+//            //log.info("Get Workplace Detail Controller", divCd, wpInfo);
+//            log.info("Get Workplace Detail Controller" + divCd);
+//            return new ResponseEntity<>(wpInfo, HttpStatus.OK);
+//        } catch (Exception e) {
+//            log.error("Error while fetching workplace info for DIV_CD {}: ", divCd, e);
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+
+    //사업장 상세
+    @GetMapping("getWorkpInfo")
+    public ResponseEntity<WorkplaceDTO> getWorkplaceInfo(
+            @RequestParam String divCd,
+            @RequestParam String coCd) {
         try {
-            WorkplaceDTO wpInfo = workplaceService.selectWorkplaceInfoByDIVCD(divCd);
-            //log.info("Get Workplace Detail Controller", divCd, wpInfo);
-            log.info("Get Workplace Detail Controller" + divCd);
+            Map<String, String> params = new HashMap<>();
+            params.put("DIV_CD", divCd);
+            params.put("CO_CD", coCd);
+            WorkplaceDTO wpInfo = workplaceService.selectWorkplaceInfoByDIVCD(params);
+            log.info("Get Workplace Detail Controller divCd: " + divCd + ", coCd: " + coCd);
             return new ResponseEntity<>(wpInfo, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Error while fetching workplace info for DIV_CD {}: ", divCd, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     // 사업장 추가
     @PostMapping("insert")
@@ -92,16 +111,17 @@ public class WorkplaceController {
     }
 
     //사업장 삭제
-    @PutMapping("delete/{DIV_CD}")
-    public ResponseEntity<Integer> deleteWorkplace(@PathVariable(value = "DIV_CD") String DIV_CD) {
+    @PutMapping("delete/{DIV_CD}/{CO_CD}")
+    public ResponseEntity<Integer> deleteWorkplace(@PathVariable String DIV_CD, @PathVariable String CO_CD) {
         try {
-            int result = workplaceService.workplaceRemove(DIV_CD);
-            log.info("Delete Workplace Controller", DIV_CD, result);
+            int result = workplaceService.workplaceRemove(DIV_CD, CO_CD);
+            log.info("Delete Workplace Controller, DIV_CD: {}, CO_CD: {}, Result: {}", DIV_CD, CO_CD, result);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Error while deleting workplace with DIV_CD {}: ", DIV_CD, e);
+            log.error("Error while deleting workplace with DIV_CD: {} and CO_CD: {}", DIV_CD, CO_CD, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 }
