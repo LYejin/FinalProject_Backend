@@ -1,7 +1,6 @@
 package com.example.demo.dao;
 
 import com.example.demo.dto.AcashFixDTO;
-import com.example.demo.dto.WorkplaceDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -18,4 +17,7 @@ public interface AcashFixDao {
 
     //고정자금 수정
     public int updateAcashFix(AcashFixDTO acashFixDTO);
+
+    //고정자금 삭제
+    public int deleteAcashFix(Map<String, Object> map);
 }

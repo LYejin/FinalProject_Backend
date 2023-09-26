@@ -105,4 +105,30 @@ public class AcashFixController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    //고정자금 삭제
+    @DeleteMapping("delete")
+    public ResponseEntity<Integer> deleteWorkplace(
+            @RequestParam(name = "DIV_CD", required = true) String DIV_CD,
+            @RequestParam(name = "SQ_NB", required = true) String[] SQ_NB
+    ) {
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("DIV_CD", DIV_CD);
+            map.put("SQ_NB", SQ_NB); // 이 부분이 배열이므로 Map 타입을 Object로 변경해야 함
+            int result = acashFixService.deleteAcashFix(map);
+            log.info("Delete AcashFix Controller");
+
+            if (result == 0) {
+                return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error while deleting AcashFix", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }
