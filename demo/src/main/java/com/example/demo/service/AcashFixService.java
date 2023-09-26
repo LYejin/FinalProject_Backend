@@ -58,5 +58,17 @@ public class AcashFixService {
         }
     }
 
+    public int deleteAcashFix(Map<String, Object> map) { // Map의 value 타입을 Object로 변경
+        try {
+            int removeResult = acashFixDao.deleteAcashFix(map);
+            log.info("Delete AcashFix Service", map);
+            return removeResult;
+        } catch (Exception e) {
+            log.error("Error while removing AcashFix : " + e);
+            return 0;
+        }
+    }
+
+
 
 }

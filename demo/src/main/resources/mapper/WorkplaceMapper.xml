@@ -74,6 +74,8 @@
              Workplace
         WHERE
             DIV_CD = #{DIV_CD}
+          AND CO_CD = #{CO_CD}
+
     </select>
 
     <!--사업장 추가하기-->
@@ -222,6 +224,7 @@
             DIV_YN = '0'
         WHERE
             DIV_CD = #{DIV_CD}
+         AND CO_CD = #{CO_CD}
     </update>
 
 </mapper>

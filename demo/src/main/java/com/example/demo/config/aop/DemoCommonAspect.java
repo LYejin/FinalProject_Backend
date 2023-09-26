@@ -92,6 +92,23 @@ public class DemoCommonAspect {
     private String DIV_CD;
 
 
+//    @Before("serviceMethods() && updateBefore()")
+//    public void doUpdateBefore(JoinPoint joinPoint) {
+//        b_companyDTO = null;
+//        b_workplaceDTO = null;
+//        b_employeeDTO = null;
+//        String methodName = joinPoint.getSignature().toShortString();
+//        Object[] args = joinPoint.getArgs();
+//        if (methodName.contains("Company")) {
+//            b_companyDTO = companyService.companyDetail(((CompanyDTO) joinPoint.getArgs()[0]).getCO_CD());
+//        } else if (methodName.contains("Workplace")) {
+//            b_workplaceDTO = workplaceService.selectWorkplaceInfoByDIVCD(((WorkplaceDTO) joinPoint.getArgs()[0]).getDIV_CD());
+//        } else if (methodName.contains("Employee")) {
+//            b_employeeDTO = employeeService.employeeDetail(((EmployeeDTO) joinPoint.getArgs()[0]));
+//        }
+//
+//        log.info("{} is start", methodName);
+//    }
     @Before("serviceMethods() && updateBefore()")
     public void doUpdateBefore(JoinPoint joinPoint) {
         b_companyDTO = null;
@@ -99,16 +116,26 @@ public class DemoCommonAspect {
         b_employeeDTO = null;
         String methodName = joinPoint.getSignature().toShortString();
         Object[] args = joinPoint.getArgs();
+
         if (methodName.contains("Company")) {
-            b_companyDTO = companyService.companyDetail(((CompanyDTO) joinPoint.getArgs()[0]).getCO_CD());
+            b_companyDTO = companyService.companyDetail(((CompanyDTO) args[0]).getCO_CD());
         } else if (methodName.contains("Workplace")) {
-            b_workplaceDTO = workplaceService.selectWorkplaceInfoByDIVCD(((WorkplaceDTO) joinPoint.getArgs()[0]).getDIV_CD());
+            if(args[0] instanceof Map) {
+                b_workplaceDTO = workplaceService.selectWorkplaceInfoByDIVCD((Map<String, String>) args[0]);
+            } else {
+                // Handle Error: Wrong Argument Type
+            }
         } else if (methodName.contains("Employee")) {
-            b_employeeDTO = employeeService.employeeDetail(((EmployeeDTO) joinPoint.getArgs()[0]));
+            if(args[0] instanceof EmployeeDTO) {
+                b_employeeDTO = employeeService.employeeDetail((EmployeeDTO) args[0]);
+            } else {
+                // Handle Error: Wrong Argument Type
+            }
         }
 
         log.info("{} is start", methodName);
     }
+
 
     @AfterReturning(pointcut = "serviceMethods() && updateInsertRemoveMethods()", returning = "result")
     public void doAfterReturning(JoinPoint joinPoint, Object result) {
