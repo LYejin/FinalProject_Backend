@@ -99,10 +99,13 @@
             ,f.DEPOSIT_NM
             ,f.ACCOUNT_OPEN_BN
             ,f.BANK_CD
+            ,fn.BANK_NAME
         FROM Strade s
         JOIN Ftrade f
             ON s.TR_CD = f.TR_CD
           AND s.CO_CD = f.CO_CD
+        LEFT OUTER JOIN FINANCECODE fn
+            ON f.BANK_CD = fn.FINANCE_CD
         <where>
             <include refid="stradeRoll" />
             <if test="TR_CD != null and !TR_NM.equals('')">
@@ -255,10 +258,13 @@
             ,f.DEPOSIT_NM
             ,f.ACCOUNT_OPEN_BN
             ,f.BANK_CD
+            ,fn.BANK_NAME
         FROM Strade s
         JOIN Ftrade f
             ON s.TR_CD = f.TR_CD
          AND s.CO_CD = f.CO_CD
+        LEFT OUTER JOIN FINANCECODE fn
+            ON f.BANK_CD = fn.FINANCE_CD
         WHERE
             s.CO_CD = #{CO_CD, jdbcType=VARCHAR}
          AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
@@ -343,18 +349,9 @@
 
     <!-- 거래처 권한 등록 insert  -->
     <insert id="stradeRollManageInsert" parameterType="com.example.demo.dto.StradeRollManageDTO">
-        <selectKey keyProperty="trmgSq" resultType="int" order="BEFORE">
-            SELECT
-                IFNULL(MAX(TRMG_SQ), 0) + 1
-            FROM StradeRollManage srm
-            WHERE
-                CO_CD=#{CO_CD, jdbcType=VARCHAR}
-              AND TR_CD=#{TR_CD, jdbcType=VARCHAR}
-        </selectKey>
         INSERT INTO
             StradeRollManage (
-                TRMG_SQ
-                ,TR_CD
+                TR_CD
                 ,CO_CD
                 ,DEPT_CD
                 ,DEPT_NM
@@ -365,8 +362,7 @@
                 ,INSERT_DT
                 ,ROLL_FG
         ) VALUES (
-                #{trmgSq, jdbcType=INTEGER}
-                ,#{TR_CD, jdbcType=VARCHAR}
+                #{TR_CD, jdbcType=VARCHAR}
                 ,#{CO_CD, jdbcType=VARCHAR}
                 ,#{DEPT_CD, jdbcType=VARCHAR}
                 ,#{DEPT_NM, jdbcType=VARCHAR}
@@ -374,9 +370,54 @@
                 ,#{KOR_NM, jdbcType=VARCHAR}
                 ,#{NOTE, jdbcType=VARCHAR}
                 ,#{USE_YN, jdbcType=VARCHAR}
-                ,NOW()
+                ,#{INSERT_DT, jdbcType=TIMESTAMP}
                 ,#{ROLL_FG, jdbcType=VARCHAR}
             )
+    </insert>
+
+    <!-- 부서도움창 거래처 권한 등록 insert  -->
+    <insert id="stradeRollInDeptInsert" parameterType="com.example.demo.dto.StradeRollManageDTO">
+        <foreach collection="list" item="item" index="index" separator=";">
+        INSERT INTO
+            StradeRollManage (
+                TR_CD
+                ,CO_CD
+                ,DEPT_CD
+                ,DEPT_NM
+                ,INSERT_DT
+                ,ROLL_FG
+        ) VALUES (
+                #{item.TR_CD}
+                ,#{item.CO_CD}
+                ,#{item.DEPT_CD}
+                ,#{item.DEPT_NM}
+                ,NOW()
+                ,#{item.ROLL_FG}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 사원도움모달 내 checkList 거래처 권한 등록 insert  -->
+    <insert id="stradeRollInEmpInsert" parameterType="com.example.demo.dto.StradeRollManageDTO">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT INTO
+                StradeRollManage (
+                    TR_CD
+                    ,CO_CD
+                    ,EMP_CD
+                    ,KOR_NM
+                    ,INSERT_DT
+                    ,ROLL_FG
+            ) VALUES
+                (
+                #{item.TR_CD}
+                ,#{item.CO_CD}
+                ,#{item.EMP_CD}
+                ,#{item.KOR_NM}
+                ,NOW()
+                ,#{item.ROLL_FG}
+                )
+            </foreach>
     </insert>
 
     <!-- 거래처 권한 관리 업데이트   -->
@@ -395,14 +436,15 @@
           AND CO_CD = #{CO_CD, jdbcType=VARCHAR}
     </update>
 
-    <delete id="stradeRollManageDelete" parameterType="com.example.demo.dto.StradeRollManageDTO">
-        DELETE FROM StradeRollManage
-        <where>
-                <foreach collection="ENRL_FG" item="enrlFg" separator="OR">
-                    ENRL_FG = #{enrlFg}
-                </foreach>
-        </where>
-    </delete>
+    <!--    -->
+<!--    <delete id="stradeRollManageDelete" parameterType="com.example.demo.dto.StradeRollManageDTO">-->
+<!--        DELETE FROM StradeRollManage-->
+<!--        <where>-->
+<!--                <foreach collection="ENRL_FG" item="enrlFg" separator="OR">-->
+<!--                    ENRL_FG = #{enrlFg}-->
+<!--                </foreach>-->
+<!--        </where>-->
+<!--    </delete>-->
 
     <!--  사원코드도움 모달  -->
     <select id="empCodeHelpList" parameterType="com.example.demo.dto.EmpCodeHelpListDTO">
@@ -420,7 +462,21 @@
           AND e.CO_CD = w.CO_CD
         WHERE
             e.EMP_CD NOT IN (<include refid="empHelpCodeEmpCD" />)
-          AND e.EMP_CD IS NOT NULL
+            AND e.EMP_CD IS NOT NULL
+            <choose>
+                <when test="ENRL_FG != null and !ENRL_FG.equals('') and ENRL_FG == 2">
+                    AND e.USER_YN IN (0,1) AND e.ENRL_FG = #{ENRL_FG}
+                </when>
+                <otherwise>
+                    AND e.USER_YN='1' AND e.ENRL_FG = #{ENRL_FG}
+                </otherwise>
+            </choose>
+            <if test="VALUE != null and !VALUE.equals('')">
+                AND (e.EMP_CD LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR e.KOR_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR d.DEPT_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR w.DIV_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%'))
+            </if>
     </select>
 
     <!-- 부서코드도움 모달   -->
@@ -428,10 +484,24 @@
         SELECT
             DEPT_CD
             ,DEPT_NM
+            ,DEPT_YN
         FROM Department
-        WHERE
+        <where>
             CO_CD = #{CO_CD, jdbcType=VARCHAR}
-          AND DEPT_CD NOT IN (<include refid="deptHelpCodeEmpCD" />)
+            AND DEPT_CD NOT IN (<include refid="deptHelpCodeEmpCD" />)
+            <choose>
+                <when test="DEPT_YN != null and !DEPT_YN.equals('') and DEPT_YN == 0">
+                    AND DEPT_YN IN (0, 1)
+                </when>
+                <otherwise>
+                    AND DEPT_YN = 1
+                </otherwise>
+            </choose>
+            <if test="VALUE != null and !VALUE.equals('')">
+                AND (DEPT_CD LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR DEPT_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%'))
+            </if>
+        </where>
     </select>
 
     <!--  거래처코드도움 모달  -->
@@ -472,6 +542,198 @@
             </if>
         </where>
     </select>
+
+    <!--  주류코드 모달  -->
+    <select id="liquorcodeHelpList" parameterType="com.example.demo.dto.EmpCodeHelpListDTO">
+        SELECT
+            LIQ_CD
+            ,WHOLESALE
+            ,RETAIL
+        FROM LIQUORCODE
+        <where>
+            <if test="VALUE != null and !VALUE.equals('')">
+                AND (LIQ_CD LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR WHOLESALE LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR RETAIL LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <!--  금융기관코드도움 모달  -->
+    <select id="financecodeHelpList" parameterType="com.example.demo.dto.FinancecodeHelpListDTO">
+        SELECT
+            FINANCE_CD
+            ,BANK_NAME
+        FROM FINANCECODE
+        <where>
+            <if test="VALUE != null and !VALUE.equals('')">
+                AND (FINANCE_CD LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR BANK_NAME LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <!--  거래처 권한 관리 삭제  -->
+    <delete id="stradeRollManageDelete" parameterType="com.example.demo.dto.StradeRollManageDeleteDTO">
+        DELETE FROM
+        StradeRollManage
+        <where>
+            CO_CD = #{CO_CD}
+            AND TR_CD = #{TR_CD}
+            AND TRMG_SQ IN
+            <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
+    </delete>
+
+    <!--  거래처 권한 관리 전체 삭제  -->
+    <delete id="stradeRollManageTotalDelete" parameterType="com.example.demo.dto.StradeRollManageDeleteDTO">
+        DELETE FROM
+        StradeRollManage
+        <where>
+            CO_CD = #{CO_CD}
+            AND TR_CD = #{TR_CD}
+        </where>
+    </delete>
+
+    <!--  고정자금등록 내 거래처 사용여부   -->
+    <select id="acashFix" parameterType="com.example.demo.dto.StradeDeleteInfo">
+        SELECT count(SQ_NB)
+        from AcashFix
+        WHERE
+            TR_CD = #{TR_CD}
+          || FTR_CD = #{TR_CD}
+    </select>
+
+    <!--  거래처 삭제  -->
+    <delete id="stradeDelete" parameterType="com.example.demo.dto.StradeDeleteDTO">
+        DELETE FROM Strade
+        WHERE
+            TR_CD = #{TR_CD}
+          AND CO_CD = #{CO_CD}
+    </delete>
+
+    <!--  일반거래처 삭제  -->
+    <delete id="gtradeDelete" parameterType="com.example.demo.dto.StradeDeleteDTO">
+        DELETE FROM Gtrade
+        WHERE
+            TR_CD = #{TR_CD}
+          AND CO_CD = #{CO_CD}
+    </delete>
+
+    <!--  금융거래처 삭제  -->
+    <delete id="ftradeDelete" parameterType="com.example.demo.dto.StradeDeleteDTO">
+        DELETE FROM Ftrade
+        WHERE
+            TR_CD = #{TR_CD}
+          AND CO_CD = #{CO_CD}
+    </delete>
+
+    <!--  거래처 내 거래처코드 사용여부   -->
+    <select id="trCdInStrade">
+        SELECT
+            TR_CD
+        FROM Strade
+        WHERE
+            CO_CD = #{CO_CD}
+          AND TR_CD = #{TR_CD}
+    </select>
+
+    <!--  그리드 내 사원 정보 여부 확인  -->
+    <select id="gridEmpCode" parameterType="com.example.demo.dto.GridEmpCdDTO">
+        SELECT
+            KOR_NM
+        FROM Employee
+        WHERE
+            EMP_CD NOT IN (<include refid="empHelpCodeEmpCD" />)
+          AND EMP_CD = #{EMP_CD}
+          AND EMP_CD IS NOT NULL
+    </select>
+
+    <!--  그리드 내 부서 정보 여부 확인  -->
+    <select id="gridDeptCd" parameterType="com.example.demo.dto.DepartmentDTO">
+        SELECT
+            DEPT_NM
+        FROM Department
+        WHERE
+            CO_CD = #{CO_CD, jdbcType=VARCHAR}
+          AND DEPT_CD NOT IN (<include refid="deptHelpCodeEmpCD" />)
+          AND DEPT_CD = #{DEPT_CD}
+          AND DEPT_CD IS NOT NULL
+    </select>
+
+    <!--  채번 기능  -->
+    <select id="getStradeSeq">
+        SELECT
+            CASE
+                WHEN IFNULL(MAX(minTr),'') != '' THEN LPAD( MIN(minTr)  + 1, #{ctrNb} + (
+                    CASE
+                        WHEN (
+                                LENGTH( MIN(minTr) + 1  ) - #{ctrNb}) &lt; 0  THEN '0'
+                        ELSE (LENGTH( MIN(minTr) + 1  ) - #{ctrNb})
+                    END ), #{makeTrCd} )
+                ELSE LPAD( MAX(tr_cd)  + 1, #{ctrNb} + (
+                    CASE
+                        WHEN (
+                                LENGTH( MAX(tr_cd) + 1  ) - #{ctrNb}) &lt; 0  THEN '0'
+                        ELSE (LENGTH( MAX(tr_cd) + 1  ) - #{ctrNb})
+                    END ), #{makeTrCd} )
+                END AS trCd
+        FROM	(
+            SELECT CAST(LPAD('0', #{ctrNb}, IF(#{makeTrCd} = '0000000000', 1000000000, 9000000000)) AS INTEGER) AS tr_cd
+                    ,null                                                                                       AS minTr
+            WHERE NOT EXISTS
+                  (
+                    SELECT tr_cd
+                    FROM   Strade
+                    WHERE  co_cd = #{coCd}
+                    AND LENGTH(tr_cd) = #{ctrNb}
+                    <if test='makeTrCd.equals("0000000000") '>
+                        <![CDATA[
+                                     AND tr_cd >= CAST(LPAD('0', #{ctrNb}, '0000000000') as CHAR)
+                                     AND tr_cd < CAST(LPAD('0', #{ctrNb}, '9000000000') as CHAR)
+                                     ]]>
+                    </if>
+                    <if test='makeTrCd.equals("9000000000") '>
+                        <![CDATA[
+                                     AND	tr_cd >= CAST(LPAD('0', #{ctrNb}, '9000000000') as CHAR)
+                                     AND	tr_cd <= CAST(LPAD('9', #{ctrNb}, '9999999999') as CHAR)
+                                     ]]>
+                    </if>
+                    AND	CAST(tr_cd AS INTEGER)	!= 0
+                    limit 1
+                  )
+            UNION
+
+            SELECT CAST(tr_cd AS INTEGER) AS tr_cd
+                   ,(CASE
+                        WHEN LPAD(tr_cd + 1, #{ctrNb}, #{makeTrCd} ) = LEAD(tr_cd) OVER(ORDER BY tr_cd) = 0
+                        THEN tr_cd
+                        ELSE null
+                     END
+                    ) AS minTr
+            FROM Strade
+            WHERE co_cd = #{coCd}
+            AND	LENGTH(tr_cd) = #{ctrNb}
+            <if test='makeTrCd.equals("0000000000") '>
+                <![CDATA[
+                        AND	tr_cd >= CAST(LPAD('0', #{ctrNb}, '0000000000') as CHAR)
+                        AND	tr_cd < CAST(LPAD('0', #{ctrNb}, '9000000000') as CHAR)
+                ]]>
+            </if>
+            <if test='makeTrCd.equals("9000000000") '>
+                <![CDATA[
+                        AND	tr_cd >= CAST(LPAD('0', #{ctrNb}, '9000000000') as CHAR)
+                        AND	tr_cd <= CAST(LPAD('9', #{ctrNb}, '9999999999') as CHAR)
+                ]]>
+            </if>
+            AND CAST(tr_cd AS INTEGER) != 0
+            ORDER BY tr_cd
+        )	T
+    </select>
+
+
 
     <!--  일반거래처 데이터 업데이트  -->
 <!--    <update id="sgtradeUpdate" parameterType="com.example.demo.dto.SGtradeDTO" statementType="CALLABLE">-->

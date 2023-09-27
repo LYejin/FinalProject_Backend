@@ -3,9 +3,9 @@ package com.example.demo.dto;
 import lombok.Data;
 
 @Data
-public class EmpCodeHelpListDTO {
+public class DeptCodeHelpListDTO {
     private String CO_CD;
     private String TR_CD;
-    private String ENRL_FG;
     private String VALUE;
+    private String DEPT_YN;
 }
