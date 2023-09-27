@@ -5,25 +5,24 @@
     <!--사업장 전체목록 가져오기-->
     <select id="selectWorkplaceSearch" parameterType="hashmap" resultType="com.example.demo.dto.WorkplaceDTO">
         SELECT
-            DIV_CD,
-            CO_CD,
-            DIV_YN,
-            FILL_YN,
-            DIV_NM,
-            DIV_ADDR,
-            DIV_TEL,
-            REG_NB,
-            DIV_TO_CD,
-            DIV_NMK,
-            BUSINESS,
-            JONGMOK,
-            OPEN_DT,
-            CLOSE_DT,
-            MAS_NM,
-            DIV_FAX,
-            COP_NB,
-            ADDR_CD,
-            ADDR_NUM
+            DIV_CD
+            ,CO_CD
+            ,DIV_YN
+            ,FILL_YN
+            ,DIV_NM
+            ,DIV_ADDR
+            ,DIV_TEL
+            ,REG_NB
+            ,DIV_NMK
+            ,BUSINESS
+            ,JONGMOK
+            ,OPEN_DT
+            ,CLOSE_DT
+            ,MAS_NM
+            ,DIV_FAX
+            ,COP_NB
+            ,ADDR_CD
+            ,ADDR_NUM
         FROM
             Workplace
         <where>
@@ -59,7 +58,6 @@
             ,DIV_ADDR
             ,DIV_TEL
             ,REG_NB
-            ,DIV_TO_CD
             ,DIV_NMK
             ,BUSINESS
             ,JONGMOK
@@ -74,6 +72,8 @@
              Workplace
         WHERE
             DIV_CD = #{DIV_CD}
+          AND CO_CD = #{CO_CD}
+
     </select>
 
     <!--사업장 추가하기-->
@@ -88,7 +88,6 @@
                       ,DIV_ADDR
                       ,DIV_TEL
                       ,REG_NB
-                      ,DIV_TO_CD
                       ,DIV_NMK
                       ,BUSINESS
                       ,JONGMOK
@@ -109,7 +108,6 @@
                  ,#{DIV_ADDR}
                  ,#{DIV_TEL}
                  ,#{REG_NB}
-                 ,#{DIV_TO_CD}
                  ,#{DIV_NMK}
                  ,#{BUSINESS}
                  ,#{JONGMOK}
@@ -168,10 +166,6 @@
                 ,REG_NB = #{REG_NB}
             </if>
 
-            <if test="DIV_TO_CD != null">
-                ,DIV_TO_CD = #{DIV_TO_CD}
-            </if>
-
             <if test="DIV_NMK != null">
                 ,DIV_NMK = #{DIV_NMK}
             </if>
@@ -222,6 +216,7 @@
             DIV_YN = '0'
         WHERE
             DIV_CD = #{DIV_CD}
+         AND CO_CD = #{CO_CD}
     </update>
 
 </mapper>

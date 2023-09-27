@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.AcashFixDao">
+
+    <!--고정자금 전체목록 가져오기-->
+    <select id="selectAcashFixSearch" parameterType="hashmap" resultType="com.example.demo.dto.AcashFixDTO">
+        SELECT
+            A.SQ_NB
+            ,A.DIV_CD
+            ,A.DEAL_DD
+            ,A.RMK_DC
+            ,A.CASH_AM
+            ,A.FR_DT
+            ,A.TO_DT
+            ,A.PJT_CD
+            ,A.DEAL_PD
+            ,A.DEAL_MM
+            ,A.DISP_SQ
+            ,A.CASH_CD
+            ,B.CASH_NM
+            ,A.TR_CD
+            ,C.TR_NM
+            ,A.FTR_CD
+            ,D.TR_NM as FTR_NM
+            ,E.BA_NB_TR
+            ,A.EMP_CD
+            ,S.BANK_NAME
+        FROM
+        AcashFix A
+        LEFT JOIN Acashcd B
+             ON A.CASH_CD = B.CASH_CD
+        LEFT JOIN Strade C
+             ON A.TR_CD = C.TR_CD
+        LEFT JOIN Strade D
+             ON A.FTR_CD = D.TR_CD
+        LEFT JOIN Ftrade E
+             ON A.FTR_CD = E.TR_CD
+        LEFT JOIN FINANCECODE S
+             ON E.BANK_CD = S.FINANCE_CD
+        <where>
+            A.CO_CD=#{CO_CD}
+            AND A.DIV_CD=#{DIV_CD}
+            AND A.DISP_SQ=#{DISP_SQ}
+            <if test="CASH_CD != null">
+                AND A.CASH_CD = #{CASH_CD}
+            </if>
+            <if test="TR_CD != null and TR_CD !=''" >
+                AND A.TR_CD = #{TR_CD}
+            </if>
+            <if test="FTR_CD != null and FTR_CD !=''">
+                AND A.FTR_CD = #{FTR_CD}
+            </if>
+            <!-- 날짜 범위에 대한 조건 추가 -->
+            <if test="FR_DT1 != null and FR_DT2 != null and FR_DT1 !='' and FR_DT2 !=''">
+                AND A.FR_DT BETWEEN #{FR_DT1} AND #{FR_DT2}
+            </if>
+            <if test="TO_DT1 != null and TO_DT2 != null and TO_DT1 !='' and TO_DT2 != '' ">
+                AND A.TO_DT BETWEEN #{TO_DT1} AND #{TO_DT2}
+            </if>
+        </where>
+        ORDER BY A.SQ_NB
+    </select>
+
+
+    <insert id="insertAcashFix" parameterType="com.example.demo.dto.AcashFixDTO">
+        INSERT INTO AcashFix
+        (
+        CO_CD
+        ,DIV_CD
+        ,CASH_CD
+        <if test="DEAL_DD != null">,DEAL_DD</if>
+        <if test="RMK_DC != null">,RMK_DC</if>
+        <if test="CASH_AM != null">,CASH_AM</if>
+        <if test="FR_DT != null">,FR_DT</if>
+        <if test="TO_DT != null">,TO_DT</if>
+        <if test="PJT_CD != null">,PJT_CD</if>
+        <if test="DEAL_PD != null">,DEAL_PD</if>
+        <if test="DEAL_MM != null">,DEAL_MM</if>
+        <if test="DISP_SQ != null">,DISP_SQ</if>
+        <if test="TR_CD != null">,TR_CD</if>
+        <if test="EMP_CD != null">,EMP_CD</if>
+        <if test="FTR_CD != null">,FTR_CD</if>
+        )
+        VALUES
+        (
+        #{CO_CD}
+        ,#{DIV_CD}
+        ,#{CASH_CD}
+        <if test="DEAL_DD != null">,#{DEAL_DD}</if>
+        <if test="RMK_DC != null">,#{RMK_DC}</if>
+        <if test="CASH_AM != null">,#{CASH_AM}</if>
+        <if test="FR_DT != null">,#{FR_DT}</if>
+        <if test="TO_DT != null">,#{TO_DT}</if>
+        <if test="PJT_CD != null">,#{PJT_CD}</if>
+        <if test="DEAL_PD != null">,#{DEAL_PD}</if>
+        <if test="DEAL_MM != null">,#{DEAL_MM}</if>
+        <if test="DISP_SQ != null">,#{DISP_SQ}</if>
+        <if test="TR_CD != null">,#{TR_CD}</if>
+        <if test="EMP_CD != null">,#{EMP_CD}</if>
+        <if test="FTR_CD != null">,#{FTR_CD}</if>
+        )
+    </insert>
+
+    <update id="updateAcashFix" parameterType="com.example.demo.dto.AcashFixDTO">
+        UPDATE AcashFix
+        <set>
+
+            <if test="DEAL_DD != null and DEAL_DD != ''">
+                DEAL_DD = #{DEAL_DD}
+            </if>
+
+            <if test="CASH_CD != null and CASH_CD != ''">
+                ,CASH_CD = #{CASH_CD}
+            </if>
+
+            <if test="RMK_DC != null and RMK_DC != ''">
+                ,RMK_DC = #{RMK_DC}
+            </if>
+
+            <if test="CASH_AM != null and CASH_AM != ''">
+                ,CASH_AM = #{CASH_AM}
+            </if>
+
+            <if test="FR_DT != null and FR_DT != ''">
+                ,FR_DT = #{FR_DT}
+            </if>
+
+            <if test="TO_DT != null and TO_DT != ''">
+                ,TO_DT = #{TO_DT}
+            </if>
+
+            <if test="PJT_CD != null and PJT_CD != ''">
+                ,PJT_CD = #{PJT_CD}
+            </if>
+
+            <if test="DEAL_PD != null and DEAL_PD != ''">
+                ,DEAL_PD = #{DEAL_PD}
+            </if>
+
+            <if test="DEAL_MM != null and DEAL_MM != ''">
+                ,DEAL_MM = #{DEAL_MM}
+            </if>
+
+            <if test="DISP_SQ != null and DISP_SQ != ''">
+                ,DISP_SQ = #{DISP_SQ}
+            </if>
+
+            <if test="TR_CD != null and TR_CD != ''">
+                ,TR_CD = #{TR_CD}
+            </if>
+
+            <if test="EMP_CD != null and EMP_CD != ''">
+                ,EMP_CD = #{EMP_CD}
+            </if>
+
+            <if test="FTR_CD != null and FTR_CD != ''">
+                ,FTR_CD = #{FTR_CD}
+            </if>
+        </set>
+        WHERE
+            DIV_CD = #{DIV_CD}
+          AND SQ_NB = #{SQ_NB}
+    </update>
+
+    <delete id="deleteAcashFix" parameterType="map">
+        DELETE FROM AcashFix
+        WHERE
+        DIV_CD = #{DIV_CD}
+        AND SQ_NB IN
+        <foreach item="item" index="index" collection="SQ_NB" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+
+
+
+</mapper>

@@ -15,7 +15,8 @@ public interface WorkplaceDao {
     public List<WorkplaceDTO> selectWorkplaceSearch(Map<String,String> map);
 
     //사업장 상세정보 가져오기
-    public WorkplaceDTO selectWorkplaceInfoByDIVCD(String DIV_CD);
+    public WorkplaceDTO selectWorkplaceInfoByDIVCD(Map<String, String> params);
+
 
     //사업장 등록(추가)
     public int insertWorkplace(WorkplaceDTO workplaceDTO);
@@ -24,6 +25,7 @@ public interface WorkplaceDao {
     public int updateWorkplace(WorkplaceDTO workplaceDTO);
 
     //사업장 삭제
-    public int deleteWorkplace(String DIV_CD);
+    public int deleteWorkplace(Map<String, String> params);
+
 
 }
