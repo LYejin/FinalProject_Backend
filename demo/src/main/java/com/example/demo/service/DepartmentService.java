@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -29,17 +30,18 @@ public class DepartmentService {
     }
 
     // 부서 상세
-    public DepartmentDTO selectDepartmentInfoByDEPTCD(String dpetCd) {
+    public DepartmentDTO selectDepartmentInfoByDEPTCD(Map<String, String> params) {
         try {
-            DepartmentDTO departmentInfo = departmentDao.selectDepartmentInfoByDEPTCD(dpetCd);
-            //log.info("Get Department Detail Service", dpetCd, departmentInfo);
-            log.info("Get Department Detail Service"+ dpetCd + departmentInfo);
-            return departmentInfo;
+            log.info("Get Department Detail Service"+ params );
+            return departmentDao.selectDepartmentInfoByDEPTCD(params);
         } catch (Exception e) {
             log.error("Error while fetching Department info: ", e);
             return null;
         }
     }
+
+
+
 
     // 사업장 추가
     public int insertDepartment(DepartmentDTO departmentDTO) {

@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -32,19 +34,24 @@ public class DepartmentController {
         }
     }
 
-    //사업장 상세
+    //부서 상세
     @GetMapping("getDeptInfo/{deptCd}")
-    public ResponseEntity<DepartmentDTO> getDepartmentInfo(@PathVariable String deptCd) {
+    public ResponseEntity<DepartmentDTO> getDepartmentInfo(@PathVariable String deptCd,
+                                                           @RequestParam String coCd, @RequestParam String divCd) {
         try {
-            DepartmentDTO deptInfo = departmentService.selectDepartmentInfoByDEPTCD(deptCd);
+            Map<String, String> params = new HashMap<>();
+            params.put("CO_CD", coCd);
+            params.put("DIV_CD", divCd);
+            params.put("DEPT_CD", deptCd);
+            DepartmentDTO deptInfo = departmentService.selectDepartmentInfoByDEPTCD(params);
             log.info("Get Department Detail Controller deptCd: {} deptInfo: {}", deptCd, deptInfo);
-            log.info("Get Department Detail Controller" + deptCd);
             return new ResponseEntity<>(deptInfo, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Error while fetching Department info for DIV_CD {}: ", deptCd, e);
+            log.error("Error while fetching Department info for deptCd {}: ", deptCd, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     //부서 추가
     @PostMapping("insert")

@@ -38,7 +38,8 @@
         LEFT JOIN FINANCECODE S
              ON E.BANK_CD = S.FINANCE_CD
         <where>
-            A.DIV_CD=#{DIV_CD}
+            A.CO_CD=#{CO_CD}
+            AND A.DIV_CD=#{DIV_CD}
             AND A.DISP_SQ=#{DISP_SQ}
             <if test="CASH_CD != null">
                 AND A.CASH_CD = #{CASH_CD}
@@ -64,7 +65,8 @@
     <insert id="insertAcashFix" parameterType="com.example.demo.dto.AcashFixDTO">
         INSERT INTO AcashFix
         (
-        DIV_CD
+        CO_CD
+        ,DIV_CD
         ,CASH_CD
         <if test="DEAL_DD != null">,DEAL_DD</if>
         <if test="RMK_DC != null">,RMK_DC</if>
@@ -81,7 +83,8 @@
         )
         VALUES
         (
-        #{DIV_CD}
+        #{CO_CD}
+        ,#{DIV_CD}
         ,#{CASH_CD}
         <if test="DEAL_DD != null">,#{DEAL_DD}</if>
         <if test="RMK_DC != null">,#{RMK_DC}</if>

@@ -35,6 +35,7 @@ public class AcashFixController {
 
     @GetMapping("getList")
     public ResponseEntity<List<AcashFixDTO>> getAllAcashFix(
+            @RequestParam(name = "CO_CD", required = true) String CO_CD,
             @RequestParam(name = "DIV_CD", required = true) String DIV_CD,
             @RequestParam(name = "DISP_SQ", required = false) String DISP_SQ,
             @RequestParam(name = "CASH_CD", required = false) String CASH_CD,
@@ -47,6 +48,7 @@ public class AcashFixController {
     ) {
         try {
             Map<String, String> map = new HashMap<>();
+            map.put("CO_CD", checkNull(CO_CD));
             map.put("DIV_CD", checkNull(DIV_CD));
             map.put("DISP_SQ", checkNull(DISP_SQ));
             map.put("CASH_CD", checkNull(CASH_CD));
@@ -57,9 +59,9 @@ public class AcashFixController {
             map.put("TO_DT1", checkNullAndFormat(TO_DT1));
             map.put("TO_DT2", checkNullAndFormat(TO_DT2));
 
-            System.out.println("DIV_SQ : " + DIV_CD + "\n"+ " DISP_SQ : " + DISP_SQ + "\n" +" CASH_CD : " + CASH_CD + "\n"
+            System.out.println("DIV_CD : " + DIV_CD + "\n"+ " DISP_SQ : " + DISP_SQ + "\n" +" CASH_CD : " + CASH_CD + "\n"
                     + " TR_CD : " +TR_CD+ "\n" + " FTR_CD :" +FTR_CD + "\n" + " FR_DT1 : " +FR_DT1 + "\n"+ " FR_DT2 : " + FR_DT2 + "\n"
-            +" TO_DT1 : " + TO_DT1 + "\n" +" TO_DT2 : " + TO_DT2) ;
+            +" TO_DT1 : " + TO_DT1 + "\n" +" TO_DT2 : " + TO_DT2);
             List<AcashFixDTO> list = acashFixService.selectAcashFixSearch(map);
             log.info("Get AcashFix List Controller" +list);
             return new ResponseEntity<>(list, HttpStatus.OK);
@@ -68,10 +70,6 @@ public class AcashFixController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
-
 
     private String checkNull(String value) {
         return "null".equals(value) ? null : value;
