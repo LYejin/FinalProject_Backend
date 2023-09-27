@@ -63,4 +63,49 @@ public interface StradeDao {
 
     // 거래처코드도움 리스트
     List<StradeCodeHelpDTO> stradeCodeHelpList(StradeCodeHelpSearchDTO stradeCodeHelpSearchDTO);
+
+    // 부서코드도움 리스트
+    List<DepartmentDTO> deptCodeHelpList(DeptCodeHelpListDTO deptCodeHelpListDTO);
+
+    // 주류코드도움 리스트
+    List<LiquorcodeHelpListDTO> liquorcodeHelpList(String VALUE);
+
+    // 금융기관코드도움 리스트
+    List<FinancecodeHelpListDTO> financecodeHelpList(String value);
+
+    // 사원도움모달 check list 거래처 등록
+    int stradeRollInEmpInsert(List<StradeRollManageDTO> list);
+
+    // 부서도움모달 check list 거래처 등록
+    int stradeRollInDeptInsert(List<StradeRollManageDTO> list);
+
+    // 자금등록 내 거래처 사용여부
+    int acashFix(@Param("TR_CD")String TR_CD);
+
+    // 거래처 삭제
+    int stradeDelete(StradeDeleteDTO stradeDeleteDTO);
+
+    // 일반 거래처 삭제
+    int gtradeDelete(StradeDeleteDTO stradeDeleteDTO);
+
+    // 금융 거래처 삭제
+    int ftradeDelete(StradeDeleteDTO stradeDeleteDTO);
+
+    // 거래처 권한 삭제
+    int stradeRollManageDelete(@Param("CO_CD")String CO_CD, @Param("TR_CD")String TR_CD, @Param("list")List<String> TRMG_SQ);
+
+    // 거래처 관리 권한 전체 삭제
+    int stradeRollManageTotalDelete(StradeDeleteDTO data);
+
+    // 거래처 내 trCd
+    String trCdInStrade(@Param("CO_CD")String CO_CD, @Param("TR_CD")String TR_CD);
+
+    // 그리드 내 사원 정보
+    String gridEmpCode(GridEmpCdDTO gridEmpCdDTO);
+
+    // 그리드 내 부서 정보
+    String gridDeptCd(GridDeptCdDTO gridDeptCdDTO);
+
+    // 채번 기능
+    String getStradeSeq(@Param("makeTrCd")String makeTrCd, @Param("ctrNb")String ctrNb, @Param("coCd")String CO_CD);
 }

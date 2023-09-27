@@ -17,4 +17,9 @@ public class SFtradeDTO {
     private String DEPOSIT_NM;
     private String ACCOUNT_OPEN_BN;
     private String BANK_CD;
+    private String BANK_NAME;
+
+//    public  SFtradeDTO(SFtradeDTO param){
+//        this.setTR_CD(param.getTR_CD() != null && !param.getTR_CD().equals("") ? param.getTR_CD() : "");
+//    }
 }

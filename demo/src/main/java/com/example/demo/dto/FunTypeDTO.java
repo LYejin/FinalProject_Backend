@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 @Data
@@ -47,5 +48,11 @@ public class FunTypeDTO {
 
 
     private List<String> columnsToUpdate;
+    private List<String> searchColumns = Arrays.asList("CASH_FG", "CASH_CD", "CASH_NM", "TYPE_NM", "SUM_NM");
+
+    @JsonProperty("searchData")
+    private String searchData;
+
+
 
 }

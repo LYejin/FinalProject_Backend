@@ -42,13 +42,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         log.info("토큰 인증");
-
-
+        log.info("토큰값"+request.getHeader("Authorization"));
         String header =request.getHeader(JwtProperties.HEADER_STRING);
-        try {
+
+        try{
             header = URLDecoder.decode(header, "UTF-8");
-        } catch (Exception e){
-            log.error("header 오류 : " + e.getMessage());
+        }catch (Exception e){
+            log.error(e.getMessage());
         }
 
         log.info(JwtProperties.HEADER_STRING);

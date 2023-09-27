@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 
 @Data
 public class StradeRollManageDTO {
-    private int trmgSq;
     private int TRMG_SQ;
     private String TR_CD;
     private String CO_CD;
