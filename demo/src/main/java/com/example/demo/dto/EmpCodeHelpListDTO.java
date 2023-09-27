@@ -6,4 +6,6 @@ import lombok.Data;
 public class EmpCodeHelpListDTO {
     private String CO_CD;
     private String TR_CD;
+    private String ENRL_FG;
+    private String VALUE;
 }
