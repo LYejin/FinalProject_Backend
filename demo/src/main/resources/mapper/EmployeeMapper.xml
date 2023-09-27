@@ -12,55 +12,59 @@
     <!-- EmployeeSearchList   -->
     <select id="employeeSearchList" parameterType="hashmap" resultType="com.example.demo.dto.EmployeeDTO">
         SELECT
-            EMP_CD
-            ,CO_CD
-            ,DIV_CD
-            ,USER_YN
-            ,USE_FG
-            ,USERNAME
-            ,PASSWORD
-            ,KOR_NM
-            ,EMAIL_ADD
-            ,TEL
-            ,GENDER_FG
-            ,JOIN_DT
-            ,RTR_DT
-            ,RSRG_ADD
-            ,PIC_FILE_ID
-            ,ENRL_FG
-            ,PERSONAL_MAIL
-            ,PERSONAL_MAIL_CP
-            ,SALARY_MAIL
-            ,SALARY_MAIL_CP
-            ,HOME_TEL
-            ,ZIPCODE
-            ,ADDR
-            ,ADDR_NUM
-        FROM Employee
+            e.EMP_CD
+            ,e.CO_CD
+            ,e.DIV_CD
+            ,e.USER_YN
+            ,e.USE_FG
+            ,e.USERNAME
+            ,e.PASSWORD
+            ,e.KOR_NM
+            ,e.EMAIL_ADD
+            ,e.TEL
+            ,e.GENDER_FG
+            ,e.JOIN_DT
+            ,e.RTR_DT
+            ,e.RSRG_ADD
+            ,e.PIC_FILE_ID
+            ,e.ENRL_FG
+            ,e.PERSONAL_MAIL
+            ,e.PERSONAL_MAIL_CP
+            ,e.SALARY_MAIL
+            ,e.SALARY_MAIL_CP
+            ,e.HOME_TEL
+            ,e.ZIPCODE
+            ,e.ADDR
+            ,e.ADDR_NUM
+            ,er.ROLE_NAME
+        FROM Employee e
+        LEFT OUTER JOIN Employee_Roll er
+        on e.EMP_CD = er.EMP_CD
         <where>
             <choose>
                 <when test="ENRL_FG != null and ENRL_FG.length > 0">
-                    USER_YN IN (0,1)
+                    e.USER_YN IN (0,1)
                 </when>
                 <otherwise>
-                    USER_YN='1'
+                    e.USER_YN='1'
                 </otherwise>
             </choose>
             <if test="CO_CD != null and !CO_CD.equals('')">
-                AND CO_CD = #{CO_CD}
+                AND e.CO_CD = #{CO_CD}
             </if>
             <if test="ENRL_FG != null and ENRL_FG.length > 0">
                 AND (
                 <foreach collection="ENRL_FG" item="enrlFg" separator="OR">
-                    ENRL_FG = #{enrlFg}
+                    e.ENRL_FG = #{enrlFg}
                 </foreach>
                 )
             </if>
             <if test="NAME != null and !NAME.equals('')">
-                AND (USERNAME LIKE CONCAT('%', #{NAME}, '%')
-                OR KOR_NM LIKE CONCAT('%', #{NAME}, '%')
-                OR EMAIL_ADD LIKE CONCAT('%', #{NAME}, '%'))
+                AND (e.USERNAME LIKE CONCAT('%', #{NAME}, '%')
+                OR e.KOR_NM LIKE CONCAT('%', #{NAME}, '%')
+                OR e.EMAIL_ADD LIKE CONCAT('%', #{NAME}, '%'))
             </if>
+            AND er.ROLE_NAME != 'ROLE_ADMIN'
         </where>
     </select>
 
