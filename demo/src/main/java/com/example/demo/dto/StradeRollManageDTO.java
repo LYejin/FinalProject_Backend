@@ -9,6 +9,8 @@ public class StradeRollManageDTO {
     private int TRMG_SQ;
     private String TR_CD;
     private String CO_CD;
+    private String DEPT_CD;
+    private String DEPT_NM;
     private String EMP_CD;
     private String KOR_NM;
     private String MANAGE_JOB;
@@ -21,5 +23,6 @@ public class StradeRollManageDTO {
     private String NOTE;
     private String USE_YN;
     private Timestamp INSERT_DT;
+    private String ROLL_FG;
 }
 

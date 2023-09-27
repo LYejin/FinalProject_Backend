@@ -22,7 +22,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Date;
 
@@ -118,7 +117,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     //리플레쉬 토큰 유효성 검사
-    private boolean jwtRefreshTokenIsValid(String refreshToken) {
+    private boolean jwtRefreshTokenIsValid(String refreshToken, HttpServletResponse response) throws IOException {
         try {
             SecretKey key = Keys.hmacShaKeyFor(JwtProperties.getSecretKey());
             Jwts.parserBuilder()
@@ -127,7 +126,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 .parseClaimsJws(refreshToken);
             return true;
         } catch (Exception e) {
-            log.error("리프레쉬 오류:"+e.getMessage());
+            log.error("RefreshToken 만료 :" + e.getMessage());
+            response.setStatus(40300);
             return false;
         }
     }
@@ -155,18 +155,23 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     }
     
     //리플레쉬 토큰 발급 유무 확인
-    private void handleExpiredAccessToken(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
-        String refreshToken = URLDecoder.decode(extractRefreshToken(request), "UTF-8").replace("Bearer ", "");
-        log.info("리플레쉬 토큰" + refreshToken);
+    private void handleExpiredAccessToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            String refreshToken = URLDecoder.decode(extractRefreshToken(request), "UTF-8").replace("Bearer ", "");
+            log.info("리플레쉬 토큰" + refreshToken);
 
-        if (refreshToken != null && jwtRefreshTokenIsValid(refreshToken)) {
-            
-            String newAccessToken = generateNewAccessTokenFromRefreshToken(refreshToken);
-            log.info("★뉴토큰★"+newAccessToken);
-            response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + newAccessToken);
-            return ;
+            if (refreshToken != null && jwtRefreshTokenIsValid(refreshToken, response)) {
+
+                String newAccessToken = generateNewAccessTokenFromRefreshToken(refreshToken);
+                log.info("★뉴토큰★" + newAccessToken);
+                response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + newAccessToken);
+                return;
+            }
+        } catch (Exception e) {
+            log.info("refreshToken :" + e.getMessage());
         }
     }
+
     //엑세스 코드 유효기간 문제 없으면 실행되는 코드
     private void processValidAccessToken(String username) {
         if (username != null) {
