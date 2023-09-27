@@ -13,7 +13,6 @@
             ,DIV_ADDR
             ,DIV_TEL
             ,REG_NB
-            ,DIV_TO_CD
             ,DIV_NMK
             ,BUSINESS
             ,JONGMOK
@@ -59,7 +58,6 @@
             ,DIV_ADDR
             ,DIV_TEL
             ,REG_NB
-            ,DIV_TO_CD
             ,DIV_NMK
             ,BUSINESS
             ,JONGMOK
@@ -90,7 +88,6 @@
                       ,DIV_ADDR
                       ,DIV_TEL
                       ,REG_NB
-                      ,DIV_TO_CD
                       ,DIV_NMK
                       ,BUSINESS
                       ,JONGMOK
@@ -111,7 +108,6 @@
                  ,#{DIV_ADDR}
                  ,#{DIV_TEL}
                  ,#{REG_NB}
-                 ,#{DIV_TO_CD}
                  ,#{DIV_NMK}
                  ,#{BUSINESS}
                  ,#{JONGMOK}
@@ -168,10 +164,6 @@
 
             <if test="REG_NB != null">
                 ,REG_NB = #{REG_NB}
-            </if>
-
-            <if test="DIV_TO_CD != null">
-                ,DIV_TO_CD = #{DIV_TO_CD}
             </if>
 
             <if test="DIV_NMK != null">
