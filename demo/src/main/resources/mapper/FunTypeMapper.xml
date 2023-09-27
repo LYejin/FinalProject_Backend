@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.dao.FunTypeDao">
+    <sql id="commonConditions">
+        AND CO_CD = #{CO_CD}
+    </sql>
 
-    <select id="dupCheck" resultType="String">
+
+    <select id="dupCheck" parameterType="java.util.Map" resultType="String">
         SELECT CASH_CD
         FROM Acashcd
         WHERE CASH_CD = #{CASH_CD}
+        <include refid="commonConditions"/>
     </select>
 
     <select id="searchRow" parameterType="com.example.demo.dto.FunTypeDTO" resultType="com.example.demo.dto.FunTypeDTO">
@@ -21,24 +26,46 @@
             ,LOW_YN
             ,USE_YN
             ,DISP_SQ
-        FROM Acashcd
+        FROM
+            Acashcd
         <where>
             <foreach collection="columnsToUpdate" item="column" separator="AND">
-                ${column} LIKE CONCAT('%', #{${column}}, '%')
+                <if test="column != null and !column.equals('') and column != 'LEVEL_CD'"> <!-- Exclude CO_CD column -->
+                    ${column} LIKE CONCAT('%', #{${column}}, '%')
+                </if>
             </foreach>
+            <if test="LEVEL_CD != null and !LEVEL_CD.equals('')">
+                AND LEVEL_CD &lt;= #{LEVEL_CD}
+            </if>
+            <choose>
+                <when test="searchData != null and !searchData.equals('')">
+                    <foreach collection="searchColumns" item="columnName" open="AND (" close=")" separator="OR">
+                        ${columnName} LIKE CONCAT('%',#{searchData},'%')
+                    </foreach>
+                </when>
+                <otherwise>
+                </otherwise>
+            </choose>
         </where>
+        ORDER BY
+            CASE
+                WHEN CASH_FG = '수입' THEN 1
+                WHEN CASH_FG = '지출' THEN 2
+                WHEN CASH_FG = '대체' THEN 3
+            END,
+                CAST(CASH_CD AS SIGNED)
     </select>
 
     <insert id="fundTypeInsert" parameterType="com.example.demo.dto.FunTypeDTO">
         INSERT INTO Acashcd (
-            <foreach collection="columnsToUpdate" item="column" separator=",">
-                ${column}
-            </foreach>
+        <foreach collection="columnsToUpdate" item="column" separator=",">
+            ${column}
+        </foreach>
         )
         VALUES (
-            <foreach collection="columnsToUpdate" item="column" separator=",">
-                #{${column}}
-            </foreach>
+        <foreach collection="columnsToUpdate" item="column" separator=",">
+            #{${column}}
+        </foreach>
         )
     </insert>
 
@@ -46,21 +73,41 @@
         UPDATE Acashcd
         <set>
             <foreach collection="columnsToUpdate" item="column" separator=",">
-                <if test="column != 'CASH_CD'"> <!-- Exclude CO_CD column -->
+                <if test="column != 'CASH_CD' and column != 'CO_CD'"> <!-- Exclude CO_CD column -->
                     ${column} = #{${column}}
                 </if>
             </foreach>
         </set>
         WHERE CASH_CD = #{CASH_CD}
+        <include refid="commonConditions"/>
     </update>
 
-    <delete id="fundTypeDelete">
+    <delete id="fundTypeDelete" parameterType="java.util.Map">
         DELETE
         FROM Acashcd
         WHERE CASH_CD IN
-        <foreach collection="list" item="item" open="(" close=")" separator=",">
+        <foreach collection="deleteList" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
+        <include refid="commonConditions"/>
     </delete>
 
+    <select id="highFundsList" parameterType="java.util.Map" resultType="String">
+        SELECT DISTINCT SUM_CD
+        FROM Acashcd
+        WHERE SUM_CD IN
+        <foreach collection="deleteList" item="item"  open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <include refid="commonConditions"/>
+    </select>
+
+
+
+
+
 </mapper>
+
+
+
+

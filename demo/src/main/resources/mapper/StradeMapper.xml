@@ -1,0 +1,800 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.StradeDao">
+
+    <!-- 거래처 권한이 있고 조회권한이 '부'인 조건   -->
+    <sql id="stradeRoll">
+        s.TR_CD IN (
+            SELECT
+                TR_CD
+            FROM StradeRollManage
+            WHERE
+                CO_CD=#{CO_CD, jdbcType=VARCHAR}
+             AND EMP_CD=#{EMP_CD, jdbcType=VARCHAR}
+            )
+        OR s.VIEW_YN = '0'
+    </sql>
+
+    <!--  해당 거래처의 권한이 있는 사원들의 EMP_CD   -->
+    <sql id="empHelpCodeEmpCD">
+        SELECT
+            EMP_CD
+        FROM StradeRollManage
+        WHERE
+            CO_CD = #{CO_CD}
+          AND TR_CD = #{TR_CD}
+          AND EMP_CD IS NOT NULL
+    </sql>
+
+    <!--  해당 거래처의 권한이 있는 부서 DEPT_CD   -->
+    <sql id="deptHelpCodeEmpCD">
+        SELECT
+            DEPT_CD
+        FROM StradeRollManage
+        WHERE
+            CO_CD = #{CO_CD}
+          AND TR_CD = #{TR_CD}
+          AND DEPT_CD IS NOT NULL
+        GROUP BY DEPT_CD
+    </sql>
+
+    <!-- 전체 일반 거래처 데이터 및 검색 결과 처리   -->
+    <select id="sgtradeSearchList" parameterType="hashmap" resultType="com.example.demo.dto.SGtradeDTO">
+        SELECT
+            s.CO_CD
+            ,s.TR_CD
+            ,s.TR_NM
+            ,s.USE_YN
+            ,g.REG_NB
+            ,g.PPL_NB
+            ,g.CEO_NM
+            ,g.BUSINESS
+            ,g.JONGMOK
+            ,g.ZIP
+            ,g.ADDR
+            ,g.ADDR_NUM
+            ,g.PHONE_NB
+            ,g.FAX
+            ,g.WEBSITE
+            ,g.EMAIL
+            ,g.START_DT
+            ,g.END_DT
+            ,g.FOR_YN
+            ,g.LIQ_CD
+        FROM Strade s
+        JOIN Gtrade g
+            ON s.TR_CD = g.TR_CD
+          AND s.CO_CD = g.CO_CD
+        <where>
+            <include refid="stradeRoll" />
+            <if test="TR_CD != null and !TR_NM.equals('')">
+                AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
+            </if>
+            <if test="TR_NM != null and !TR_NM.equals('')">
+                AND s.TR_NM = #{TR_NM}, jdbcType=VARCHAR
+            </if>
+            <if test="REG_NB != null and !REG_NB.equals('')">
+                AND g.REG_NB = #{REG_NB, jdbcType=VARCHAR}
+            </if>
+            <if test="PPL_NB != null and !PPL_NB.equals('')">
+                AND g.PPL_NB = #{PPL_NB, jdbcType=VARCHAR}
+            </if>
+            <if test="USE_YN != null and !USE_YN.equals('')">
+                AND s.USE_YN = #{USE_YN, jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <!-- 전체 금융 거래처 데이터 및 검색 결과 처리   -->
+    <select id="sftradeSearchList" parameterType="hashmap" resultType="com.example.demo.dto.SFtradeDTO">
+        SELECT
+            s.CO_CD
+            ,s.TR_CD
+            ,s.TR_NM
+            ,s.USE_YN
+            ,f.FSTART_DT
+            ,f.FEND_DT
+            ,f.BA_NB_TR
+            ,f.DEPOSITOR
+            ,f.DEPOSIT_NM
+            ,f.ACCOUNT_OPEN_BN
+            ,f.BANK_CD
+            ,fn.BANK_NAME
+        FROM Strade s
+        JOIN Ftrade f
+            ON s.TR_CD = f.TR_CD
+          AND s.CO_CD = f.CO_CD
+        LEFT OUTER JOIN FINANCECODE fn
+            ON f.BANK_CD = fn.FINANCE_CD
+        <where>
+            <include refid="stradeRoll" />
+            <if test="TR_CD != null and !TR_NM.equals('')">
+                AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
+            </if>
+            <if test="TR_NM != null and !TR_NM.equals('')">
+                AND s.TR_NM = #{TR_NM, jdbcType=VARCHAR}
+            </if>
+            <if test="BA_NB_TR != null and !BA_NB_TR.equals('')">
+                AND f.BA_NB_TR = #{BA_NB_TR, jdbcType=VARCHAR}
+            </if>
+            <if test="USE_YN != null and !USE_YN.equals('')">
+                AND s.USE_YN = #{USE_YN, jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <!--  거래처 insert  -->
+    <insert id="stradeInsert" parameterType="com.example.demo.dto.SGFtradeDTO">
+        INSERT INTO Strade (
+            TR_CD
+            ,CO_CD
+            ,TR_NM
+            ,TR_FG
+            ,USE_YN
+            ,VIEW_YN
+        ) VALUES (
+            #{TR_CD, jdbcType=VARCHAR}
+            ,#{CO_CD, jdbcType=VARCHAR}
+            ,#{TR_NM, jdbcType=VARCHAR}
+            ,#{TR_FG, jdbcType=VARCHAR}
+            ,#{USE_YN, jdbcType=VARCHAR}
+            ,#{VIEW_YN, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!--  일반 거래처 insert  -->
+    <insert id="gtradeInsert" parameterType="com.example.demo.dto.SGFtradeDTO">
+        INSERT INTO
+            Gtrade (
+                TR_CD
+                ,CO_CD
+                ,REG_NB
+                ,PPL_NB
+                ,CEO_NM
+                ,BUSINESS
+                ,JONGMOK
+                ,ZIP
+                ,ADDR
+                ,ADDR_NUM
+                ,PHONE_NB
+                ,FAX
+                ,WEBSITE
+                ,EMAIL
+                ,START_DT
+                ,END_DT
+                ,FOR_YN
+                ,LIQ_CD
+        ) VALUES (
+                #{TR_CD, jdbcType=VARCHAR}
+                ,#{CO_CD, jdbcType=VARCHAR}
+                ,#{REG_NB, jdbcType=VARCHAR}
+                ,#{PPL_NB, jdbcType=VARCHAR}
+                ,#{CEO_NM, jdbcType=VARCHAR}
+                ,#{BUSINESS, jdbcType=VARCHAR}
+                ,#{JONGMOK, jdbcType=VARCHAR}
+                ,#{ZIP, jdbcType=VARCHAR}
+                ,#{ADDR, jdbcType=VARCHAR}
+                ,#{ADDR_NUM, jdbcType=VARCHAR}
+                ,#{PHONE_NB, jdbcType=VARCHAR}
+                ,#{FAX, jdbcType=VARCHAR}
+                ,#{WEBSITE, jdbcType=VARCHAR}
+                ,#{EMAIL, jdbcType=VARCHAR}
+                ,#{START_DT, jdbcType=VARCHAR}
+                ,#{END_DT, jdbcType=VARCHAR}
+                ,#{FOR_YN, jdbcType=VARCHAR}
+                ,#{LIQ_CD, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!--  금융 거래처 insert  -->
+    <insert id="ftradeInsert" parameterType="com.example.demo.dto.SGFtradeDTO">
+        INSERT INTO
+            Ftrade (
+                    TR_CD
+                    ,CO_CD
+                    ,FSTART_DT
+                    ,FEND_DT
+                    ,BA_NB_TR
+                    ,DEPOSITOR
+                    ,DEPOSIT_NM
+                    ,ACCOUNT_OPEN_BN
+                    ,BANK_CD
+        ) VALUES (
+                    #{TR_CD, jdbcType=VARCHAR}
+                    ,#{CO_CD, jdbcType=VARCHAR}
+                    ,#{FSTART_DT, jdbcType=VARCHAR}
+                    ,#{FEND_DT, jdbcType=VARCHAR}
+                    ,#{BA_NB_TR, jdbcType=VARCHAR}
+                    ,#{DEPOSITOR, jdbcType=VARCHAR}
+                    ,#{DEPOSIT_NM, jdbcType=VARCHAR}
+                    ,#{ACCOUNT_OPEN_BN, jdbcType=VARCHAR}
+                    ,#{BANK_CD, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 일반 거래처 데이터 1건 출력   -->
+    <select id="sgtradeDetail" parameterType="com.example.demo.dto.SGtradeDTO" resultType="com.example.demo.dto.SGtradeDTO">
+        SELECT
+            s.CO_CD
+            ,s.TR_CD
+            ,s.TR_NM
+            ,s.USE_YN
+            ,g.REG_NB
+            ,g.PPL_NB
+            ,g.CEO_NM
+            ,g.BUSINESS
+            ,g.JONGMOK
+            ,g.ZIP
+            ,g.ADDR
+            ,g.ADDR_NUM
+            ,g.PHONE_NB
+            ,g.FAX
+            ,g.WEBSITE
+            ,g.EMAIL
+            ,g.START_DT
+            ,g.END_DT
+            ,g.FOR_YN
+            ,g.LIQ_CD
+        FROM Strade s
+        JOIN Gtrade g
+            ON s.TR_CD = g.TR_CD
+          AND s.CO_CD = g.CO_CD
+        WHERE
+            s.CO_CD = #{CO_CD, jdbcType=VARCHAR}
+          AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
+    </select>
+
+    <!-- 금융 거래처 데이터 1건 출력   -->
+    <select id="sftradeDetail" parameterType="com.example.demo.dto.SFtradeDTO" resultType="com.example.demo.dto.SFtradeDTO">
+        SELECT
+            s.CO_CD
+            ,s.TR_CD
+            ,s.TR_NM
+            ,s.USE_YN
+            ,f.FSTART_DT
+            ,f.FEND_DT
+            ,f.BA_NB_TR
+            ,f.DEPOSITOR
+            ,f.DEPOSIT_NM
+            ,f.ACCOUNT_OPEN_BN
+            ,f.BANK_CD
+            ,fn.BANK_NAME
+        FROM Strade s
+        JOIN Ftrade f
+            ON s.TR_CD = f.TR_CD
+         AND s.CO_CD = f.CO_CD
+        LEFT OUTER JOIN FINANCECODE fn
+            ON f.BANK_CD = fn.FINANCE_CD
+        WHERE
+            s.CO_CD = #{CO_CD, jdbcType=VARCHAR}
+         AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
+    </select>
+
+    <!--  거래처 업데이트  -->
+    <update id="stradeUpdate" parameterType="com.example.demo.dto.StradeDTO">
+        UPDATE
+            Strade
+        SET
+            TR_NM = IFNULL(#{TR_NM, jdbcType=VARCHAR}, TR_NM)
+            ,USE_YN = IFNULL(#{USE_YN, jdbcType=VARCHAR}, USE_YN)
+            ,VIEW_YN = IFNULL(#{VIEW_YN, jdbcType=VARCHAR}, VIEW_YN)
+        WHERE
+            TR_CD=#{TR_CD, jdbcType=VARCHAR}
+         AND CO_CD=#{CO_CD, jdbcType=VARCHAR}
+    </update>
+
+    <!--  일반 거래처 업데이트  -->
+    <update id="gtradeUpdate" parameterType="com.example.demo.dto.GtradeDTO">
+        UPDATE
+            Gtrade
+        SET
+            REG_NB = IFNULL(#{REG_NB, jdbcType=VARCHAR}, REG_NB)
+            ,PPL_NB = IFNULL(#{PPL_NB, jdbcType=VARCHAR}, PPL_NB)
+            ,CEO_NM = IFNULL(#{CEO_NM, jdbcType=VARCHAR}, CEO_NM)
+            ,BUSINESS = IFNULL(#{BUSINESS, jdbcType=VARCHAR}, BUSINESS)
+            ,JONGMOK = IFNULL(#{JONGMOK, jdbcType=VARCHAR}, JONGMOK)
+            ,ZIP = IFNULL(#{ZIP, jdbcType=VARCHAR}, ZIP)
+            ,ADDR = IFNULL(#{ADDR, jdbcType=VARCHAR}, ADDR)
+            ,ADDR_NUM = IFNULL(#{ADDR_NUM, jdbcType=VARCHAR}, ADDR_NUM)
+            ,PHONE_NB = IFNULL(#{PHONE_NB, jdbcType=VARCHAR}, PHONE_NB)
+            ,FAX = IFNULL(#{FAX, jdbcType=VARCHAR}, FAX)
+            ,WEBSITE = IFNULL(#{WEBSITE, jdbcType=VARCHAR}, WEBSITE)
+            ,EMAIL = IFNULL(#{EMAIL, jdbcType=VARCHAR}, EMAIL)
+            ,START_DT = IFNULL(#{START_DT, jdbcType=VARCHAR}, START_DT)
+            ,END_DT = IFNULL(#{END_DT, jdbcType=VARCHAR}, END_DT)
+            ,FOR_YN = IFNULL(#{FOR_YN, jdbcType=VARCHAR}, FOR_YN)
+            ,LIQ_CD = IFNULL(#{LIQ_CD, jdbcType=VARCHAR}, LIQ_CD)
+        WHERE
+            TR_CD=#{TR_CD, jdbcType=VARCHAR}
+          AND CO_CD=#{CO_CD, jdbcType=VARCHAR}
+    </update>
+
+    <!-- 금융 거래처 업데이트  -->
+    <update id="ftradeUpdate" parameterType="com.example.demo.dto.FtradeDTO">
+        UPDATE
+            Ftrade
+        SET
+            FSTART_DT = IFNULL(#{FSTART_DT, jdbcType=VARCHAR}, FSTART_DT)
+            ,FEND_DT = IFNULL(#{FEND_DT, jdbcType=VARCHAR}, FEND_DT)
+            ,BA_NB_TR = IFNULL(#{BA_NB_TR, jdbcType=VARCHAR}, BA_NB_TR)
+            ,DEPOSITOR = IFNULL(#{DEPOSITOR, jdbcType=VARCHAR}, DEPOSITOR)
+            ,DEPOSIT_NM = IFNULL(#{DEPOSIT_NM, jdbcType=VARCHAR}, DEPOSIT_NM)
+            ,ACCOUNT_OPEN_BN = IFNULL(#{ACCOUNT_OPEN_BN, jdbcType=VARCHAR}, ACCOUNT_OPEN_BN)
+            ,BANK_CD = IFNULL(#{BANK_CD, jdbcType=VARCHAR}, BANK_CD)
+        WHERE
+            TR_CD=#{TR_CD, jdbcType=VARCHAR}
+          AND CO_CD=#{CO_CD, jdbcType=VARCHAR}
+    </update>
+
+    <!--  거래처권한관리   -->
+    <!--  각 거래처 권한 리스트 -->
+    <select id="stradeRollManageSearchList" parameterType="com.example.demo.dto.StradeRollManageDTO"  resultType="com.example.demo.dto.StradeRollManageDTO">
+        SELECT
+            TRMG_SQ
+            ,TR_CD
+            ,ROLL_FG
+            ,DEPT_CD
+            ,DEPT_NM
+            ,CO_CD
+            ,EMP_CD
+            ,KOR_NM
+            ,NOTE
+            ,USE_YN
+            ,INSERT_DT
+        FROM StradeRollManage
+        WHERE
+            TR_CD = #{TR_CD, jdbcType=VARCHAR}
+          AND CO_CD = #{CO_CD, jdbcType=VARCHAR}
+    </select>
+
+    <!-- 거래처 권한 등록 insert  -->
+    <insert id="stradeRollManageInsert" parameterType="com.example.demo.dto.StradeRollManageDTO">
+        INSERT INTO
+            StradeRollManage (
+                TR_CD
+                ,CO_CD
+                ,DEPT_CD
+                ,DEPT_NM
+                ,EMP_CD
+                ,KOR_NM
+                ,NOTE
+                ,USE_YN
+                ,INSERT_DT
+                ,ROLL_FG
+        ) VALUES (
+                #{TR_CD, jdbcType=VARCHAR}
+                ,#{CO_CD, jdbcType=VARCHAR}
+                ,#{DEPT_CD, jdbcType=VARCHAR}
+                ,#{DEPT_NM, jdbcType=VARCHAR}
+                ,#{EMP_CD, jdbcType=VARCHAR}
+                ,#{KOR_NM, jdbcType=VARCHAR}
+                ,#{NOTE, jdbcType=VARCHAR}
+                ,#{USE_YN, jdbcType=VARCHAR}
+                ,#{INSERT_DT, jdbcType=TIMESTAMP}
+                ,#{ROLL_FG, jdbcType=VARCHAR}
+            )
+    </insert>
+
+    <!-- 부서도움창 거래처 권한 등록 insert  -->
+    <insert id="stradeRollInDeptInsert" parameterType="com.example.demo.dto.StradeRollManageDTO">
+        <foreach collection="list" item="item" index="index" separator=";">
+        INSERT INTO
+            StradeRollManage (
+                TR_CD
+                ,CO_CD
+                ,DEPT_CD
+                ,DEPT_NM
+                ,INSERT_DT
+                ,ROLL_FG
+        ) VALUES (
+                #{item.TR_CD}
+                ,#{item.CO_CD}
+                ,#{item.DEPT_CD}
+                ,#{item.DEPT_NM}
+                ,NOW()
+                ,#{item.ROLL_FG}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 사원도움모달 내 checkList 거래처 권한 등록 insert  -->
+    <insert id="stradeRollInEmpInsert" parameterType="com.example.demo.dto.StradeRollManageDTO">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT INTO
+                StradeRollManage (
+                    TR_CD
+                    ,CO_CD
+                    ,EMP_CD
+                    ,KOR_NM
+                    ,INSERT_DT
+                    ,ROLL_FG
+            ) VALUES
+                (
+                #{item.TR_CD}
+                ,#{item.CO_CD}
+                ,#{item.EMP_CD}
+                ,#{item.KOR_NM}
+                ,NOW()
+                ,#{item.ROLL_FG}
+                )
+            </foreach>
+    </insert>
+
+    <!-- 거래처 권한 관리 업데이트   -->
+    <update id="stradeRollManageUpdate" parameterType="com.example.demo.dto.StradeRollManageDTO">
+        UPDATE
+            StradeRollManage
+        SET
+            EMP_CD = IFNULL(#{EMP_CD, jdbcType=VARCHAR}, EMP_CD)
+            ,KOR_NM = IFNULL(#{KOR_NM, jdbcType=VARCHAR}, KOR_NM)
+            ,NOTE = IFNULL(#{NOTE, jdbcType=VARCHAR}, NOTE)
+            ,USE_YN = IFNULL(#{USE_YN, jdbcType=VARCHAR}, USE_YN)
+            ,INSERT_DT = IFNULL(#{INSERT_DT, jdbcType=TIMESTAMP}, INSERT_DT)
+        WHERE
+            TRMG_SQ = #{TRMG_SQ, jdbcType=VARCHAR}
+          AND TR_CD = #{TR_CD, jdbcType=VARCHAR}
+          AND CO_CD = #{CO_CD, jdbcType=VARCHAR}
+    </update>
+
+    <!--    -->
+<!--    <delete id="stradeRollManageDelete" parameterType="com.example.demo.dto.StradeRollManageDTO">-->
+<!--        DELETE FROM StradeRollManage-->
+<!--        <where>-->
+<!--                <foreach collection="ENRL_FG" item="enrlFg" separator="OR">-->
+<!--                    ENRL_FG = #{enrlFg}-->
+<!--                </foreach>-->
+<!--        </where>-->
+<!--    </delete>-->
+
+    <!--  사원코드도움 모달  -->
+    <select id="empCodeHelpList" parameterType="com.example.demo.dto.EmpCodeHelpListDTO">
+        SELECT
+            e.EMP_CD
+            ,e.KOR_NM
+            ,d.DEPT_NM
+            ,w.DIV_NM
+        FROM Employee e
+        LEFT OUTER JOIN Department d
+           ON e.DEPT_CD = d.DEPT_CD
+          AND e.CO_CD = d.CO_CD
+        LEFT OUTER JOIN Workplace w
+           ON e.DIV_CD = w.DIV_CD
+          AND e.CO_CD = w.CO_CD
+        WHERE
+            e.EMP_CD NOT IN (<include refid="empHelpCodeEmpCD" />)
+            AND e.EMP_CD IS NOT NULL
+            <choose>
+                <when test="ENRL_FG != null and !ENRL_FG.equals('') and ENRL_FG == 2">
+                    AND e.USER_YN IN (0,1) AND e.ENRL_FG = #{ENRL_FG}
+                </when>
+                <otherwise>
+                    AND e.USER_YN='1' AND e.ENRL_FG = #{ENRL_FG}
+                </otherwise>
+            </choose>
+            <if test="VALUE != null and !VALUE.equals('')">
+                AND (e.EMP_CD LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR e.KOR_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR d.DEPT_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR w.DIV_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%'))
+            </if>
+    </select>
+
+    <!-- 부서코드도움 모달   -->
+    <select id="deptCodeHelpList" parameterType="com.example.demo.dto.DepartmentDTO" resultType="com.example.demo.dto.DepartmentDTO">
+        SELECT
+            DEPT_CD
+            ,DEPT_NM
+            ,DEPT_YN
+        FROM Department
+        <where>
+            CO_CD = #{CO_CD, jdbcType=VARCHAR}
+            AND DEPT_CD NOT IN (<include refid="deptHelpCodeEmpCD" />)
+            <choose>
+                <when test="DEPT_YN != null and !DEPT_YN.equals('') and DEPT_YN == 0">
+                    AND DEPT_YN IN (0, 1)
+                </when>
+                <otherwise>
+                    AND DEPT_YN = 1
+                </otherwise>
+            </choose>
+            <if test="VALUE != null and !VALUE.equals('')">
+                AND (DEPT_CD LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR DEPT_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <!--  거래처코드도움 모달  -->
+    <select id="stradeCodeHelpList" parameterType="com.example.demo.dto.StradeCodeHelpSearchDTO" resultType="com.example.demo.dto.StradeCodeHelpDTO">
+        SELECT
+            s.TR_CD
+            ,s.TR_NM
+            ,s.TR_FG
+            ,g.REG_NB
+            ,g.CEO_NM
+            ,f.BA_NB_TR
+        FROM Strade s
+        LEFT OUTER JOIN Gtrade g
+            ON s.TR_CD = g.TR_CD
+          AND s.CO_CD = g.CO_CD
+        LEFT OUTER JOIN Ftrade f
+            ON s.TR_CD = f.TR_CD
+          AND s.CO_CD = f.CO_CD
+        <where>
+            s.CO_CD = #{CO_CD, jdbcType=VARCHAR}
+            <choose>
+                <when test="USE_YN != null and !USE_YN.equals('') and USE_YN == 0">
+                    AND s.USE_YN IN (0, 1)
+                </when>
+                <otherwise>
+                    AND s.USE_YN = 1
+                </otherwise>
+            </choose>
+            <if test="VALUE != null and !VALUE.equals('')">
+                AND (s.TR_CD LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR s.TR_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR f.BA_NB_TR LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR g.REG_NB LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR g.CEO_NM LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%'))
+            </if>
+            <if test="TR_FG != null and !TR_FG.equals('')">
+                AND s.TR_FG = #{TR_FG}
+            </if>
+        </where>
+    </select>
+
+    <!--  주류코드 모달  -->
+    <select id="liquorcodeHelpList" parameterType="com.example.demo.dto.EmpCodeHelpListDTO">
+        SELECT
+            LIQ_CD
+            ,WHOLESALE
+            ,RETAIL
+        FROM LIQUORCODE
+        <where>
+            <if test="VALUE != null and !VALUE.equals('')">
+                AND (LIQ_CD LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR WHOLESALE LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR RETAIL LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <!--  금융기관코드도움 모달  -->
+    <select id="financecodeHelpList" parameterType="com.example.demo.dto.FinancecodeHelpListDTO">
+        SELECT
+            FINANCE_CD
+            ,BANK_NAME
+        FROM FINANCECODE
+        <where>
+            <if test="VALUE != null and !VALUE.equals('')">
+                AND (FINANCE_CD LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%')
+                OR BANK_NAME LIKE CONCAT('%', #{VALUE, jdbcType=VARCHAR}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <!--  거래처 권한 관리 삭제  -->
+    <delete id="stradeRollManageDelete" parameterType="com.example.demo.dto.StradeRollManageDeleteDTO">
+        DELETE FROM
+        StradeRollManage
+        <where>
+            CO_CD = #{CO_CD}
+            AND TR_CD = #{TR_CD}
+            AND TRMG_SQ IN
+            <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
+    </delete>
+
+    <!--  거래처 권한 관리 전체 삭제  -->
+    <delete id="stradeRollManageTotalDelete" parameterType="com.example.demo.dto.StradeRollManageDeleteDTO">
+        DELETE FROM
+        StradeRollManage
+        <where>
+            CO_CD = #{CO_CD}
+            AND TR_CD = #{TR_CD}
+        </where>
+    </delete>
+
+    <!--  고정자금등록 내 거래처 사용여부   -->
+    <select id="acashFix" parameterType="com.example.demo.dto.StradeDeleteInfo">
+        SELECT count(SQ_NB)
+        from AcashFix
+        WHERE
+            TR_CD = #{TR_CD}
+          || FTR_CD = #{TR_CD}
+    </select>
+
+    <!--  거래처 삭제  -->
+    <delete id="stradeDelete" parameterType="com.example.demo.dto.StradeDeleteDTO">
+        DELETE FROM Strade
+        WHERE
+            TR_CD = #{TR_CD}
+          AND CO_CD = #{CO_CD}
+    </delete>
+
+    <!--  일반거래처 삭제  -->
+    <delete id="gtradeDelete" parameterType="com.example.demo.dto.StradeDeleteDTO">
+        DELETE FROM Gtrade
+        WHERE
+            TR_CD = #{TR_CD}
+          AND CO_CD = #{CO_CD}
+    </delete>
+
+    <!--  금융거래처 삭제  -->
+    <delete id="ftradeDelete" parameterType="com.example.demo.dto.StradeDeleteDTO">
+        DELETE FROM Ftrade
+        WHERE
+            TR_CD = #{TR_CD}
+          AND CO_CD = #{CO_CD}
+    </delete>
+
+    <!--  거래처 내 거래처코드 사용여부   -->
+    <select id="trCdInStrade">
+        SELECT
+            TR_CD
+        FROM Strade
+        WHERE
+            CO_CD = #{CO_CD}
+          AND TR_CD = #{TR_CD}
+    </select>
+
+    <!--  그리드 내 사원 정보 여부 확인  -->
+    <select id="gridEmpCode" parameterType="com.example.demo.dto.GridEmpCdDTO">
+        SELECT
+            KOR_NM
+        FROM Employee
+        WHERE
+            EMP_CD NOT IN (<include refid="empHelpCodeEmpCD" />)
+          AND EMP_CD = #{EMP_CD}
+          AND EMP_CD IS NOT NULL
+    </select>
+
+    <!--  그리드 내 부서 정보 여부 확인  -->
+    <select id="gridDeptCd" parameterType="com.example.demo.dto.DepartmentDTO">
+        SELECT
+            DEPT_NM
+        FROM Department
+        WHERE
+            CO_CD = #{CO_CD, jdbcType=VARCHAR}
+          AND DEPT_CD NOT IN (<include refid="deptHelpCodeEmpCD" />)
+          AND DEPT_CD = #{DEPT_CD}
+          AND DEPT_CD IS NOT NULL
+    </select>
+
+    <!--  채번 기능  -->
+    <select id="getStradeSeq">
+        SELECT
+            CASE
+                WHEN IFNULL(MAX(minTr),'') != '' THEN LPAD( MIN(minTr)  + 1, #{ctrNb} + (
+                    CASE
+                        WHEN (
+                                LENGTH( MIN(minTr) + 1  ) - #{ctrNb}) &lt; 0  THEN '0'
+                        ELSE (LENGTH( MIN(minTr) + 1  ) - #{ctrNb})
+                    END ), #{makeTrCd} )
+                ELSE LPAD( MAX(tr_cd)  + 1, #{ctrNb} + (
+                    CASE
+                        WHEN (
+                                LENGTH( MAX(tr_cd) + 1  ) - #{ctrNb}) &lt; 0  THEN '0'
+                        ELSE (LENGTH( MAX(tr_cd) + 1  ) - #{ctrNb})
+                    END ), #{makeTrCd} )
+                END AS trCd
+        FROM	(
+            SELECT CAST(LPAD('0', #{ctrNb}, IF(#{makeTrCd} = '0000000000', 1000000000, 9000000000)) AS INTEGER) AS tr_cd
+                    ,null                                                                                       AS minTr
+            WHERE NOT EXISTS
+                  (
+                    SELECT tr_cd
+                    FROM   Strade
+                    WHERE  co_cd = #{coCd}
+                    AND LENGTH(tr_cd) = #{ctrNb}
+                    <if test='makeTrCd.equals("0000000000") '>
+                        <![CDATA[
+                                     AND tr_cd >= CAST(LPAD('0', #{ctrNb}, '0000000000') as CHAR)
+                                     AND tr_cd < CAST(LPAD('0', #{ctrNb}, '9000000000') as CHAR)
+                                     ]]>
+                    </if>
+                    <if test='makeTrCd.equals("9000000000") '>
+                        <![CDATA[
+                                     AND	tr_cd >= CAST(LPAD('0', #{ctrNb}, '9000000000') as CHAR)
+                                     AND	tr_cd <= CAST(LPAD('9', #{ctrNb}, '9999999999') as CHAR)
+                                     ]]>
+                    </if>
+                    AND	CAST(tr_cd AS INTEGER)	!= 0
+                    limit 1
+                  )
+            UNION
+
+            SELECT CAST(tr_cd AS INTEGER) AS tr_cd
+                   ,(CASE
+                        WHEN LPAD(tr_cd + 1, #{ctrNb}, #{makeTrCd} ) = LEAD(tr_cd) OVER(ORDER BY tr_cd) = 0
+                        THEN tr_cd
+                        ELSE null
+                     END
+                    ) AS minTr
+            FROM Strade
+            WHERE co_cd = #{coCd}
+            AND	LENGTH(tr_cd) = #{ctrNb}
+            <if test='makeTrCd.equals("0000000000") '>
+                <![CDATA[
+                        AND	tr_cd >= CAST(LPAD('0', #{ctrNb}, '0000000000') as CHAR)
+                        AND	tr_cd < CAST(LPAD('0', #{ctrNb}, '9000000000') as CHAR)
+                ]]>
+            </if>
+            <if test='makeTrCd.equals("9000000000") '>
+                <![CDATA[
+                        AND	tr_cd >= CAST(LPAD('0', #{ctrNb}, '9000000000') as CHAR)
+                        AND	tr_cd <= CAST(LPAD('9', #{ctrNb}, '9999999999') as CHAR)
+                ]]>
+            </if>
+            AND CAST(tr_cd AS INTEGER) != 0
+            ORDER BY tr_cd
+        )	T
+    </select>
+
+
+
+    <!--  일반거래처 데이터 업데이트  -->
+<!--    <update id="sgtradeUpdate" parameterType="com.example.demo.dto.SGtradeDTO" statementType="CALLABLE">-->
+<!--        {call UpdateStradeAndGtradeProcedure(-->
+<!--        #{TR_CD},-->
+<!--        #{CO_CD},-->
+<!--        #{TR_NM},-->
+<!--        '1',-->
+<!--        '0',-->
+<!--        #{REG_NB},-->
+<!--        #{PPL_NB},-->
+<!--        #{CEO_NM},-->
+<!--        #{BUSINESS},-->
+<!--        #{JONGMOK},-->
+<!--        #{ZIP},-->
+<!--        #{ADDR},-->
+<!--        #{ADDR_NUM},-->
+<!--        #{PHONE_NB},-->
+<!--        #{FAX},-->
+<!--        #{WEBSITE},-->
+<!--        #{EMAIL},-->
+<!--        #{START_DT},-->
+<!--        #{END_DT},-->
+<!--        '0',-->
+<!--        #{LIQ_CD}-->
+<!--        )}-->
+<!--    </update>-->
+
+    <!--  일반거래처 등록  -->
+    <!--    <insert id="insertStradeAndGtradeProcedure"  parameterType="com.example.demo.dto.SGtradeDTO" statementType="CALLABLE">-->
+    <!--        {call InsertStradeAndGtradeProcedure(-->
+    <!--        #{TR_CD},-->
+    <!--        #{CO_CD},-->
+    <!--        #{TR_NM},-->
+    <!--        '1',-->
+    <!--        #{USE_YN},-->
+    <!--        '0',-->
+    <!--        #{REG_NB},-->
+    <!--        #{PPL_NB},-->
+    <!--        #{CEO_NM},-->
+    <!--        #{BUSINESS},-->
+    <!--        #{JONGMOK},-->
+    <!--        #{ZIP},-->
+    <!--        #{ADDR},-->
+    <!--        #{ADDR_NUM},-->
+    <!--        #{PHONE_NB},-->
+    <!--        #{FAX},-->
+    <!--        #{WEBSITE},-->
+    <!--        #{EMAIL},-->
+    <!--        #{START_DT},-->
+    <!--        #{END_DT},-->
+    <!--        #{FOR_YN},-->
+    <!--        #{LIQ_CD}-->
+    <!--        )}-->
+    <!--    </insert>-->
+
+    <!-- 특정 사원 데이터 비 활성화 -->
+<!--    <update id="sgtradeRemove" parameterType="com.example.demo.dto.EmployeeDTO">-->
+<!--        UPDATE Employee-->
+<!--        SET USER_YN = '0', USE_FG = '0', ENRL_FG = '2'-->
+<!--        WHERE-->
+<!--            TR_CD = #{TR_CD}-->
+<!--    </update>-->
+</mapper>
