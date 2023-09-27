@@ -50,7 +50,7 @@ public class StradeService {
         return sgtradeList;
     }
 
-    // 전체 일반 거래처 리스트 출력 및 검색 결과 출력
+    // 전체 금융 거래처 리스트 출력 및 검색 결과 출력
     public List<SFtradeDTO> sftradeSearchList(Map<String, String> map) {
         log.info("sftradeSearchListService 실행");
         List<SFtradeDTO> sftradeList = new ArrayList<>();
@@ -80,6 +80,7 @@ public class StradeService {
     public SFtradeDTO sftradeDetail(Map<String, String> map) {
         log.info("sftradeDetailService 실행");
         SFtradeDTO sftradeInfo = null;
+
         try {
             sftradeInfo = stradeDao.sftradeDetail(map);
             log.info("결과 sftradeInfo={}", sftradeInfo);
@@ -133,6 +134,30 @@ public class StradeService {
         log.info("stradeRollManageInsert row : {}", row);
     }
 
+    // 사원모달창 거래처 등록 Insert
+    public void stradeRollInEmpInsert(List<StradeRollManageDTO> list) {
+        log.info("stradeRollInEmpInsertService 실행");
+        int row = 0;
+        try {
+            row = stradeDao.stradeRollInEmpInsert(list);
+        } catch (Exception e) {
+            log.error("stradeRollInEmpInsertService Error : stradeRollManageDTO={}, errorMessage={}",list,e.getMessage());
+        }
+        log.info("stradeRollInEmpInsert row : {}", row);
+    }
+
+    // 부서모달창 거래처 등록 Insert
+    public void stradeRollInDeptInsert(List<StradeRollManageDTO> list) {
+        log.info("stradeRollInDeptInsertService 실행");
+        int row = 0;
+        try {
+            row = stradeDao.stradeRollInDeptInsert(list);
+        } catch (Exception e) {
+            log.error("stradeRollInDeptInsertService Error : stradeRollManageDTO={}, errorMessage={}",list,e.getMessage());
+        }
+        log.info("stradeRollInDeptInsert row : {}", row);
+    }
+
     // 거래처 권한 관리 update
     public void stradeRollManageUpdate(StradeRollManageDTO stradeRollManageDTO) {
         log.info("stradeRollManageUpdateService 실행");
@@ -150,6 +175,7 @@ public class StradeService {
     public List<EmpCodeHelpDTO> empCodeHelpList(EmpCodeHelpListDTO empCodeHelpListDTO) {
         log.info("empCodeHelpListService 실행");
         List<EmpCodeHelpDTO> empCodeHelpList = new ArrayList<>();
+
         try {
             empCodeHelpList = stradeDao.empCodeHelpList(empCodeHelpListDTO);
             //log.info("결과 empCodeHelpList={}", empCodeHelpList);
@@ -160,11 +186,11 @@ public class StradeService {
     }
 
     // 부서코드도움 모달창 list
-    public List<DepartmentDTO> deptCodeHelpList(String CO_CD, String TR_CD) {
+    public List<DepartmentDTO> deptCodeHelpList(DeptCodeHelpListDTO deptCodeHelpListDTO) {
         log.info("deptCodeHelpListService 실행");
         List<DepartmentDTO> deptCodeHelpList = new ArrayList<>();
         try {
-            deptCodeHelpList = stradeDao.deptCodeHelpList(CO_CD, TR_CD);
+            deptCodeHelpList = stradeDao.deptCodeHelpList(deptCodeHelpListDTO);
             //log.info("결과 deptCodeHelpList={}", deptCodeHelpList);
         } catch (Exception e) {
             log.error("deptCodeHelpListService Error : deptCodeHelpList={}, errorMessage={}",deptCodeHelpList,e.getMessage());
@@ -184,6 +210,147 @@ public class StradeService {
             log.error("StradeCodeHelpListService Error : stradeCodeHelpList={}, errorMessage={}",stradeCodeHelpList,e.getMessage());
         }
         return stradeCodeHelpList;
+    }
+
+    // 주류코드도움 모달창 list
+    public List<LiquorcodeHelpListDTO> liquorcodeHelpList(String VALUE) {
+        log.info("stradeCodeHelpListService 실행");
+        List<LiquorcodeHelpListDTO> liquorcodeHelpList = new ArrayList<>();
+
+        try {
+            liquorcodeHelpList = stradeDao.liquorcodeHelpList(VALUE);
+            //log.info("결과 stradeCodeHelpList={}", stradeCodeHelpList);
+        } catch (Exception e) {
+            log.error("StradeCodeHelpListService Error : liquorcodeHelpList={}, errorMessage={}",liquorcodeHelpList,e.getMessage());
+        }
+        return liquorcodeHelpList;
+    }
+
+    // 주류코드도움 모달창 list
+    public List<FinancecodeHelpListDTO> financecodeHelpList(String VALUE) {
+        log.info("financecodeHelpListtService 실행");
+        List<FinancecodeHelpListDTO> financecodeHelpList = new ArrayList<>();
+
+        try {
+            financecodeHelpList = stradeDao.financecodeHelpList(VALUE);
+            //log.info("결과 stradeCodeHelpList={}", stradeCodeHelpList);
+        } catch (Exception e) {
+            log.error("financecodeHelpListService Error : financecodeHelpList={}, errorMessage={}",financecodeHelpList,e.getMessage());
+        }
+        return financecodeHelpList;
+    }
+
+    // 거래처 권한 관리 삭제
+    public void stradeRollManageDelete(StradeRollManageDeleteDTO stradeRollManageDelete) {
+        log.info("stradeRollManageDeleteService 실행");
+        //StradeRollManageDeleteDTO stradeRollManage = new StradeRollManageDeleteDTO(stradeRollManageDelete);
+        int row = 0;
+
+        try {
+            row = stradeDao.stradeRollManageDelete(stradeRollManageDelete.getCO_CD(), stradeRollManageDelete.getTR_CD(),stradeRollManageDelete.getTRMG_SQ());
+            log.info("결과 row={}", row);
+        } catch (Exception e) {
+            log.error("stradeRollManageDeleteService Error : stradeRollManageDelete={}, errorMessage={}", stradeRollManageDelete,e.getMessage());
+        }
+    }
+
+
+    // 거래처 삭제
+    @Transactional(rollbackFor = {RuntimeException.class, Exception.class, SQLException.class})
+    public List<StradeDeleteInfo> stradeDelete(List<StradeDeleteDTO> stradeDeleteDTO) {
+        log.info("stradeDeleteService 실행");
+
+        int acashFixRow;
+        List<StradeDeleteInfo> stradeUseDataList = new ArrayList<>();
+
+        for (StradeDeleteDTO data: stradeDeleteDTO) {
+            System.out.println("kkkkkkkkkk"+data);
+            acashFixRow = stradeDao.acashFix(data.getTR_CD());// 정보를 가져와야함...ㅎㅎ 어느 거래처에 몇개 사용중인지
+            if (acashFixRow > 0) {
+                System.out.println("pppp"+data.getTR_CD());
+                StradeDeleteInfo stradeDeleteInfo = new StradeDeleteInfo(data.getTR_CD(),acashFixRow);
+                stradeUseDataList.add(stradeDeleteInfo);
+            }
+        }
+        System.out.println("listDelete");
+        for (StradeDeleteDTO data: stradeDeleteDTO) {
+            System.out.println("jipppppps");
+            if (stradeDao.acashFix(data.getTR_CD()) <= 0) {
+                System.out.println("jiiiiii");
+                int deleteRow = 0;
+                System.out.println("----------------"+data.getTR_FG());
+                if (data.getTR_FG().equals("1")) {
+                    log.info("일반 거래처 DELETE 실행");
+                    deleteRow += stradeDao.gtradeDelete(data);
+                } else if (data.getTR_FG().equals("3")) {
+                    log.info("금융 거래처 DELETE 실행");
+                    deleteRow += stradeDao.ftradeDelete(data);
+                }
+                deleteRow += stradeDao.stradeRollManageTotalDelete(data);
+                log.info("stradeDelete row : {}", deleteRow);
+                deleteRow = stradeDao.stradeDelete(data);
+                System.out.println("kkkkkk");
+            }
+        }
+        return stradeUseDataList;
+    }
+
+    // 거래처 내 거래처 코드 사용 여부
+    public Boolean trCdInStrade(String CO_CD, String TR_CD) {
+        log.info("trCdInStradeService");
+        String trCdID = null;
+        try {
+            trCdID = stradeDao.trCdInStrade(CO_CD, TR_CD);
+        } catch (Exception e) {
+            log.error("trCdInStradeService Error : trCdID={}, errorMessage={}",trCdID,e.getMessage());
+        }
+        if (trCdID != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // 거래처 내 거래처 코드 사용 여부
+    public String gridEmpCode(GridEmpCdDTO gridEmpCdDTO) {
+        log.info("gridEmpCodeService");
+        String gridKorNM = null;
+
+        try {
+            gridKorNM = stradeDao.gridEmpCode(gridEmpCdDTO);
+        } catch (Exception e) {
+            log.error("gridEmpCodeService Error : gridKorNM={}, errorMessage={}",gridKorNM,e.getMessage());
+        }
+        return gridKorNM;
+    }
+
+    // 거래처 내 거래처 코드 사용 여부
+    public String gridDeptCd(GridDeptCdDTO gridDeptCdDTO) {
+        log.info("gridDeptCdService");
+        String gridDeptNM = null;
+
+        try {
+            gridDeptNM = stradeDao.gridDeptCd(gridDeptCdDTO);
+        } catch (Exception e) {
+            log.error("gridDeptCdService Error : gridDeptNM={}, errorMessage={}",gridDeptNM,e.getMessage());
+        }
+        return gridDeptNM;
+    }
+
+    public String getStradeSeq(StradeSeqDTO seqDTO) {
+        log.info("getStradeSeqService");
+        String stradeSeq = null;
+
+        try {
+            if (seqDTO.getTR_FG().equals("1")) {
+                stradeSeq = stradeDao.getStradeSeq("0000000000", "4", seqDTO.getCO_CD());
+            } else if (seqDTO.getTR_FG().equals("3")) {
+                stradeSeq = stradeDao.getStradeSeq("9000000000", "4", seqDTO.getCO_CD());
+            }
+        } catch (Exception e) {
+            log.error("getStradeSeqService Error : stradeSeq={}, errorMessage={}",stradeSeq,e.getMessage());
+        }
+        return stradeSeq;
     }
 
     //    @Transactional
