@@ -3,30 +3,50 @@
 <mapper namespace="com.example.demo.dao.DepartmentDao">
 
         <!-- 부서 계층 구조를 가져오는 쿼리 -->
+<!--    <select id="getDepartmentHierarchy" resultType="com.example.demo.dto.DepartmentDTO">-->
+<!--        SELECT-->
+<!--            d.DEPT_CD-->
+<!--            ,d.CO_CD-->
+<!--            ,d.DIV_CD-->
+<!--            ,d.CALL_YN-->
+<!--            ,d.CALL_NM-->
+<!--            ,d.DEPT_CT-->
+<!--            ,d.DEPT_NM-->
+<!--            ,d.DEPT_NMK-->
+<!--            ,d.MGR_NM-->
+<!--            ,d.DEPT_YN-->
+<!--            ,d.SHOW_YN-->
+<!--            ,d.SORT_YN-->
+<!--            ,d.MDEPT_CD-->
+<!--            ,c.CO_NM-->
+<!--            ,w.DIV_NM-->
+<!--        FROM Department d-->
+<!--    LEFT JOIN Company c-->
+<!--           ON d.CO_CD = c.CO_CD-->
+<!--    LEFT JOIN Workplace w-->
+<!--           ON d.DIV_CD = w.DIV_CD-->
+<!--          AND d.CO_CD = w.CO_CD-->
+<!--       WHERE-->
+<!--           d.CO_CD=#{CO_CD}-->
+<!--    </select>-->
+
     <select id="getDepartmentHierarchy" resultType="com.example.demo.dto.DepartmentDTO">
         SELECT
-            d.DEPT_CD
-            ,d.CO_CD
-            ,d.DIV_CD
-            ,d.CALL_YN
-            ,d.CALL_NM
-            ,d.DEPT_CT
-            ,d.DEPT_NM
-            ,d.DEPT_NMK
-            ,d.MGR_NM
-            ,d.DEPT_YN
-            ,d.SHOW_YN
-            ,d.SORT_YN
-            ,d.MDEPT_CD
-            ,c.CO_NM
-            ,w.DIV_NM
-        FROM Department d
-    LEFT JOIN Company c
-           ON d.CO_CD = c.CO_CD
-    LEFT JOIN Workplace w
-           ON d.DIV_CD = w.DIV_CD
-       WHERE
-           d.CO_CD=#{CO_CD}
+            c.CO_CD
+             ,c.CO_NM
+             ,w.DIV_CD
+             ,w.DIV_NM
+             ,d.DEPT_CD
+             ,d.DEPT_NM
+             ,d.MDEPT_CD
+        FROM Company c
+                 LEFT JOIN Workplace w
+                           ON c.CO_CD = w.CO_CD
+                 LEFT JOIN Department d
+                           ON c.CO_CD = d.CO_CD
+                               AND d.DIV_CD = w.DIV_CD
+        WHERE
+            c.CO_CD=#{CO_CD}
     </select>
 
     <!--부서정보 가져오기-->
