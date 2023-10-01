@@ -9,15 +9,12 @@
             ,d.CO_CD
             ,d.DIV_CD
             ,d.CALL_YN
-            ,d.Field2
             ,d.CALL_NM
             ,d.DEPT_CT
             ,d.DEPT_NM
             ,d.DEPT_NMK
-            ,d.APPR_NM
             ,d.MGR_NM
             ,d.DEPT_YN
-            ,d.MGR_YN
             ,d.SHOW_YN
             ,d.SORT_YN
             ,d.MDEPT_CD
@@ -32,4 +29,96 @@
            d.CO_CD=#{CO_CD}
     </select>
 
-    </mapper>
+    <!--부서정보 가져오기-->
+    <select id="selectDepartmentInfoByDEPTCD" resultType="com.example.demo.dto.DepartmentDTO">
+        SELECT
+            DEPT_CD
+             ,DIV_CD
+             ,CALL_YN
+             ,CALL_YN
+             ,CALL_NM
+             ,DEPT_CT
+             ,DEPT_NM
+             ,DEPT_NMK
+             ,MGR_NM
+             ,DEPT_YN
+             ,SHOW_YN
+             ,SORT_YN
+             ,MDEPT_CD
+             ,ADDR_CD
+             ,ADDR
+             ,ADDR_NUM
+        FROM
+            Department
+        WHERE
+            CO_CD = #{CO_CD}
+        AND DIV_CD = #{DIV_CD}
+        And DEPT_CD = #{DEPT_CD}
+    </select>
+
+    <insert id="insertDepartment" parameterType="com.example.demo.dto.DepartmentDTO">
+        INSERT INTO Department (
+            CO_CD
+            ,DIV_CD
+            ,DEPT_CD
+            ,CALL_YN
+            ,CALL_NM
+            ,DEPT_CT
+            ,DEPT_NM
+            ,DEPT_NMK
+            ,MGR_NM
+            ,DEPT_YN
+            ,SHOW_YN
+            ,SORT_YN
+            ,MDEPT_CD
+            ,ADDR_CD
+            ,ADDR
+            ,ADDR_NUM
+        ) VALUES (
+                     #{CO_CD}
+                     ,#{DIV_CD}
+                     ,#{DEPT_CD}
+                     ,#{CALL_YN}
+                     ,#{CALL_NM}
+                     ,#{DEPT_CT}
+                     ,#{DEPT_NM}
+                     ,#{DEPT_NMK}
+                     ,#{MGR_NM}
+                     ,#{DEPT_YN}
+                     ,#{SHOW_YN}
+                     ,#{SORT_YN}
+                     ,#{MDEPT_CD}
+                     ,#{ADDR_CD}
+                     ,#{ADDR}
+                     ,#{ADDR_NUM}
+                 )
+    </insert>
+
+    <update id="updateDepartment" parameterType="com.example.demo.dto.DepartmentDTO">
+        UPDATE Department
+        <set>
+            <if test="DEPT_CD != null">DEPT_CD = #{DEPT_CD},</if>
+            <if test="CO_CD != null">CO_CD = #{CO_CD},</if>
+            <if test="DIV_CD != null">DIV_CD = #{DIV_CD},</if>
+            <if test="CALL_YN != null">CALL_YN = #{CALL_YN},</if>
+            <if test="CALL_NM != null">CALL_NM = #{CALL_NM},</if>
+            <if test="DEPT_CT != null">DEPT_CT = #{DEPT_CT},</if>
+            <if test="DEPT_NM != null">DEPT_NM = #{DEPT_NM},</if>
+            <if test="DEPT_NMK != null">DEPT_NMK = #{DEPT_NMK},</if>
+            <if test="MGR_NM != null">MGR_NM = #{MGR_NM},</if>
+            <if test="DEPT_YN != null">DEPT_YN = #{DEPT_YN},</if>
+            <if test="SHOW_YN != null">SHOW_YN = #{SHOW_YN},</if>
+            <if test="SORT_YN != null">SORT_YN = #{SORT_YN},</if>
+            <if test="MDEPT_CD != null">MDEPT_CD = #{MDEPT_CD},</if>
+            <if test="CO_NM != null">CO_NM = #{CO_NM},</if>
+            <if test="DIV_NM != null">DIV_NM = #{DIV_NM},</if>
+            <if test="ADDR_CD != null">ADDR_CD = #{ADDR_CD},</if>
+            <if test="ADDR != null">ADDR = #{ADDR},</if>
+            <if test="ADDR_NUM != null">ADDR_NUM = #{ADDR_NUM}</if>
+        </set>
+        WHERE DEPT_CD = #{DEPT_CD} AND CO_CD = #{CO_CD}
+    </update>
+
+
+
+</mapper>
