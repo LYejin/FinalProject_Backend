@@ -1,10 +1,12 @@
 package com.example.demo.dto;
 
 
-import lombok.Data;
+import lombok.*;
 
 @Data
 public class EmployeeDTO {
+
+
     private String EMP_CD; // 사원계정
     private String CO_CD; // 회사코드
     private String DIV_CD; // 사업장코드

@@ -10,4 +10,5 @@ public class StradeCodeHelpDTO {
     private String REG_NB; // 사업자번호
     private String CEO_NM; // 대표자명
     private String BA_NB_TR; // 계좌번호
+    private String BANK_NAME; //은행명
 }

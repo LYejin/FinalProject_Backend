@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,17 +36,17 @@ public class WorkplaceService {
     }
 
     // 사업장 상세
-    public WorkplaceDTO selectWorkplaceInfoByDIVCD(String divCd) {
+    public WorkplaceDTO selectWorkplaceInfoByDIVCD(Map<String, String> params) {
         try {
-            WorkplaceDTO workplaceInfo = workplaceDao.selectWorkplaceInfoByDIVCD(divCd);
-            //log.info("Get Workplace Detail Service", divCd, workplaceInfo);
-            log.info("Get Workplace Detail Service", divCd);
+            WorkplaceDTO workplaceInfo = workplaceDao.selectWorkplaceInfoByDIVCD(params);
+            log.info("Get Workplace Detail Service divCd: " + params.get("DIV_CD") + ", coCd: " + params.get("CO_CD"));
             return workplaceInfo;
         } catch (Exception e) {
             log.error("Error while fetching workplace info: ", e);
             return null;
         }
     }
+
 
     // 사업장 추가
     public int workplaceInsert(WorkplaceDTO workplaceDTO) {
@@ -73,15 +74,16 @@ public class WorkplaceService {
         }
     }
 
-    public int workplaceRemove(String DIV_CD) {
+    public int workplaceRemove(Map<String, String> params ) {
+        int removeResult = 0;
         try {
-            int removeResult = workplaceDao.deleteWorkplace(DIV_CD);
-            //log.info("Delete Workplace Service", DIV_CD, removeResult);
-            log.info("Delete Workplace Service", DIV_CD);
-            return removeResult;
+            removeResult = workplaceDao.deleteWorkplace(params);
         } catch (Exception e) {
-            log.error("Error while removing workplace with DIV_CD: " + DIV_CD, e);
-            return 0;
+            log.error("Error while removing workplace: ", e);
+            // 예외를 던지거나 다른 처리를 추가할 수 있습니다.
+            throw new RuntimeException("Workplace removal failed", e);
         }
+        return removeResult;
     }
+
 }

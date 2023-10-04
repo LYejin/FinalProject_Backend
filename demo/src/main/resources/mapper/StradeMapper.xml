@@ -513,6 +513,7 @@
             ,g.REG_NB
             ,g.CEO_NM
             ,f.BA_NB_TR
+            ,b.BANK_NAME
         FROM Strade s
         LEFT OUTER JOIN Gtrade g
             ON s.TR_CD = g.TR_CD
@@ -520,6 +521,9 @@
         LEFT OUTER JOIN Ftrade f
             ON s.TR_CD = f.TR_CD
           AND s.CO_CD = f.CO_CD
+        LEFT OUTER JOIN FINANCECODE b
+            ON f.BANK_CD = b.FINANCE_CD
+
         <where>
             s.CO_CD = #{CO_CD, jdbcType=VARCHAR}
             <choose>

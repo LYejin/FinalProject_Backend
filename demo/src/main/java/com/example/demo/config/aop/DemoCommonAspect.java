@@ -102,7 +102,12 @@ public class DemoCommonAspect {
         if (methodName.contains("Company")) {
             b_companyDTO = companyService.companyDetail(((CompanyDTO) joinPoint.getArgs()[0]).getCO_CD());
         } else if (methodName.contains("Workplace")) {
-            b_workplaceDTO = workplaceService.selectWorkplaceInfoByDIVCD(((WorkplaceDTO) joinPoint.getArgs()[0]).getDIV_CD());
+            WorkplaceDTO workplaceDTO = (WorkplaceDTO) joinPoint.getArgs()[0];
+            Map<String, String> params = new HashMap<>();
+            params.put("DIV_CD", workplaceDTO.getDIV_CD());
+            params.put("CO_CD", workplaceDTO.getCO_CD());
+            b_workplaceDTO = workplaceService.selectWorkplaceInfoByDIVCD(params);
+
         } else if (methodName.contains("Employee")) {
             b_employeeDTO = employeeService.employeeDetail(((EmployeeDTO) joinPoint.getArgs()[0]));
         }
@@ -112,6 +117,7 @@ public class DemoCommonAspect {
 
     @AfterReturning(pointcut = "serviceMethods() && updateInsertRemoveMethods()", returning = "result")
     public void doAfterReturning(JoinPoint joinPoint, Object result) {
+        System.out.println("AOP★★★★★★★★★★★★★★★★★★" );
         claims = null;
         a_companyDTO = null;
         a_employeeDTO = null;
@@ -143,6 +149,7 @@ public class DemoCommonAspect {
 
 //        log.info("CO_CD: {}", CO_CD);
 //        log.info("DIV_CD: {}", DIV_CD);
+        log.info("서치 데이터"+changeHistorySearchDTO);
         Map<String, String> resultMap = getCHD_TARGET(changeHistorySearchDTO);
         changeHistoryDTO.setCHD_TARGET_CO_NM(resultMap.get("CHD_TARGET_CO_NM"));
         changeHistoryDTO.setCHD_TARGET_NM(resultMap.get("CHD_TARGET_NM"));
@@ -159,11 +166,11 @@ public class DemoCommonAspect {
 
         List<ChangeHistoryDetailDTO> changeHistoryDetailDTOS = null;
         if (changeHistoryDTO.getCH_DIVISION().equals("수정")) {
-            if(methodName.contains("Company")){
+            if (methodName.contains("Company")) {
                 changeHistoryDetailDTOS = changeHistoryDetailInfo(b_companyDTO, a_companyDTO);
-            }else if (methodName.contains("Workplace")){
+            } else if (methodName.contains("Workplace")) {
                 changeHistoryDetailDTOS = changeHistoryDetailInfo(b_workplaceDTO, a_workplaceDTO);
-            }else if(methodName.contains("Employee")){
+            } else if (methodName.contains("Employee")) {
                 System.out.println("사원!!!!!!!!!!!!!!!!");
                 changeHistoryDetailDTOS = changeHistoryDetailInfo(b_employeeDTO, a_employeeDTO);
             }
@@ -173,9 +180,6 @@ public class DemoCommonAspect {
         params.put("changeHistoryDTO", changeHistoryDTO);
         params.put("changeHistoryDetailList", changeHistoryDetailDTOS);
         changeHistoryService.changeHistoryDetailInset(params);
-
-
-
 
 
 //        log.info("CO_CD: {}", CO_CD);
@@ -278,39 +282,45 @@ public class DemoCommonAspect {
             Object argument = args[0];
             if (argument instanceof CompanyDTO) {
                 a_companyDTO = (CompanyDTO) args[0];
-                changeHistorySearchDTO = setChangeHistoryValues("CO_CD", a_companyDTO.getCO_CD(), "Company", "CO_NM");
+                changeHistorySearchDTO = setChangeHistoryValues("CO_CD", a_companyDTO.getCO_CD(), "Company", "CO_NM","null");
             } else if (argument instanceof EmployeeDTO) {
                 a_employeeDTO = (EmployeeDTO) args[0];
-                changeHistorySearchDTO = setChangeHistoryValues("USERNAME", a_employeeDTO.getUSERNAME(), "Employee", "KOR_NM");
+                changeHistorySearchDTO = setChangeHistoryValues("USERNAME", a_employeeDTO.getUSERNAME(), "Employee", "KOR_NM","null");
             } else if (argument instanceof WorkplaceDTO) {
                 a_workplaceDTO = (WorkplaceDTO) args[0];
-                changeHistorySearchDTO = setChangeHistoryValues("DIV_CD", a_workplaceDTO.getDIV_CD(), "Workplace", "DIV_NM");
+                changeHistorySearchDTO = setChangeHistoryValues("DIV_CD", a_workplaceDTO.getDIV_CD(), "Workplace", "DIV_NM",a_workplaceDTO.getCO_CD());
             } else if (methodName.contains("Company") && argument instanceof String) {
                 CO_CD = (String) args[0];
-                changeHistorySearchDTO = setChangeHistoryValues("CO_CD", CO_CD, "Company", "CO_NM");
-            } else if (methodName.contains("Workplace") && argument instanceof String) {
-                DIV_CD = (String) args[0];
-                changeHistorySearchDTO = setChangeHistoryValues("DIV_CD", DIV_CD, "Workplace", "DIV_NM");
+                changeHistorySearchDTO = setChangeHistoryValues("CO_CD", CO_CD, "Company", "CO_NM","null");
+            } else if (methodName.contains("Workplace") && argument instanceof Map<?, ?>) {
+                Map<String, String> params = (Map<String, String>) args[0];
+                changeHistorySearchDTO = setChangeHistoryValues("DIV_CD", params.get("DIV_CD"), "Workplace", "DIV_NM", params.get("CO_CD"));
             }
         }
     }
 
-    public ChangeHistorySearchDTO setChangeHistoryValues(String columnName, String identifyValue, String tableName, String chdTarget) {
+    public ChangeHistorySearchDTO setChangeHistoryValues(String columnName, String identifyValue, String tableName, String chdTarget, String CO_CD) {
         ChangeHistorySearchDTO changeHistorySearchDTO = new ChangeHistorySearchDTO();
         changeHistorySearchDTO.setIDENTIFY_COLUMN_NAME(columnName);
         changeHistorySearchDTO.setIDENTIFY_VALUE(identifyValue);
         changeHistorySearchDTO.setTABLENAME(tableName);
         changeHistorySearchDTO.setCHD_TARGET(chdTarget);
         changeHistorySearchDTO.setCH_DT(changeHistoryDTO.getCH_DT());
-
+        if(tableName.equals("Workplace")){
+            changeHistorySearchDTO.setCO_CD(CO_CD);
+        }
         return changeHistorySearchDTO;
 
     }
 
     public Map<String, String> getCHD_TARGET(ChangeHistorySearchDTO changeHistorySearchDTO) {
         Map<String, String> resultMap = null;
-
-        resultMap = changeHistoryService.getCHD_TARGET(changeHistorySearchDTO);
+        log.info("검색:" + changeHistorySearchDTO);
+        try {
+            resultMap = changeHistoryService.getCHD_TARGET(changeHistorySearchDTO);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
 
         // log.info("검색된 데이터:" + resultMap);
 
@@ -326,7 +336,7 @@ public class DemoCommonAspect {
         List<ChangeHistoryDetailDTO> changeDetails = new ArrayList<>();
 
         // 클래스 필드 반복
-        Class<?> DTO = b_object.getClass() ;
+        Class<?> DTO = b_object.getClass();
         Field[] fields = DTO.getDeclaredFields();
         for (Field field : fields) {
             field.setAccessible(true);
@@ -342,11 +352,11 @@ public class DemoCommonAspect {
                     detailDTO.setCHD_ITEM(field.getName());
                     detailDTO.setCHD_DT(field.getType().getName().contains("String") ? "String" : "image");
                     //log.info("field.getName()"+field.getName());
-                    if(field.getName().equals("PIC_FILE_ID")) {
+                    if (field.getName().equals("PIC_FILE_ID")) {
                         // log.info("사진타냐?????"+field.getName());
                         detailDTO.setCHD_PIC_BT(b_value != null ? b_value.toString() : null);
                         detailDTO.setCHD_PIC_AT(a_value != null ? a_value.toString() : null);
-                    }else{
+                    } else {
                         detailDTO.setCHD_BT(b_value != null ? b_value.toString() : null);
                         detailDTO.setCHD_AT(a_value != null ? a_value.toString() : null);
                     }
@@ -359,7 +369,6 @@ public class DemoCommonAspect {
         }
         return changeDetails;
     }
-
 
 
 }
