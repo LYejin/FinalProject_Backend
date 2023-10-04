@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class SGFtradeDTO {
+    private String TR_MA;
     private String TR_CD;
     private String CO_CD;
     private String TR_NM;
