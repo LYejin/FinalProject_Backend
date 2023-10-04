@@ -58,7 +58,7 @@
             ,DIV_ADDR
             ,DIV_TEL
             ,REG_NB
-            ,DIV_NMK
+            ,COP_NB
             ,BUSINESS
             ,JONGMOK
             ,OPEN_DT
@@ -67,7 +67,7 @@
             ,DIV_FAX
             ,ADDR_CD
             ,ADDR_NUM
-            ,COP_SL
+            ,PIC_FILE_ID
          FROM
              Workplace
         WHERE
@@ -98,7 +98,7 @@
                       ,COP_NB
                       ,ADDR_CD
                       ,ADDR_NUM
-                      ,COP_SL
+                      ,PIC_FILE_ID
         ) VALUES (
                      #{DIV_CD}
                  ,#{CO_CD}
@@ -118,7 +118,7 @@
                  ,#{COP_NB}
                  ,#{ADDR_CD}
                  ,#{ADDR_NUM}
-                 ,#{COP_SL}
+                 ,#{PIC_FILE_ID}
                  )
     </insert>
 
@@ -198,8 +198,8 @@
                 ,COP_NB = #{COP_NB}
             </if>
 
-            <if test="COP_SL != null">
-                ,COP_SL = #{COP_SL}
+            <if test="PIC_FILE_ID != null">
+                ,PIC_FILE_ID = #{PIC_FILE_ID}
             </if>
 
         </set>
