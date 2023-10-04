@@ -108,4 +108,31 @@ public interface StradeDao {
 
     // 채번 기능
     String getStradeSeq(@Param("makeTrCd")String makeTrCd, @Param("ctrNb")String ctrNb, @Param("coCd")String CO_CD);
+
+    // 그리드 내 부서 코드 사용 여부
+    String gridUseDeptCd(GridDeptCdDTO gridDeptCdDTO);
+
+    // 그리드 내 부서 코드 존재 여부
+    String gridNotDeptCd(GridDeptCdDTO gridDeptCdDTO);
+
+    // 그리드 내 사원 코드 사용 여부
+    String gridUseEmpCd(GridEmpCdDTO gridEmpCdDTO);
+
+    // 그리드 내 부서 코드 존재 여부
+    String gridNotEmpCd(GridEmpCdDTO gridEmpCdDTO);
+
+    //거래처코드 유효성
+    String trCdVal(@Param("CO_CD")String CO_CD, @Param("TR_CD")String TR_CD);
+
+    // 계좌번호 유효성
+    String baNbTrVal(@Param("CO_CD")String CO_CD, @Param("BA_NB_TR")String BA_NB_TR);
+
+    // 사업자등록번호 유효성
+    String regNbVal(@Param("CO_CD")String CO_CD, @Param("REG_NB")String REG_NB);
+
+    // 주민등록번호 유효성
+    String pplNbVal(@Param("CO_CD")String CO_CD, @Param("PPL_NB")String PPL_NB);
+
+    // 금융코드 정보 자동 입력
+    List<FinancecodeDTO> financecodeInfo(@Param("FINANCE_CD")String FINANCE_CD);
 }

@@ -22,9 +22,21 @@ public class StradeService {
 
     @Transactional(rollbackFor = {RuntimeException.class, Exception.class, SQLException.class})
     // 거래처 등록 Insert
-    public void stradeInsert(SGFtradeDTO sgftradeDTO) {
+    public String stradeInsert(SGFtradeDTO sgftradeDTO) {
         log.info("stradeInsertService 실행");
         int row = 0;
+        String stradeSeq = null;
+
+        if (sgftradeDTO.getTR_MA().equals("auto")) {
+            System.out.println(sgftradeDTO.getTR_MA());
+            StradeSeqDTO stradeSeqDTO = new StradeSeqDTO(sgftradeDTO.getTR_FG(), sgftradeDTO.getCO_CD());
+            System.out.println(stradeSeqDTO);
+            stradeSeq = getStradeSeq(stradeSeqDTO);
+            System.out.println(stradeSeq);
+            sgftradeDTO.setTR_CD(stradeSeq);
+            System.out.println(sgftradeDTO);
+        }
+
         if (sgftradeDTO.getTR_FG().equals("1")) {
             log.info("일반 거래처 INSERT 실행");
             row = stradeDao.stradeInsert(sgftradeDTO);
@@ -35,6 +47,7 @@ public class StradeService {
             row += stradeDao.ftradeInsert(sgftradeDTO);
         }
         log.info("stradeInsert row : {}", row);
+        return sgftradeDTO.getTR_CD();
     }
 
     // 전체 일반 거래처 리스트 출력 및 검색 결과 출력
@@ -265,7 +278,7 @@ public class StradeService {
 
         for (StradeDeleteDTO data: stradeDeleteDTO) {
             System.out.println("kkkkkkkkkk"+data);
-            acashFixRow = stradeDao.acashFix(data.getTR_CD());// 정보를 가져와야함...ㅎㅎ 어느 거래처에 몇개 사용중인지
+            acashFixRow = stradeDao.acashFix(data.getTR_CD());
             if (acashFixRow > 0) {
                 System.out.println("pppp"+data.getTR_CD());
                 StradeDeleteInfo stradeDeleteInfo = new StradeDeleteInfo(data.getTR_CD(),acashFixRow);
@@ -311,7 +324,20 @@ public class StradeService {
         }
     }
 
-    // 거래처 내 거래처 코드 사용 여부
+    // 금융코드 정보 자동 입력
+    public List<FinancecodeDTO> financecodeInfo(String financeCD) {
+        log.info("financecodeInfoService");
+        List<FinancecodeDTO> financeCDList = new ArrayList<>();
+
+        try {
+            financeCDList = stradeDao.financecodeInfo(financeCD);
+        } catch (Exception e) {
+            log.error("financecodeInfoService Error : financeCDList={}, errorMessage={}",financeCDList,e.getMessage());
+        }
+        return financeCDList;
+    }
+
+    // 거래처 내 사원 정보 자동 입력
     public String gridEmpCode(GridEmpCdDTO gridEmpCdDTO) {
         log.info("gridEmpCodeService");
         String gridKorNM = null;
@@ -324,7 +350,7 @@ public class StradeService {
         return gridKorNM;
     }
 
-    // 거래처 내 거래처 코드 사용 여부
+    // 거래처 내 부서 정보 자동 입력
     public String gridDeptCd(GridDeptCdDTO gridDeptCdDTO) {
         log.info("gridDeptCdService");
         String gridDeptNM = null;
@@ -337,6 +363,115 @@ public class StradeService {
         return gridDeptNM;
     }
 
+    // 거래처 내 부서코드 유효성
+    public String gridUseDeptCd(GridDeptCdDTO gridDeptCdDTO) {
+        log.info("gridUseDeptCdService");
+        String gridUseDeptCd = null;
+        System.out.println("kkkkkkkk"+gridDeptCdDTO);
+        try {
+            gridUseDeptCd = stradeDao.gridUseDeptCd(gridDeptCdDTO);
+            System.out.println("---------" + gridUseDeptCd);
+            if (gridUseDeptCd != null) {
+                return "사용중";
+            }
+            gridUseDeptCd = stradeDao.gridNotDeptCd(gridDeptCdDTO);
+            if (gridUseDeptCd == null) {
+                return "부서없음";
+            }
+        } catch (Exception e) {
+            log.error("gridUseDeptCdService Error : gridDeptCdDTO={}, errorMessage={}",gridDeptCdDTO,e.getMessage());
+        }
+        return gridUseDeptCd;
+    }
+
+    // 거래처 내 사원코드 유효성
+    public String gridUseEmpCd(GridEmpCdDTO gridEmpCdDTO) {
+        log.info("gridUseEmpCdService");
+        String gridUseEmpCd = null;
+        System.out.println(gridEmpCdDTO);
+        try {
+            gridUseEmpCd = stradeDao.gridUseEmpCd(gridEmpCdDTO);
+            System.out.println(gridUseEmpCd);
+            if (gridUseEmpCd != null) {
+                return "사용중";
+            }
+            gridUseEmpCd = stradeDao.gridNotEmpCd(gridEmpCdDTO);
+            if (gridUseEmpCd == null) {
+                return "사원없음";
+            }
+        } catch (Exception e) {
+            log.error("gridUseDeptCdService Error : gridUseEmpCd={}, errorMessage={}",gridUseEmpCd,e.getMessage());
+        }
+        return gridUseEmpCd;
+    }
+
+    // 거래처코드 유효성
+    public Boolean trCdVal(String CO_CD, String TR_CD) {
+        log.info("trCdValService");
+        String trCdVal = null;
+
+        try {
+            trCdVal = stradeDao.trCdVal(CO_CD, TR_CD);
+            if (trCdVal != null) {
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("trCdValService Error : trCdVal={}, errorMessage={}",trCdVal,e.getMessage());
+        }
+        return false;
+    }
+
+    // 계좌번호 유효성
+    public Boolean baNbTrVal(String CO_CD, String BA_NB_TR) {
+        log.info("baNbTrValService");
+        String baNbTrVal = null;
+        System.out.println("ooooo"+BA_NB_TR);
+        try {
+            baNbTrVal = stradeDao.baNbTrVal(CO_CD, BA_NB_TR);
+            System.out.println(baNbTrVal);
+            if (baNbTrVal != null) {
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("baNbTrValService Error : baNbTrVal={}, errorMessage={}",baNbTrVal,e.getMessage());
+        }
+        return false;
+    }
+
+    // 사업자등록번호 유효성
+    public Boolean regNbVal(String CO_CD, String REG_NB) {
+        log.info("regNbValService");
+        String regNbVal = null;
+
+        try {
+            regNbVal = stradeDao.regNbVal(CO_CD, REG_NB);
+            if (regNbVal != null) {
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("regNbValService Error : regNbVal={}, errorMessage={}",regNbVal,e.getMessage());
+        }
+        return false;
+    }
+
+    // 주민등록번호 유효성
+    public Boolean pplNbVal(String CO_CD, String PPL_NB) {
+        log.info("gridUseEmpCdCdService");
+        String gridUseEmpCd = null;
+
+        try {
+            gridUseEmpCd = stradeDao.pplNbVal(CO_CD, PPL_NB);
+            if (gridUseEmpCd != null) {
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("gridUseDeptCdService Error : gridUseEmpCd={}, errorMessage={}",gridUseEmpCd,e.getMessage());
+        }
+        return false;
+    }
+
+
+    // 채번 기능
     public String getStradeSeq(StradeSeqDTO seqDTO) {
         log.info("getStradeSeqService");
         String stradeSeq = null;
