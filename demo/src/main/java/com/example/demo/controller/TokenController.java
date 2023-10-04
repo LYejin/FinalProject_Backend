@@ -30,7 +30,7 @@ import java.util.Date;
 
 @Slf4j
 @RestController
-@RequestMapping("/account/user/token")
+@RequestMapping("/account/user/token/")
 @CrossOrigin("http://localhost:3000")
 public class TokenController {
 
@@ -54,6 +54,16 @@ public class TokenController {
             throw new ExpireRefreshTokenException("RefreshToken 만료", response);
         }
         return new ResponseEntity<>("New AccessToken 발급", HttpStatus.OK);
+    }
+
+    @GetMapping("logoutRemoveRefreshToken")
+    private ResponseEntity<String> logoutRemoveRefreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Cookie refreshCookie = new Cookie("refreshToken", null);
+        refreshCookie.setMaxAge(0); // 쿠키의 expiration 타임을 0으로 하여 없앤다.
+        refreshCookie.setPath("/"); // 모든 경로에서 삭제 됬음을 알린다.
+        response.addCookie(refreshCookie);
+
+        return new ResponseEntity<>("RefreshToken 삭제 완료", HttpStatus.OK);
     }
 
     private boolean jwtAccessTokenIsExpired(String token) {

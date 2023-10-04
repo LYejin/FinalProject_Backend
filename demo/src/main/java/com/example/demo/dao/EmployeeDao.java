@@ -1,9 +1,6 @@
 package com.example.demo.dao;
 
-import com.example.demo.dto.CompanyDTO;
-import com.example.demo.dto.EmployeeDTO;
-import com.example.demo.dto.UserDTO;
-import com.example.demo.dto.WorkplaceDTO;
+import com.example.demo.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -42,4 +39,6 @@ public interface EmployeeDao {
     String employeeUsernameInCompany(String username);
 
     String employeeEmailInCompany(String emailID);
+
+    public LoginUserInfoDTO loginUserInfo(EmployeeDTO employeeDTO);
 }
