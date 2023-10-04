@@ -274,4 +274,26 @@
         WHERE
             USERNAME = #{USERNAME}
     </update>
+
+    <select id="loginUserInfo" parameterType="com.example.demo.dto.EmployeeDTO" resultType="com.example.demo.dto.LoginUserInfoDTO">
+        SELECT
+            e.KOR_NM,
+            e.PIC_FILE_ID,
+            c.CO_NM,
+            d.DEPT_NM,
+            er.ROLE_NAME
+        FROM
+            Employee e
+        LEFT JOIN
+            Company c ON e.CO_CD = c.CO_CD
+        LEFT JOIN
+            Department d ON e.DEPT_CD = d.DEPT_CD
+        LEFT JOIN
+            Employee_Roll er ON e.EMP_CD = er.EMP_CD
+        WHERE
+            e.EMP_CD = #{EMP_CD}
+            AND e.CO_CD = #{CO_CD}
+            AND e.DEPT_CD = #{DEPT_CD}
+            AND e.DIV_CD = #{DIV_CD}
+    </select>
 </mapper>

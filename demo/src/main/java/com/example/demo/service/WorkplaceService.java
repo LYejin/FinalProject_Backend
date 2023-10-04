@@ -74,22 +74,16 @@ public class WorkplaceService {
         }
     }
 
-    public int workplaceRemove(String DIV_CD, String CO_CD) {
+    public int workplaceRemove(Map<String, String> params ) {
+        int removeResult = 0;
         try {
-            Map<String, String> params = new HashMap<>();
-            params.put("DIV_CD", DIV_CD);
-            params.put("CO_CD", CO_CD);
-
-            int removeResult = workplaceDao.deleteWorkplace(params);
-
-            log.info("Delete Workplace Service, DIV_CD: {}, CO_CD: {}", DIV_CD, CO_CD);
-            return removeResult;
+            removeResult = workplaceDao.deleteWorkplace(params);
         } catch (Exception e) {
-            log.error("Error while removing workplace with DIV_CD: {} and CO_CD: {}", DIV_CD, CO_CD, e);
-            return 0;
+            log.error("Error while removing workplace: ", e);
+            // 예외를 던지거나 다른 처리를 추가할 수 있습니다.
+            throw new RuntimeException("Workplace removal failed", e);
         }
+        return removeResult;
     }
-
-
 
 }

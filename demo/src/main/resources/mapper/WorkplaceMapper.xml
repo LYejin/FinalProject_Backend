@@ -5,26 +5,26 @@
     <!--사업장 전체목록 가져오기-->
     <select id="selectWorkplaceSearch" parameterType="hashmap" resultType="com.example.demo.dto.WorkplaceDTO">
         SELECT
-            DIV_CD
-            ,CO_CD
-            ,DIV_YN
-            ,FILL_YN
-            ,DIV_NM
-            ,DIV_ADDR
-            ,DIV_TEL
-            ,REG_NB
-            ,DIV_NMK
-            ,BUSINESS
-            ,JONGMOK
-            ,OPEN_DT
-            ,CLOSE_DT
-            ,MAS_NM
-            ,DIV_FAX
-            ,COP_NB
-            ,ADDR_CD
-            ,ADDR_NUM
+        DIV_CD
+        ,CO_CD
+        ,DIV_YN
+        ,FILL_YN
+        ,DIV_NM
+        ,DIV_ADDR
+        ,DIV_TEL
+        ,REG_NB
+        ,DIV_NMK
+        ,BUSINESS
+        ,JONGMOK
+        ,OPEN_DT
+        ,CLOSE_DT
+        ,MAS_NM
+        ,DIV_FAX
+        ,COP_NB
+        ,ADDR_CD
+        ,ADDR_NUM
         FROM
-            Workplace
+        Workplace
         <where>
             <if test="(DIV_CD != null or DIV_NM != null)">
                 <if test="DIV_CD != null">
@@ -49,77 +49,78 @@
 
     <!--사업장정보 가져오기-->
     <select id="selectWorkplaceInfoByDIVCD" resultType="com.example.demo.dto.WorkplaceDTO">
-       SELECT
-            DIV_CD
-            ,CO_CD
-            ,DIV_YN
-            ,FILL_YN
-            ,DIV_NM
-            ,DIV_ADDR
-            ,DIV_TEL
-            ,REG_NB
-            ,DIV_NMK
-            ,BUSINESS
-            ,JONGMOK
-            ,OPEN_DT
-            ,CLOSE_DT
-            ,MAS_NM
-            ,DIV_FAX
-            ,ADDR_CD
-            ,ADDR_NUM
-            ,COP_SL
-         FROM
-             Workplace
+        SELECT
+        DIV_CD
+        ,CO_CD
+        ,DIV_YN
+        ,FILL_YN
+        ,DIV_NM
+        ,DIV_ADDR
+        ,DIV_TEL
+        ,REG_NB
+        ,DIV_NMK
+        ,COP_NB
+        ,BUSINESS
+        ,JONGMOK
+        ,OPEN_DT
+        ,CLOSE_DT
+        ,MAS_NM
+        ,DIV_FAX
+        ,ADDR_CD
+        ,ADDR_NUM
+        ,PIC_FILE_ID
+        FROM
+        Workplace
         WHERE
-            DIV_CD = #{DIV_CD}
-          AND CO_CD = #{CO_CD}
+        DIV_CD = #{DIV_CD}
+        AND CO_CD = #{CO_CD}
 
     </select>
 
     <!--사업장 추가하기-->
     <insert id="insertWorkplace" parameterType="com.example.demo.dto.WorkplaceDTO">
         INSERT INTO
-            Workplace (
-                       DIV_CD
-                      ,CO_CD
-                      ,DIV_YN
-                      ,FILL_YN
-                      ,DIV_NM
-                      ,DIV_ADDR
-                      ,DIV_TEL
-                      ,REG_NB
-                      ,DIV_NMK
-                      ,BUSINESS
-                      ,JONGMOK
-                      ,OPEN_DT
-                      ,CLOSE_DT
-                      ,MAS_NM
-                      ,DIV_FAX
-                      ,COP_NB
-                      ,ADDR_CD
-                      ,ADDR_NUM
-                      ,COP_SL
+        Workplace (
+        DIV_CD
+        ,CO_CD
+        ,DIV_YN
+        ,FILL_YN
+        ,DIV_NM
+        ,DIV_ADDR
+        ,DIV_TEL
+        ,REG_NB
+        ,DIV_NMK
+        ,BUSINESS
+        ,JONGMOK
+        ,OPEN_DT
+        ,CLOSE_DT
+        ,MAS_NM
+        ,DIV_FAX
+        ,COP_NB
+        ,ADDR_CD
+        ,ADDR_NUM
+        ,PIC_FILE_ID
         ) VALUES (
-                     #{DIV_CD}
-                 ,#{CO_CD}
-                 ,#{DIV_YN}
-                 ,#{FILL_YN}
-                 ,#{DIV_NM}
-                 ,#{DIV_ADDR}
-                 ,#{DIV_TEL}
-                 ,#{REG_NB}
-                 ,#{DIV_NMK}
-                 ,#{BUSINESS}
-                 ,#{JONGMOK}
-                 ,#{OPEN_DT}
-                 ,#{CLOSE_DT}
-                 ,#{MAS_NM}
-                 ,#{DIV_FAX}
-                 ,#{COP_NB}
-                 ,#{ADDR_CD}
-                 ,#{ADDR_NUM}
-                 ,#{COP_SL}
-                 )
+        #{DIV_CD}
+        ,#{CO_CD}
+        ,#{DIV_YN}
+        ,#{FILL_YN}
+        ,#{DIV_NM}
+        ,#{DIV_ADDR}
+        ,#{DIV_TEL}
+        ,#{REG_NB}
+        ,#{DIV_NMK}
+        ,#{BUSINESS}
+        ,#{JONGMOK}
+        ,#{OPEN_DT}
+        ,#{CLOSE_DT}
+        ,#{MAS_NM}
+        ,#{DIV_FAX}
+        ,#{COP_NB}
+        ,#{ADDR_CD}
+        ,#{ADDR_NUM}
+        ,#{PIC_FILE_ID}
+        )
     </insert>
 
 
@@ -128,7 +129,7 @@
     <!--    사업장 정보 수정-->
     <update id="updateWorkplace" parameterType="com.example.demo.dto.WorkplaceDTO">
         UPDATE
-            Workplace
+        Workplace
         <set>
             <if test="DIV_CD != null">
                 DIV_CD = #{DIV_CD}
@@ -198,25 +199,25 @@
                 ,COP_NB = #{COP_NB}
             </if>
 
-            <if test="COP_SL != null">
-                ,COP_SL = #{COP_SL}
+            <if test="PIC_FILE_ID != null">
+                ,PIC_FILE_ID = #{PIC_FILE_ID}
             </if>
 
         </set>
         WHERE
-            DIV_CD = #{DIV_CD}
-          AND CO_CD = #{CO_CD}
+        DIV_CD = #{DIV_CD}
+        AND CO_CD = #{CO_CD}
     </update>
 
     <!--사업장 삭제 처리-->
     <update id="deleteWorkplace">
-       UPDATE
-           Workplace
-          SET
-            DIV_YN = '0'
+        UPDATE
+        Workplace
+        SET
+        DIV_YN = '0'
         WHERE
-            DIV_CD = #{DIV_CD}
-         AND CO_CD = #{CO_CD}
+        DIV_CD = #{DIV_CD}
+        AND CO_CD = #{CO_CD}
     </update>
 
 </mapper>

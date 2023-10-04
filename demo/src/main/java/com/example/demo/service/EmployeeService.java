@@ -1,15 +1,20 @@
 package com.example.demo.service;
 
+import com.example.demo.config.jwt.JwtProperties;
 import com.example.demo.dao.EmployeeDao;
-import com.example.demo.dto.CompanyDTO;
-import com.example.demo.dto.EmployeeDTO;
-import com.example.demo.dto.UserDTO;
-import com.example.demo.dto.WorkplaceDTO;
+import com.example.demo.dto.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +27,9 @@ public class EmployeeService {
 
     @Autowired
     private EmployeeDao employeeDao;
+
+    @Autowired
+    private HttpServletRequest request;
 
     public UserDTO findByUsername(String username) {
         UserDTO loginUserDTO = null;
@@ -162,5 +170,52 @@ public class EmployeeService {
         if (employeeDTO.getPASSWORD() != null) {
             employeeDao.employeeRollUpdate(employeeDTO);
         }
+    }
+
+    public LoginUserInfoDTO loginUserInfo(){
+        Claims claims = getUserInfo();
+        LoginUserInfoDTO loginUserInfoDTO = null;
+        EmployeeDTO employeeDTO = new EmployeeDTO();
+        employeeDTO.setEMP_CD(String.valueOf(claims.get("EMP_CD")));
+        employeeDTO.setCO_CD(String.valueOf(claims.get("CO_CD")));
+        employeeDTO.setDIV_CD(String.valueOf(claims.get("DIV_CD")));
+        employeeDTO.setDEPT_CD(String.valueOf(claims.get("DEPT_CD")));
+        try {
+            loginUserInfoDTO = employeeDao.loginUserInfo(employeeDTO);
+            log.info("사용자정보:"+loginUserInfoDTO);
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+        return loginUserInfoDTO;
+    }
+
+
+
+    public Claims getUserInfo() {
+        String username = null;
+        try {
+            String header = request.getHeader(JwtProperties.HEADER_STRING);
+            header = URLDecoder.decode(header, "UTF-8");
+
+            String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
+
+
+            SecretKey key = Keys.hmacShaKeyFor(JwtProperties.getSecretKey());
+
+            Jws<Claims> claimsJws = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+
+            Claims claims = claimsJws.getBody();
+            username = String.valueOf(claims.get("username"));
+
+
+            return claims;
+
+        } catch (Exception e) {
+            log.error("Token validation failed: " + e.getMessage());
+        }
+        return null;
     }
 }
