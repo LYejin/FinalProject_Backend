@@ -1,13 +1,21 @@
 package com.example.demo.service;
 
+import com.example.demo.config.jwt.JwtProperties;
 import com.example.demo.dao.AcashFixDao;
 import com.example.demo.dao.WorkplaceDao;
 import com.example.demo.dto.AcashFixDTO;
 import com.example.demo.dto.WorkplaceDTO;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +25,8 @@ public class AcashFixService {
 
     @Autowired
     private AcashFixDao acashFixDao;
+    @Autowired
+    private HttpServletRequest request;
 
     // 사업장 목록
     public List<AcashFixDTO> selectAcashFixSearch(Map<String, String> map) {
@@ -68,6 +78,8 @@ public class AcashFixService {
             return 0;
         }
     }
+
+
 
 
 

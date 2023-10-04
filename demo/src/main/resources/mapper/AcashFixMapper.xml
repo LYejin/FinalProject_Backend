@@ -158,15 +158,17 @@
             </if>
         </set>
         WHERE
-            DIV_CD = #{DIV_CD}
+            CO_CD = #{CO_CD}
+          AND DIV_CD = #{DIV_CD}
           AND SQ_NB = #{SQ_NB}
     </update>
 
     <delete id="deleteAcashFix" parameterType="map">
         DELETE FROM AcashFix
         WHERE
-        DIV_CD = #{DIV_CD}
-        AND SQ_NB IN
+            CO_CD = #{CO_CD}
+          AND DIV_CD = #{DIV_CD}
+          AND SQ_NB IN
         <foreach item="item" index="index" collection="SQ_NB" open="(" separator="," close=")">
             #{item}
         </foreach>
