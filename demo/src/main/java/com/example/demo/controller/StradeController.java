@@ -48,6 +48,7 @@ public class StradeController {
         Claims claims = getUserInfo(request);
         String CO_CD = String.valueOf(claims.get("CO_CD"));
         String EMP_CD = String.valueOf(claims.get("EMP_CD"));
+        String DEPT_CD = String.valueOf(claims.get("DEPT_CD"));
 
         // 검색 조건들
         Map<String, String> map = new HashMap<>();
@@ -58,6 +59,7 @@ public class StradeController {
         map.put("USE_YN", USE_YN);
         map.put("CO_CD", CO_CD);
         map.put("EMP_CD", EMP_CD);
+        map.put("DEPT_CD", DEPT_CD);
 
         List<SGtradeDTO> sgtradeList = new ArrayList<>();
         try {
@@ -84,6 +86,7 @@ public class StradeController {
         Claims claims = getUserInfo(request);
         String CO_CD = String.valueOf(claims.get("CO_CD"));
         String EMP_CD = String.valueOf(claims.get("EMP_CD"));
+        String DEPT_CD = String.valueOf(claims.get("DEPT_CD"));
 
         // 검색 조건들
         Map<String, String> map = new HashMap<>();
@@ -93,6 +96,7 @@ public class StradeController {
         map.put("USE_YN", USE_YN);
         map.put("CO_CD", CO_CD);
         map.put("EMP_CD", EMP_CD);
+        map.put("DEPT_CD", DEPT_CD);
 
         List<SFtradeDTO> sftradeList = new ArrayList<>();
         try {
@@ -134,6 +138,7 @@ public class StradeController {
     @PostMapping("stradeInsert")
     public ResponseEntity<String> stradeInsert(@RequestBody SGFtradeDTO sgftradeDTO)  {
         log.info("stradeInsertController : sgftradeDTO={}", sgftradeDTO);
+        String trCd = null;
 
         // 사원이 속한 회사 코드
         Claims claims = getUserInfo(request);
@@ -141,11 +146,11 @@ public class StradeController {
 
         try {
             sgftradeDTO.setCO_CD(CO_CD);
-            stradeService.stradeInsert(sgftradeDTO);
+            trCd = stradeService.stradeInsert(sgftradeDTO);
         } catch (Exception e) {
             log.error("stradeInsertController Error : SGFtradeDTO={}, errorMessage={}", sgftradeDTO, e.getMessage());
         }
-        return new ResponseEntity<>("입력완료", HttpStatus.OK);
+        return new ResponseEntity<>(trCd, HttpStatus.OK);
     }
 
     // 일반 거래처 데이터 1건 출력
@@ -470,6 +475,21 @@ public class StradeController {
     }
 
     // 그리드 사원코드 자동완성 구현
+    @GetMapping("financecodeInfo")
+    public ResponseEntity<List<FinancecodeDTO>> financecodeInfo(@RequestParam(value = "FINANCE_CD")String financeCD) {
+        log.info("financecodeInfoController 실행");
+
+        List<FinancecodeDTO> financeCDList = new ArrayList<>();
+
+        try {
+            financeCDList = stradeService.financecodeInfo(financeCD);
+        } catch (Exception e) {
+            log.error("financecodeInfoController Error : financeCDList={}, errorMessage={}", financeCDList, e.getMessage());
+        }
+        return new ResponseEntity<>(financeCDList, HttpStatus.OK);
+    }
+
+    // 그리드 사원코드 자동완성 구현
     @GetMapping("gridEmpCode")
     public ResponseEntity<String> gridEmpCode(GridEmpCdDTO gridEmpCdDTO) {
         log.info("gridEmpCodeController 실행");
@@ -489,7 +509,7 @@ public class StradeController {
         return new ResponseEntity<>(gridKorNM, HttpStatus.OK);
     }
 
-    // 그리드 사원코드 자동완성 구현
+    // 그리드 부서코드 자동완성 구현
     @GetMapping("gridDeptCd")
     public ResponseEntity<String> gridDeptCd(GridDeptCdDTO gridDeptCdDTO) {
         log.info("gridDeptCdController 실행");
@@ -509,7 +529,27 @@ public class StradeController {
         return new ResponseEntity<>(gridDeptNM, HttpStatus.OK);
     }
 
-    // 그리드 사원코드 자동완성 구현
+    // 그리드 부서코드 유효성
+    @PostMapping("gridUseDeptCd")
+    public ResponseEntity<String> gridUseDeptCd(@RequestBody GridDeptCdDTO gridDeptCdDTO) {
+        log.info("gridUseDeptCdController 실행");
+        String gridUseDeptCd = null;
+        System.out.println("dddddd"+gridDeptCdDTO);
+
+        // 사원이 속한 회사 코드
+        Claims claims = getUserInfo(request);
+        String CO_CD = String.valueOf(claims.get("CO_CD"));
+
+        try {
+            gridDeptCdDTO.setCO_CD(CO_CD);
+            gridUseDeptCd = stradeService.gridUseDeptCd(gridDeptCdDTO);
+        } catch (Exception e) {
+            log.error("ggridUseDeptCdController Error : gridUseDeptCd={}, errorMessage={}", gridUseDeptCd, e.getMessage());
+        }
+        return new ResponseEntity<>(gridUseDeptCd, HttpStatus.OK);
+    }
+
+    // 채번 기능
     @GetMapping("getStradeSeq")
     public ResponseEntity<String> getStradeSeq(@RequestParam(value = "TR_FG")String TR_FG) {
         log.info("getStradeSeqController 실행");
@@ -531,6 +571,96 @@ public class StradeController {
         return new ResponseEntity<>(stradeSeq, HttpStatus.OK);
     }
 
+    // 그리드 사원코드 유효성
+    @PostMapping("gridUseEmpCd")
+    public ResponseEntity<String> gridUseEmpCd(@RequestBody GridEmpCdDTO gridEmpCdDTO) {
+        log.info("gridUseEmpCdController 실행");
+        String gridEmpCd = null;
+        System.out.println("dkdkdk"+ gridEmpCdDTO);
+        // 사원이 속한 회사 코드
+        Claims claims = getUserInfo(request);
+        String CO_CD = String.valueOf(claims.get("CO_CD"));
+
+        try {
+            gridEmpCdDTO.setCO_CD(CO_CD);
+            gridEmpCd = stradeService.gridUseEmpCd(gridEmpCdDTO);
+        } catch (Exception e) {
+            log.error("gridUseEmpCdController Error : gridEmpCd={}, errorMessage={}", gridEmpCd, e.getMessage());
+        }
+        return new ResponseEntity<>(gridEmpCd, HttpStatus.OK);
+    }
+
+    // 거래처코드 유효성
+    @GetMapping("trCdVal")
+    public ResponseEntity<Boolean> trCdVal(@RequestParam(value = "TR_CD")String TR_CD) {
+        log.info("trCdValController 실행");
+        Boolean trCdVal = false;
+
+        // 사원이 속한 회사 코드
+        Claims claims = getUserInfo(request);
+        String CO_CD = String.valueOf(claims.get("CO_CD"));
+
+        try {
+            trCdVal = stradeService.trCdVal(CO_CD, TR_CD);
+        } catch (Exception e) {
+            log.error("trCdValController Error : trCdVal={}, errorMessage={}", trCdVal, e.getMessage());
+        }
+        return new ResponseEntity<>(trCdVal, HttpStatus.OK);
+    }
+
+    // 계좌번호 유효성
+    @GetMapping("baNbTrVal")
+    public ResponseEntity<Boolean> baNbTrVal(@RequestParam(value = "BA_NB_TR")String BA_NB_TR) {
+        log.info("baNbTrValController 실행");
+        Boolean baNbTrVal = false;
+
+        // 사원이 속한 회사 코드
+        Claims claims = getUserInfo(request);
+        String CO_CD = String.valueOf(claims.get("CO_CD"));
+
+        try {
+            baNbTrVal = stradeService.baNbTrVal(CO_CD, BA_NB_TR);
+        } catch (Exception e) {
+            log.error("baNbTrValController Error : baNbTrVal={}, errorMessage={}", baNbTrVal, e.getMessage());
+        }
+        return new ResponseEntity<>(baNbTrVal, HttpStatus.OK);
+    }
+
+    // 사업자등록번호 유효성
+    @GetMapping("regNbVal")
+    public ResponseEntity<Boolean> regNbVal(@RequestParam(value = "REG_NB")String REG_NB) {
+        log.info("regNbValController 실행");
+        Boolean regNbVal = false;
+
+        // 사원이 속한 회사 코드
+        Claims claims = getUserInfo(request);
+        String CO_CD = String.valueOf(claims.get("CO_CD"));
+
+        try {
+            regNbVal = stradeService.regNbVal(CO_CD, REG_NB);
+        } catch (Exception e) {
+            log.error("regNbValController Error : regNbVal={}, errorMessage={}", regNbVal, e.getMessage());
+        }
+        return new ResponseEntity<>(regNbVal, HttpStatus.OK);
+    }
+
+    // 주민등록번호 유효성
+    @GetMapping("pplNbVal")
+    public ResponseEntity<Boolean> pplNbVal(@RequestParam(value = "PPL_NB")String PPL_NB) {
+        log.info("gridUseDeptCdController 실행");
+        Boolean pplNbVal = false;
+
+        // 사원이 속한 회사 코드
+        Claims claims = getUserInfo(request);
+        String CO_CD = String.valueOf(claims.get("CO_CD"));
+
+        try {
+            pplNbVal = stradeService.pplNbVal(CO_CD, PPL_NB);
+        } catch (Exception e) {
+            log.error("ggridUseDeptCdController Error : pplNbVal={}, errorMessage={}", pplNbVal, e.getMessage());
+        }
+        return new ResponseEntity<>(pplNbVal, HttpStatus.OK);
+    }
 
 
     // 쿠키에서 사원 정보 가져오기
