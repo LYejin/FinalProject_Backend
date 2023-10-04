@@ -2,11 +2,15 @@ package com.example.demo.service;
 
 import com.example.demo.dao.ChangeHistoryDao;
 import com.example.demo.dto.ChangeHistoryDTO;
+import com.example.demo.dto.ChangeHistoryDetailDTO;
 import com.example.demo.dto.ChangeHistorySearchDTO;
+import com.example.demo.dto.CompanyDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,12 +68,61 @@ public class ChangeHistoryService {
     public List<ChangeHistoryDTO> getChangeHistoryList(String CH_CATEGORY) {
         List<ChangeHistoryDTO> changeHistorySearchDTOS = null;
         try {
-            changeHistorySearchDTOS = changeHistoryDao.ChangeHistorySelect(CH_CATEGORY);
+            changeHistorySearchDTOS = changeHistoryDao.ChangeHistoryList(CH_CATEGORY);
         }catch (Exception e){
             log.error(e.getMessage());
         }
         return changeHistorySearchDTOS;
     }
+    public List<ChangeHistoryDTO> ChangeHistorySearch(ChangeHistoryDTO changeHistoryDTO) {
+        List<ChangeHistoryDTO> changeHistorySearchDTOS = null;
+        try {
+            changeHistorySearchDTOS = changeHistoryDao.ChangeHistorySearch(changeHistoryDTO);
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+        return changeHistorySearchDTOS;
+    }
+    public List<ChangeHistoryDetailDTO> ChangeHistoryDetailList(ChangeHistoryDTO changeHistoryDTO) {
+        List<ChangeHistoryDetailDTO> changeHistoryDetailDTOS = new ArrayList<>();
+        try {
+            findByInputColumns(changeHistoryDTO);
+            changeHistoryDetailDTOS = changeHistoryDao.ChangeHistoryDetailList(changeHistoryDTO);
+            log.info("디테일정보:"+changeHistoryDetailDTOS);
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+        return  changeHistoryDetailDTOS;
+    }
+
+
+
+    public void findByInputColumns(ChangeHistoryDTO changeHistoryDTO){
+        List<String> columnsToUpdate = new ArrayList<>();
+
+        // DTO의 필드를 반복하며 널이 아닌 데이터가 담긴 필드를 columnsToUpdate 목록에 추가
+        //getDeclaredFields() 함수는 해당 클래스에 선언된 모든 필드(멤버 변수)를 배열로 반환
+        Field[] fields = changeHistoryDTO.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            // 비공개(private) 필드에 접근 가능하도록 설정
+            field.setAccessible(true);
+            try {
+                // 각 필드마다 실제로 담긴 값 가져오기
+                Object value = field.get(changeHistoryDTO);
+                // 값이 null이 아닌 경우 컬럼 이름 리스트에 추가
+                if (value != null && !(field.getName().equals("searchColumns") || field.getName().equals("searchData"))) {
+                    columnsToUpdate.add(field.getName());
+                }
+            } catch (IllegalAccessException e) {
+                // 필드에 접근 예외가 발생하면 무시
+            }
+        }
+
+        // columnsToUpdate 목록을 설정하고 DAO 메서드를 호출합니다
+        changeHistoryDTO.setColumnsToUpdate(columnsToUpdate);
+    }
+
+
 
 
 

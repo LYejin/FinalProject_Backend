@@ -82,6 +82,14 @@
         <include refid="commonConditions"/>
     </update>
 
+    <update id="highFundsNameUpdate" parameterType="com.example.demo.dto.FunTypeDTO">
+        UPDATE Acashcd
+        SET SUM_NM = #{CASH_NM}
+        WHERE SUM_CD = #{CASH_CD}
+        <include refid="commonConditions"/>
+    </update>
+
+
     <delete id="fundTypeDelete" parameterType="java.util.Map">
         DELETE
         FROM Acashcd

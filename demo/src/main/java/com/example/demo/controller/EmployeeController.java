@@ -3,6 +3,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.CompanyDTO;
 import com.example.demo.dto.EmployeeDTO;
+import com.example.demo.dto.LoginUserInfoDTO;
 import com.example.demo.dto.WorkplaceDTO;
 import com.example.demo.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
@@ -96,7 +97,7 @@ public class EmployeeController {
         try {
             employeeEmpCD = employeeService.employeeEmpCDInWorkplace(map);
         } catch (Exception e) {
-            log.error("employeeEmpCDInWorkplaceController Error : CO_CD={}, EMP_CD={}, errorMessage={}",CO_CD, EMP_CD, e.getMessage());
+            log.error("employeeEmpCDInWorkplaceController Error : CO_CD={}, EMP_CD={}, errorMessage={}", CO_CD, EMP_CD, e.getMessage());
         }
         return new ResponseEntity<>(employeeEmpCD, HttpStatus.OK);
     }
@@ -110,7 +111,7 @@ public class EmployeeController {
         Boolean employeeUsernameYN = false;
 
         try {
-            employeeUsernameYN =employeeService.employeeUsernameInCompany(username);
+            employeeUsernameYN = employeeService.employeeUsernameInCompany(username);
         } catch (Exception e) {
             log.error("employeeUsernameInCompanyController Error : username={}, errorMessage={}", username, e.getMessage());
         }
@@ -235,7 +236,7 @@ public class EmployeeController {
                 byte[] photoBytes = image.getBytes();
                 String base64Image = encoder.encodeToString(photoBytes);  // 이미지를 Base64로 인코딩
                 String mimeType = image.getContentType();  // 이미지의 MIME 타입 가져오기
-                dataURL ="data:" + mimeType + ";base64," + base64Image;  // "data:" URI 스킴을 포함한 Base64 데이터 생성
+                dataURL = "data:" + mimeType + ";base64," + base64Image;  // "data:" URI 스킴을 포함한 Base64 데이터 생성
                 photoImg = dataURL;
             }
             employeeDTO.setPIC_FILE_ID(photoImg);
@@ -245,4 +246,18 @@ public class EmployeeController {
         }
         return new ResponseEntity<>("입력완료", HttpStatus.OK);
     }
+
+    @GetMapping("loginUserInfo")
+    public ResponseEntity<?> loginUserInfo() {
+
+        LoginUserInfoDTO loginUserInfoDTO = null;
+        try {
+            loginUserInfoDTO = employeeService.loginUserInfo();
+        } catch (Exception e) {
+            log.error("employeeRemoveController Error : employeeDTO={}, errorMessage={}", e.getMessage());
+        }
+        return new ResponseEntity<LoginUserInfoDTO>(loginUserInfoDTO, HttpStatus.OK);
+    }
+
+
 }

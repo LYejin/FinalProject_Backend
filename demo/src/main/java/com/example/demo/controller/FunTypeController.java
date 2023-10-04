@@ -52,6 +52,13 @@ public class FunTypeController {
 
         return new ResponseEntity<String>("성공", HttpStatus.OK);
     }
+    @PutMapping("highFundsNameUpdate")
+    public ResponseEntity<?> highFundsNameUpdate(@RequestBody FunTypeDTO funTypeDTO){
+        log.info("업데이트!!!!!!"+funTypeDTO);
+        funTypeService.highFundsNameUpdate(funTypeDTO);
+
+        return new ResponseEntity<String>("성공", HttpStatus.OK);
+    }
 
     @DeleteMapping("fundTypeDelete")
     public ResponseEntity<?> fundTypeDelete(@RequestBody List<String> checkList){
@@ -64,8 +71,7 @@ public class FunTypeController {
 
     @PostMapping("highFundsList")
     public ResponseEntity<?> highFundsList(@RequestBody List<String> checkList){
-        log.info("체크된"+checkList);
-        List<String> highFunds = new ArrayList<>();
+          List<String> highFunds = new ArrayList<>();
         highFunds = funTypeService.highFundsList(checkList);
 
         return new ResponseEntity<List<String>>(highFunds, HttpStatus.OK);

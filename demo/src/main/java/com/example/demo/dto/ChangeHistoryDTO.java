@@ -2,6 +2,8 @@ package com.example.demo.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ChangeHistoryDTO {
     private int CH_CD;          //변경이력번호    자동생성
@@ -15,4 +17,9 @@ public class ChangeHistoryDTO {
     private String CH_IP;       //변경자IP       IP객체 사용하기
     private String CHD_TARGET_NM;  //변경된 대상
     private String CHD_TARGET_CO_NM;       //회사명         매개변수 CompanyDTO객체
+
+    private String startDate;
+    private String endDate;
+
+    private List<String> columnsToUpdate;
 }

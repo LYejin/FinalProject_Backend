@@ -52,7 +52,6 @@ public class DepartmentController {
         }
     }
 
-
     //부서 추가
     @PostMapping("insert")
     public ResponseEntity<Integer> insertDepartment(@RequestBody DepartmentDTO departmentDTO) {
@@ -80,4 +79,14 @@ public class DepartmentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    //부서코드중복검사
+    @GetMapping("/deptCheck")
+    public boolean checkDuplicate(@RequestParam String coCd, @RequestParam String deptCd) {
+        Map<String, String> params = new HashMap<>();
+        params.put("CO_CD", coCd);
+        params.put("DEPT_CD", deptCd);
+        return departmentService.isDepartmentDuplicate(params);
+    }
+
 }

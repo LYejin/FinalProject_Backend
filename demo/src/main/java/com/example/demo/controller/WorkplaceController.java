@@ -114,7 +114,10 @@ public class WorkplaceController {
     @PutMapping("delete/{DIV_CD}/{CO_CD}")
     public ResponseEntity<Integer> deleteWorkplace(@PathVariable String DIV_CD, @PathVariable String CO_CD) {
         try {
-            int result = workplaceService.workplaceRemove(DIV_CD, CO_CD);
+            Map<String, String> params = new HashMap<>();
+            params.put("DIV_CD", DIV_CD);
+            params.put("CO_CD", CO_CD);
+            int result = workplaceService.workplaceRemove(params);
             log.info("Delete Workplace Controller, DIV_CD: {}, CO_CD: {}, Result: {}", DIV_CD, CO_CD, result);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
