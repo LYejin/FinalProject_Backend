@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.DepartmentDTO;
+import com.example.demo.dto.DeptEmpListDTO;
 import com.example.demo.dto.WorkplaceDTO;
 import com.example.demo.service.DepartmentService;
 import lombok.extern.slf4j.Slf4j;
@@ -88,5 +89,16 @@ public class DepartmentController {
         params.put("DEPT_CD", deptCd);
         return departmentService.isDepartmentDuplicate(params);
     }
+
+
+    @GetMapping("/list")
+    public List<DeptEmpListDTO> getDeptEmpList(@RequestParam String CO_CD, @RequestParam String DEPT_CD) {
+        Map<String, String> params = new HashMap<>();
+        params.put("CO_CD", CO_CD);
+        params.put("DEPT_CD", DEPT_CD);
+        return departmentService.getDeptEmpList(params);
+    }
+
+
 
 }

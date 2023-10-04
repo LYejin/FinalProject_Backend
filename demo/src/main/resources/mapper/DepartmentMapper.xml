@@ -112,6 +112,7 @@
     <update id="updateDepartment" parameterType="com.example.demo.dto.DepartmentDTO">
         UPDATE Department
         <set>
+            <if test="DIV_CD != null and DIV_CD != ''">DIV_CD = #{DIV_CD},</if>
             <if test="CALL_YN != null">CALL_YN = #{CALL_YN},</if>
             <if test="CALL_NM != null">CALL_NM = #{CALL_NM},</if>
             <if test="DEPT_CT != null">DEPT_CT = #{DEPT_CT},</if>
@@ -136,6 +137,32 @@
          WHERE CO_CD = #{CO_CD}
            AND DEPT_CD = #{DEPT_CD}
     </select>
+
+    <!-- 사원정보 가져오기-->
+    <select id="selectDeptEmpList" resultType="com.example.demo.dto.DeptEmpListDTO">
+        SELECT
+            E.CO_CD AS CO_CD,
+            C.CO_NM AS CO_NM,
+            E.DEPT_CD AS DEPT_CD,
+            D.DEPT_NM AS DEPT_NM,
+            E.USER_YN AS USER_YN,
+            E.USERNAME AS USERNAME,
+            E.KOR_NM AS KOR_NM,
+            E.EMAIL_ADD AS EMAIL_ADD,
+            E.TEL AS TEL,
+            E.JOIN_DT AS JOIN_DT,
+            E.PIC_FILE_ID AS PIC_FILE_ID,
+            E.ENRL_FG AS ENRL_FG,
+            E.PERSONAL_MAIL AS PERSONAL_MAIL
+        FROM Employee E
+                 JOIN Company C ON E.CO_CD = C.CO_CD
+                 JOIN Department D ON E.DEPT_CD = D.DEPT_CD
+        WHERE E.CO_CD = #{CO_CD}
+          AND E.DEPT_CD = #{DEPT_CD}
+          AND (E.ENRL_FG = '0' OR E.ENRL_FG = '1')
+    </select>
+
+
 
 
 

@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dao.DepartmentDao;
 import com.example.demo.dto.DepartmentDTO;
+import com.example.demo.dto.DeptEmpListDTO;
 import com.example.demo.dto.WorkplaceDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,4 +80,10 @@ public class DepartmentService {
             return false;
         }
     }
+
+    public List<DeptEmpListDTO> getDeptEmpList(Map<String, String> params) {
+        return departmentDao.selectDeptEmpList(params);
+    }
+
+
 }

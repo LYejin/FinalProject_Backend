@@ -1,6 +1,7 @@
 package com.example.demo.dao;
 
 import com.example.demo.dto.DepartmentDTO;
+import com.example.demo.dto.DeptEmpListDTO;
 import com.example.demo.dto.WorkplaceDTO;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
@@ -25,4 +26,10 @@ public interface DepartmentDao {
 
     //부서코드 중복검사
     public int checkDepartmentDuplicate(Map<String, String> params);
+
+
+    //사원목록가져오기
+    List<DeptEmpListDTO> selectDeptEmpList(Map<String, String> params);
+    
+
 }
