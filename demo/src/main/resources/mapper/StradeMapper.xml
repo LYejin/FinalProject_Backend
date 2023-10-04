@@ -10,8 +10,9 @@
             FROM StradeRollManage
             WHERE
                 CO_CD=#{CO_CD, jdbcType=VARCHAR}
-             AND EMP_CD=#{EMP_CD, jdbcType=VARCHAR}
-            )
+             AND (EMP_CD=#{EMP_CD, jdbcType=VARCHAR}
+               OR DEPT_CD=#{DEPT_CD, jdbcType=VARCHAR})
+        )
         OR s.VIEW_YN = '0'
     </sql>
 
@@ -45,6 +46,7 @@
             ,s.TR_CD
             ,s.TR_NM
             ,s.USE_YN
+            ,s.VIEW_YN
             ,g.REG_NB
             ,g.PPL_NB
             ,g.CEO_NM
@@ -92,6 +94,7 @@
             ,s.TR_CD
             ,s.TR_NM
             ,s.USE_YN
+            ,s.VIEW_YN
             ,f.FSTART_DT
             ,f.FEND_DT
             ,f.BA_NB_TR
@@ -219,6 +222,7 @@
             ,s.TR_CD
             ,s.TR_NM
             ,s.USE_YN
+            ,s.VIEW_YN
             ,g.REG_NB
             ,g.PPL_NB
             ,g.CEO_NM
@@ -251,6 +255,7 @@
             ,s.TR_CD
             ,s.TR_NM
             ,s.USE_YN
+            ,s.VIEW_YN
             ,f.FSTART_DT
             ,f.FEND_DT
             ,f.BA_NB_TR
@@ -649,6 +654,18 @@
           AND TR_CD = #{TR_CD}
     </select>
 
+    <!--  금융코드 정보 자동 입력  -->
+    <select id="financecodeInfo" resultType="com.example.demo.dto.FinancecodeDTO">
+        SELECT
+            FINANCE_CD
+            ,BANK_NAME
+        FROM FINANCECODE
+        WHERE
+            <if test="FINANCE_CD != null and !FINANCE_CD.equals('')">
+                FINANCE_CD LIKE CONCAT('%', #{FINANCE_CD}, '%')
+            </if>
+    </select>
+
     <!--  그리드 내 사원 정보 자동 입력  -->
     <select id="gridEmpCode" parameterType="com.example.demo.dto.GridEmpCdDTO">
         SELECT
@@ -679,13 +696,13 @@
     <select id="gridUseDeptCd" parameterType="com.example.demo.dto.GridDeptCdDTO">
         SELECT
             DEPT_CD
-        FROM Department
+        FROM StradeRollManage
         WHERE
-            CO_CD = #{CO_CD, jdbcType=VARCHAR}
-          AND DEPT_CD IN (<include refid="deptHelpCodeDeptCD" />)
+            CO_CD = #{CO_CD}
+          AND TR_CD = #{TR_CD}
           AND DEPT_CD = #{DEPT_CD}
-          AND DEPT_YN = '1'
           AND DEPT_CD IS NOT NULL
+        GROUP BY DEPT_CD
     </select>
 
     <!--  그리드 내 부서코드 존재 유효성  -->
@@ -733,6 +750,7 @@
         WHERE
             CO_CD = #{CO_CD}
           AND TR_CD = #{TR_CD}
+        GROUP BY TR_CD
     </select>
 
     <!--  계좌번호 유효성  -->
@@ -743,6 +761,7 @@
         WHERE
           CO_CD = #{CO_CD}
           AND BA_NB_TR = #{BA_NB_TR}
+        GROUP BY BA_NB_TR
     </select>
 
     <!--  사업자등록번호 유효성  -->
@@ -753,6 +772,7 @@
         WHERE
             CO_CD = #{CO_CD}
           AND REG_NB = #{REG_NB}
+        GROUP BY REG_NB
     </select>
 
     <!--  주민등록번호 유효성  -->
@@ -763,6 +783,7 @@
         WHERE
             CO_CD = #{CO_CD}
           AND PPL_NB = #{PPL_NB}
+        GROUP BY PPL_NB
     </select>
 
     <!--  채번 기능  -->

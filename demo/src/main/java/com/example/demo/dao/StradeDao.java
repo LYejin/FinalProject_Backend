@@ -132,4 +132,7 @@ public interface StradeDao {
 
     // 주민등록번호 유효성
     String pplNbVal(@Param("CO_CD")String CO_CD, @Param("PPL_NB")String PPL_NB);
+
+    // 금융코드 정보 자동 입력
+    List<FinancecodeDTO> financecodeInfo(@Param("FINANCE_CD")String FINANCE_CD);
 }

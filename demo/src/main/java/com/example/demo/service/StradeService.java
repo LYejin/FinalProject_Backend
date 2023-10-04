@@ -324,6 +324,19 @@ public class StradeService {
         }
     }
 
+    // 금융코드 정보 자동 입력
+    public List<FinancecodeDTO> financecodeInfo(String financeCD) {
+        log.info("financecodeInfoService");
+        List<FinancecodeDTO> financeCDList = new ArrayList<>();
+
+        try {
+            financeCDList = stradeDao.financecodeInfo(financeCD);
+        } catch (Exception e) {
+            log.error("financecodeInfoService Error : financeCDList={}, errorMessage={}",financeCDList,e.getMessage());
+        }
+        return financeCDList;
+    }
+
     // 거래처 내 사원 정보 자동 입력
     public String gridEmpCode(GridEmpCdDTO gridEmpCdDTO) {
         log.info("gridEmpCodeService");
@@ -354,9 +367,10 @@ public class StradeService {
     public String gridUseDeptCd(GridDeptCdDTO gridDeptCdDTO) {
         log.info("gridUseDeptCdService");
         String gridUseDeptCd = null;
-
+        System.out.println("kkkkkkkk"+gridDeptCdDTO);
         try {
             gridUseDeptCd = stradeDao.gridUseDeptCd(gridDeptCdDTO);
+            System.out.println("---------" + gridUseDeptCd);
             if (gridUseDeptCd != null) {
                 return "사용중";
             }
@@ -374,9 +388,10 @@ public class StradeService {
     public String gridUseEmpCd(GridEmpCdDTO gridEmpCdDTO) {
         log.info("gridUseEmpCdService");
         String gridUseEmpCd = null;
-
+        System.out.println(gridEmpCdDTO);
         try {
             gridUseEmpCd = stradeDao.gridUseEmpCd(gridEmpCdDTO);
+            System.out.println(gridUseEmpCd);
             if (gridUseEmpCd != null) {
                 return "사용중";
             }
@@ -410,9 +425,10 @@ public class StradeService {
     public Boolean baNbTrVal(String CO_CD, String BA_NB_TR) {
         log.info("baNbTrValService");
         String baNbTrVal = null;
-
+        System.out.println("ooooo"+BA_NB_TR);
         try {
             baNbTrVal = stradeDao.baNbTrVal(CO_CD, BA_NB_TR);
+            System.out.println(baNbTrVal);
             if (baNbTrVal != null) {
                 return true;
             }

@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class SGtradeDTO {
+    private String DEPT_CD;
     private String TR_CD;
     private String CO_CD;
     private String TR_NM;
