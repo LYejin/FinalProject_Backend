@@ -2,31 +2,26 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.dao.DepartmentDao">
 
-        <!-- 부서 계층 구조를 가져오는 쿼리 -->
+    <!--부서리스트 가져오기-->
     <select id="getDepartmentHierarchy" resultType="com.example.demo.dto.DepartmentDTO">
         SELECT
-            d.DEPT_CD
-            ,d.CO_CD
-            ,d.DIV_CD
-            ,d.CALL_YN
-            ,d.CALL_NM
-            ,d.DEPT_CT
-            ,d.DEPT_NM
-            ,d.DEPT_NMK
-            ,d.MGR_NM
-            ,d.DEPT_YN
-            ,d.SHOW_YN
-            ,d.SORT_YN
-            ,d.MDEPT_CD
-            ,c.CO_NM
-            ,w.DIV_NM
-        FROM Department d
-    LEFT JOIN Company c
-           ON d.CO_CD = c.CO_CD
+            c.CO_CD
+             ,c.CO_NM
+             ,w.DIV_CD
+             ,w.DIV_NM
+             ,d.DEPT_CD
+             ,d.DEPT_NM
+             ,d.MDEPT_CD
+             ,d.SORT_YN
+             ,d.DEPT_YN
+         FROM Company c
     LEFT JOIN Workplace w
-           ON d.DIV_CD = w.DIV_CD
-       WHERE
-           d.CO_CD=#{CO_CD}
+           ON c.CO_CD = w.CO_CD
+    LEFT JOIN Department d
+           ON c.CO_CD = d.CO_CD
+          AND d.DIV_CD = w.DIV_CD
+        WHERE
+            c.CO_CD=#{CO_CD}
     </select>
 
     <!--부서정보 가져오기-->
@@ -53,7 +48,7 @@
         WHERE
             CO_CD = #{CO_CD}
         AND DIV_CD = #{DIV_CD}
-        And DEPT_CD = #{DEPT_CD}
+        AND DEPT_CD = #{DEPT_CD}
     </select>
 
     <insert id="insertDepartment" parameterType="com.example.demo.dto.DepartmentDTO">
@@ -94,12 +89,29 @@
                  )
     </insert>
 
+<!--    <update id="updateDepartment" parameterType="com.example.demo.dto.DepartmentDTO">-->
+<!--        UPDATE Department-->
+<!--        <set>-->
+<!--            <if test="CALL_YN != null and CALL_YN != ''">CALL_YN = #{CALL_YN},</if>-->
+<!--            <if test="CALL_NM != null and CALL_NM != ''">CALL_NM = #{CALL_NM},</if>-->
+<!--            <if test="DEPT_CT != null and DEPT_CT != ''">DEPT_CT = #{DEPT_CT},</if>-->
+<!--            <if test="DEPT_NM != null and DEPT_NM != ''">DEPT_NM = #{DEPT_NM},</if>-->
+<!--            <if test="DEPT_NMK != null and DEPT_NMK != ''">DEPT_NMK = #{DEPT_NMK},</if>-->
+<!--            <if test="MGR_NM != null and MGR_NM != ''">MGR_NM = #{MGR_NM},</if>-->
+<!--            <if test="DEPT_YN != null and DEPT_YN != ''">DEPT_YN = #{DEPT_YN},</if>-->
+<!--            <if test="SHOW_YN != null and SHOW_YN != ''">SHOW_YN = #{SHOW_YN},</if>-->
+<!--            <if test="SORT_YN != null and SORT_YN != ''">SORT_YN = #{SORT_YN},</if>-->
+<!--            <if test="MDEPT_CD != null and MDEPT_CD != ''">MDEPT_CD = #{MDEPT_CD},</if>-->
+<!--            <if test="ADDR_CD != null and ADDR_CD != ''">ADDR_CD = #{ADDR_CD},</if>-->
+<!--            <if test="ADDR != null and ADDR != ''">ADDR = #{ADDR},</if>-->
+<!--            <if test="ADDR_NUM != null and ADDR_NUM != ''">ADDR_NUM = #{ADDR_NUM}</if>-->
+<!--        </set>-->
+<!--        WHERE DEPT_CD = #{DEPT_CD} AND CO_CD = #{CO_CD}-->
+<!--    </update>-->
+
     <update id="updateDepartment" parameterType="com.example.demo.dto.DepartmentDTO">
         UPDATE Department
         <set>
-            <if test="DEPT_CD != null">DEPT_CD = #{DEPT_CD},</if>
-            <if test="CO_CD != null">CO_CD = #{CO_CD},</if>
-            <if test="DIV_CD != null">DIV_CD = #{DIV_CD},</if>
             <if test="CALL_YN != null">CALL_YN = #{CALL_YN},</if>
             <if test="CALL_NM != null">CALL_NM = #{CALL_NM},</if>
             <if test="DEPT_CT != null">DEPT_CT = #{DEPT_CT},</if>
@@ -110,14 +122,20 @@
             <if test="SHOW_YN != null">SHOW_YN = #{SHOW_YN},</if>
             <if test="SORT_YN != null">SORT_YN = #{SORT_YN},</if>
             <if test="MDEPT_CD != null">MDEPT_CD = #{MDEPT_CD},</if>
-            <if test="CO_NM != null">CO_NM = #{CO_NM},</if>
-            <if test="DIV_NM != null">DIV_NM = #{DIV_NM},</if>
             <if test="ADDR_CD != null">ADDR_CD = #{ADDR_CD},</if>
             <if test="ADDR != null">ADDR = #{ADDR},</if>
             <if test="ADDR_NUM != null">ADDR_NUM = #{ADDR_NUM}</if>
         </set>
         WHERE DEPT_CD = #{DEPT_CD} AND CO_CD = #{CO_CD}
     </update>
+
+
+    <select id="checkDepartmentDuplicate" parameterType="map">
+        SELECT COUNT(*)
+          FROM Department
+         WHERE CO_CD = #{CO_CD}
+           AND DEPT_CD = #{DEPT_CD}
+    </select>
 
 
 

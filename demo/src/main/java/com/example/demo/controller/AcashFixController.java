@@ -1,14 +1,22 @@
 package com.example.demo.controller;
 
+import com.example.demo.config.jwt.JwtProperties;
 import com.example.demo.dto.AcashFixDTO;
 import com.example.demo.dto.WorkplaceDTO;
 import com.example.demo.service.AcashFixService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +33,8 @@ public class AcashFixController {
     public AcashFixController(AcashFixService acashFixService) {
         this.acashFixService = acashFixService;
     }
+    @Autowired
+    private HttpServletRequest request;
 
     private String checkNullAndFormat(String date) {
         if (date == null || date.isEmpty() || "null".equals(date)) {
@@ -35,7 +45,6 @@ public class AcashFixController {
 
     @GetMapping("getList")
     public ResponseEntity<List<AcashFixDTO>> getAllAcashFix(
-            @RequestParam(name = "CO_CD", required = true) String CO_CD,
             @RequestParam(name = "DIV_CD", required = true) String DIV_CD,
             @RequestParam(name = "DISP_SQ", required = false) String DISP_SQ,
             @RequestParam(name = "CASH_CD", required = false) String CASH_CD,
@@ -46,6 +55,8 @@ public class AcashFixController {
             @RequestParam(name = "TO_DT1", required = false) String TO_DT1,
             @RequestParam(name = "TO_DT2", required = false) String TO_DT2
     ) {
+        Claims claims = getUserInfo();
+        String CO_CD = String.valueOf(claims.get("CO_CD"));
         try {
             Map<String, String> map = new HashMap<>();
             map.put("CO_CD", checkNull(CO_CD));
@@ -80,6 +91,9 @@ public class AcashFixController {
     @PostMapping("insert")
     public ResponseEntity<Integer> AcashFixInsert(@RequestBody AcashFixDTO acashFixDTO) {
         try {
+            Claims claims = getUserInfo();
+            String CO_CD = String.valueOf(claims.get("CO_CD"));
+            acashFixDTO.setCO_CD(CO_CD);
             int result = acashFixService.AcashFixInsert(acashFixDTO);
             //log.info("Inserted AcashFix Controller", acashFixDTO, result);
             log.info("Insert AcashFix Controller");
@@ -94,6 +108,11 @@ public class AcashFixController {
     @PutMapping("update")
     public ResponseEntity<Integer> AcashFixUpdate(@RequestBody AcashFixDTO acashFixDTO) {
         try {
+
+            Claims claims = getUserInfo();
+            String CO_CD = String.valueOf(claims.get("CO_CD"));
+            acashFixDTO.setCO_CD(CO_CD);
+
             int result = acashFixService.AcashFixUpdate(acashFixDTO);
             //log.info("Update AcashFix Controller", acashFixDTO, result);
             log.info("Update AcashFix Controller");
@@ -111,7 +130,10 @@ public class AcashFixController {
             @RequestParam(name = "SQ_NB", required = true) String[] SQ_NB
     ) {
         try {
+            Claims claims = getUserInfo();
+            String CO_CD = String.valueOf(claims.get("CO_CD"));
             Map<String, Object> map = new HashMap<>();
+            map.put("CO_CD", CO_CD);
             map.put("DIV_CD", DIV_CD);
             map.put("SQ_NB", SQ_NB); // 이 부분이 배열이므로 Map 타입을 Object로 변경해야 함
             int result = acashFixService.deleteAcashFix(map);
@@ -126,6 +148,34 @@ public class AcashFixController {
             log.error("Error while deleting AcashFix", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public Claims getUserInfo() {
+        String username = null;
+        try {
+            String header = request.getHeader(JwtProperties.HEADER_STRING);
+            header = URLDecoder.decode(header, "UTF-8");
+
+            String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
+
+
+            SecretKey key = Keys.hmacShaKeyFor(JwtProperties.getSecretKey());
+
+            Jws<Claims> claimsJws = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+
+            Claims claims = claimsJws.getBody();
+            username = String.valueOf(claims.get("username"));
+
+
+            return claims;
+
+        } catch (Exception e) {
+            log.error("Token validation failed: " + e.getMessage());
+        }
+        return null;
     }
 
 

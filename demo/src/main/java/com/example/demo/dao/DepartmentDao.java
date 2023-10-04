@@ -23,4 +23,6 @@ public interface DepartmentDao {
     //부서 삭제
     public int deleteDepartment(String DEPT_CD);
 
+    //부서코드 중복검사
+    public int checkDepartmentDuplicate(Map<String, String> params);
 }

@@ -68,4 +68,15 @@ public class DepartmentService {
             return 0;
         }
     }
+
+    //부서코드 중복검사
+    public boolean isDepartmentDuplicate(Map<String, String> params) {
+        try {
+            int count = departmentDao.checkDepartmentDuplicate(params);
+            return count > 0;
+        } catch (Exception e) {
+            log.error("Error while check DepartmentCD: ", e);
+            return false;
+        }
+    }
 }

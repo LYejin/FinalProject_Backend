@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class AcashFixDTO {
+    private String CO_CD;
     private Integer SQ_NB;
     private String DIV_CD;
     private String DEAL_DD;

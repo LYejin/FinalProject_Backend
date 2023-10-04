@@ -49,6 +49,7 @@
 
     <!--사업장정보 가져오기-->
     <select id="selectWorkplaceInfoByDIVCD" resultType="com.example.demo.dto.WorkplaceDTO">
+
         SELECT
         DIV_CD
         ,CO_CD
@@ -71,6 +72,7 @@
         ,PIC_FILE_ID
         FROM
         Workplace
+
         WHERE
         DIV_CD = #{DIV_CD}
         AND CO_CD = #{CO_CD}
@@ -80,47 +82,47 @@
     <!--사업장 추가하기-->
     <insert id="insertWorkplace" parameterType="com.example.demo.dto.WorkplaceDTO">
         INSERT INTO
-        Workplace (
-        DIV_CD
-        ,CO_CD
-        ,DIV_YN
-        ,FILL_YN
-        ,DIV_NM
-        ,DIV_ADDR
-        ,DIV_TEL
-        ,REG_NB
-        ,DIV_NMK
-        ,BUSINESS
-        ,JONGMOK
-        ,OPEN_DT
-        ,CLOSE_DT
-        ,MAS_NM
-        ,DIV_FAX
-        ,COP_NB
-        ,ADDR_CD
-        ,ADDR_NUM
-        ,PIC_FILE_ID
+            Workplace (
+                       DIV_CD
+                      ,CO_CD
+                      ,DIV_YN
+                      ,FILL_YN
+                      ,DIV_NM
+                      ,DIV_ADDR
+                      ,DIV_TEL
+                      ,REG_NB
+                      ,DIV_NMK
+                      ,BUSINESS
+                      ,JONGMOK
+                      ,OPEN_DT
+                      ,CLOSE_DT
+                      ,MAS_NM
+                      ,DIV_FAX
+                      ,COP_NB
+                      ,ADDR_CD
+                      ,ADDR_NUM
+                      ,PIC_FILE_ID
         ) VALUES (
-        #{DIV_CD}
-        ,#{CO_CD}
-        ,#{DIV_YN}
-        ,#{FILL_YN}
-        ,#{DIV_NM}
-        ,#{DIV_ADDR}
-        ,#{DIV_TEL}
-        ,#{REG_NB}
-        ,#{DIV_NMK}
-        ,#{BUSINESS}
-        ,#{JONGMOK}
-        ,#{OPEN_DT}
-        ,#{CLOSE_DT}
-        ,#{MAS_NM}
-        ,#{DIV_FAX}
-        ,#{COP_NB}
-        ,#{ADDR_CD}
-        ,#{ADDR_NUM}
-        ,#{PIC_FILE_ID}
-        )
+                     #{DIV_CD}
+                 ,#{CO_CD}
+                 ,#{DIV_YN}
+                 ,#{FILL_YN}
+                 ,#{DIV_NM}
+                 ,#{DIV_ADDR}
+                 ,#{DIV_TEL}
+                 ,#{REG_NB}
+                 ,#{DIV_NMK}
+                 ,#{BUSINESS}
+                 ,#{JONGMOK}
+                 ,#{OPEN_DT}
+                 ,#{CLOSE_DT}
+                 ,#{MAS_NM}
+                 ,#{DIV_FAX}
+                 ,#{COP_NB}
+                 ,#{ADDR_CD}
+                 ,#{ADDR_NUM}
+                 ,#{PIC_FILE_ID}
+                 )
     </insert>
 
 
