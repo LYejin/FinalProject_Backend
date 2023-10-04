@@ -3,6 +3,8 @@
 
 <mapper namespace="com.example.demo.dao.ChangeHistoryDao">
 
+
+
     <select id="CH_NM_Select" resultType="String">
         SELECT CONCAT(KOR_NM, '(', USERNAME, ')') AS CH_NM
         FROM Employee
@@ -29,6 +31,9 @@
         JOIN Company c
             ON f.CO_CD = c.CO_CD
         WHERE f.${IDENTIFY_COLUMN_NAME} = #{IDENTIFY_VALUE}
+        <if test="TABLENAME == 'Workplace'">
+            AND f.CO_CD &lt;= #{CO_CD}
+        </if>
     </select>
 
 
@@ -99,16 +104,54 @@
     </insert>
 
 
-    <select id="ChangeHistorySelect" resultType="com.example.demo.dto.ChangeHistoryDTO">
+    <select id="ChangeHistoryList" resultType="com.example.demo.dto.ChangeHistoryDTO">
         SELECT
-            CH_DT
+            CH_CD
+            ,EMP_CD
+            ,CO_CD
+            ,CH_DT
             ,CH_DIVISION
             ,CH_IM
             ,CHD_TARGET_NM
-            ,CH_NM, CH_IP
+            ,CH_NM
+            ,CH_IP
             ,CHD_TARGET_CO_NM
         FROM Change_History
         WHERE CH_CATEGORY = #{CH_CATEGORY}
+        ORDER BY CH_CD DESC
+    </select>
+
+    <select id="ChangeHistoryDetailList" resultType="com.example.demo.dto.ChangeHistoryDetailDTO" parameterType="com.example.demo.dto.ChangeHistoryDTO">
+        SELECT
+            CHD_CD,
+            CHD_ITEM,
+            CHD_DT,
+            CHD_BT,
+            CHD_AT,
+            CHD_PIC_BT,
+            CHD_PIC_AT
+        FROM Change_History_Detail
+        WHERE
+            CH_CD = #{CH_CD}
+            AND EMP_CD = #{EMP_CD}
+            AND CO_CD = #{CO_CD}
+    </select>
+
+    <select id="ChangeHistorySearch" resultType="com.example.demo.dto.ChangeHistoryDTO" parameterType="com.example.demo.dto.ChangeHistoryDTO">
+        SELECT
+            CH_CD
+            ,EMP_CD
+            ,CO_CD
+            ,CH_DT
+            ,CH_DIVISION
+            ,CH_IM
+            ,CHD_TARGET_NM
+            ,CH_NM
+            ,CH_IP
+            ,CHD_TARGET_CO_NM
+        FROM Change_History
+        WHERE STR_TO_DATE(CH_DT, '%Y-%m-%d') BETWEEN
+        STR_TO_DATE(#{startDate}, '%Y-%m-%d') AND STR_TO_DATE(#{endDate}, '%Y-%m-%d')
         ORDER BY CH_CD DESC
     </select>
 

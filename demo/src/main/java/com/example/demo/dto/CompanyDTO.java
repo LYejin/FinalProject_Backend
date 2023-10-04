@@ -39,8 +39,7 @@
 
         private List<String> columnsToUpdate;
 
-//        public CompanyDTO(String 일반_의료기관, String number, String 아아아, String number1, String s, Object o, String number2, String 개인, String number3, String s1, String s2, String s3, String s4, String s5, String number4, String number5, String number6, String s6, String s7, String s8, String number7, String number8) {
-//        }
+
 
         public void setColumnsToUpdate(List<String> columnsToUpdate) {
             this.columnsToUpdate = columnsToUpdate;

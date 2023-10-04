@@ -21,6 +21,7 @@ public class WorkplaceDTO {
     private String DIV_FAX;     //FAX번호
     private String COP_NB;      //법인번호
     private String ADDR_CD;     //우편번호
-    private String ADDR_NUM;    //상세주소
+    private String ADDR_NUM;    //상세주소g
     private String PIC_FILE_ID; //부서이미지
+
 }

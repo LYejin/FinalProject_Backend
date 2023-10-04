@@ -17,6 +17,8 @@ public interface FunTypeDao {
 
     public void fundTypeUpdate(FunTypeDTO funTypeDTO);
 
+    public void highFundsNameUpdate(FunTypeDTO funTypeDTO);
+
     public List<String> highFundsList(Map<String, Object> delectMap);
 
     public void fundTypeDelete(Map<String, Object> delectMap);

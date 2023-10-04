@@ -10,4 +10,6 @@ public class ChangeHistorySearchDTO {
     private String TABLENAME;
     private String CHD_TARGET;
     private String CH_DT;
+    private String CO_CD;
+
 }

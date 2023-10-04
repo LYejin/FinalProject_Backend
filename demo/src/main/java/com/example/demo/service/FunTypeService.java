@@ -95,6 +95,17 @@ public class FunTypeService {
         }
     }
 
+    public void highFundsNameUpdate(FunTypeDTO funTypeDTO){
+        Claims claims = getUserInfo();
+        String CO_CD = String.valueOf(claims.get("CO_CD"));
+        try {
+            funTypeDTO.setCO_CD(CO_CD);
+            funTypeDao.highFundsNameUpdate(funTypeDTO);
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+    }
+
     public void fundTypeDelete(List<String> deleteList){
         Claims claims = getUserInfo();
         Map<String, Object> deleteMap = new HashMap<String, Object>();

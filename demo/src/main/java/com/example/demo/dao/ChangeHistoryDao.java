@@ -1,6 +1,7 @@
 package com.example.demo.dao;
 
 import com.example.demo.dto.ChangeHistoryDTO;
+import com.example.demo.dto.ChangeHistoryDetailDTO;
 import com.example.demo.dto.ChangeHistorySearchDTO;
 import com.example.demo.dto.EmployeeDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -16,5 +17,10 @@ public interface ChangeHistoryDao {
 
     public void changeHistoryDetailInset(Map<String, Object> params);
 
-    public List<ChangeHistoryDTO> ChangeHistorySelect(String CH_CATEGORY);
+    public List<ChangeHistoryDTO> ChangeHistoryList(String CH_CATEGORY);
+
+    public List<ChangeHistoryDTO> ChangeHistorySearch(ChangeHistoryDTO changeHistoryDTO) ;
+
+    public List<ChangeHistoryDetailDTO> ChangeHistoryDetailList(ChangeHistoryDTO changeHistoryDTO);
+
 }
