@@ -160,9 +160,71 @@
         WHERE E.CO_CD = #{CO_CD}
           AND E.DEPT_CD = #{DEPT_CD}
           AND (E.ENRL_FG = '0' OR E.ENRL_FG = '1')
+          AND E.USER_YN = '1'
     </select>
 
+    <!-- 부서 속한 직원찾기 -->
+    <select id="countEmployeeWithCondition" resultType="int">
+        SELECT COUNT(*)
+        FROM Employee E
+        WHERE E.CO_CD = #{CO_CD}
+          AND E.DEPT_CD = #{DEPT_CD}
+          AND E.USER_YN = '1'
+    </select>
+    <!-- 하위부서 찾기 -->
+    <select id="countDepartmentWithCondition" resultType="int">
+        SELECT COUNT(*)
+        FROM Department D
+        WHERE D.CO_CD = #{CO_CD}
+          AND D.MDEPT_CD = #{DEPT_CD}
+          AND D.DEPT_YN = '1'
+    </select>
 
+    <!-- 부서 속한 직원 비활성화 -->
+    <!-- 해당 부서에 속한 직원 비활성화 -->
+    <update id="updateEmployeeUserYNWithDeptCD">
+        UPDATE Employee
+        SET USER_YN = 0
+        WHERE CO_CD = #{CO_CD}
+          AND DEPT_CD = #{DEPT_CD}
+    </update>
+
+    <!-- 하위 부서에 속한 직원 비활성화 -->
+    <update id="updateEmployeeUserYNWithMDeptCD">
+        UPDATE Employee e
+            JOIN Department d ON e.DEPT_CD = d.DEPT_CD
+            SET USER_YN = 0
+        WHERE e.CO_CD = #{CO_CD}
+          AND d.MDEPT_CD = #{DEPT_CD}
+    </update>
+
+    <!-- 부서 및 하위부서 비활성화 -->
+    <update id="updateDepartmentDeptYN">
+        UPDATE Department
+        SET DEPT_YN = 0
+        WHERE CO_CD = #{CO_CD}
+          AND DEPT_CD = #{DEPT_CD};
+
+        SET @updatedRows = ROW_COUNT();
+
+    WHILE @updatedRows > 0 DO
+        UPDATE Department d1
+            JOIN Department d2 ON d1.MDEPT_CD = d2.DEPT_CD
+            SET d1.DEPT_YN = 0
+        WHERE d1.CO_CD = #{CO_CD}
+          AND d2.DEPT_YN = 0
+          AND d1.DEPT_YN != 0;
+
+        SET @updatedRows = ROW_COUNT();
+        END WHILE;
+    </update>
+
+    <delete id="deleteDepartment">
+        DELETE
+        FROM Department
+        WHERE CO_CD = #{CO_CD}
+          AND DEPT_CD = #{DEPT_CD}
+    </delete>
 
 
 

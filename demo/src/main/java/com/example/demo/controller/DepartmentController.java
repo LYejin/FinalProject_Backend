@@ -99,6 +99,23 @@ public class DepartmentController {
         return departmentService.getDeptEmpList(params);
     }
 
+    @GetMapping("/check-data")
+    public boolean checkDataExistence(@RequestParam String CO_CD, @RequestParam String DEPT_CD) {
+        return departmentService.checkExistence(CO_CD, DEPT_CD);
+    }
+
+    @PutMapping("/update-department-employee")
+    public String updateDepartmentAndEmployee(@RequestBody Map<String, String> body) {
+        String CO_CD = body.get("CO_CD");
+        String DEPT_CD = body.get("DEPT_CD");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("CO_CD", CO_CD);
+        params.put("DEPT_CD", DEPT_CD);
+
+        return departmentService.updateDepartmentAndEmployee(params);
+    }
+
 
 
 }

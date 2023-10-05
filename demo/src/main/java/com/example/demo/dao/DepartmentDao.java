@@ -4,11 +4,14 @@ import com.example.demo.dto.DepartmentDTO;
 import com.example.demo.dto.DeptEmpListDTO;
 import com.example.demo.dto.WorkplaceDTO;
 import org.apache.ibatis.annotations.Mapper;
+
+
 import java.util.List;
 import java.util.Map;
 
 @Mapper
 public interface DepartmentDao {
+
     //부서 목록 가져오기
     List<DepartmentDTO> getDepartmentHierarchy(String CO_CD);
 
@@ -30,6 +33,15 @@ public interface DepartmentDao {
 
     //사원목록가져오기
     List<DeptEmpListDTO> selectDeptEmpList(Map<String, String> params);
-    
+
+
+    //부서삭제 검사
+    int countEmployeeWithCondition(Map<String, Object> params);
+    int countDepartmentWithCondition(Map<String, Object> params);
+
+    //부서삭제
+    void updateEmployeeUserYNWithDeptCD(Map<String, Object> params);
+    void updateEmployeeUserYNWithMDeptCD(Map<String, Object> params);
+    void updateDepartmentDeptYN(Map<String, Object> params);
 
 }

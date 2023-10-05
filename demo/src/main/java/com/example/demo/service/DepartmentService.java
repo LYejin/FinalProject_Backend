@@ -7,8 +7,10 @@ import com.example.demo.dto.WorkplaceDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -85,5 +87,28 @@ public class DepartmentService {
         return departmentDao.selectDeptEmpList(params);
     }
 
+
+    public boolean checkExistence(String CO_CD, String DEPT_CD) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("CO_CD", CO_CD);
+        params.put("DEPT_CD", DEPT_CD);
+
+        int employeeCount = departmentDao.countEmployeeWithCondition(params);
+        int departmentCount = departmentDao.countDepartmentWithCondition(params);
+
+        return (employeeCount == 0) && (departmentCount == 0);
+    }
+
+    @Transactional
+    public String updateDepartmentAndEmployee(Map<String, Object> params) {
+        try {
+            departmentDao.updateEmployeeUserYNWithDeptCD(params); // 해당 부서의 직원 상태 변경
+            departmentDao.updateEmployeeUserYNWithMDeptCD(params); // 하위 부서의 직원 상태 변경
+            departmentDao.updateDepartmentDeptYN(params); // 부서 및 하위부서 비활성화
+            return "Success";
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
 
 }
