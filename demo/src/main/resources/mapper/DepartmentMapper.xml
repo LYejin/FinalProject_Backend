@@ -2,31 +2,26 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.dao.DepartmentDao">
 
-        <!-- 부서 계층 구조를 가져오는 쿼리 -->
+    <!--부서리스트 가져오기-->
     <select id="getDepartmentHierarchy" resultType="com.example.demo.dto.DepartmentDTO">
         SELECT
-            d.DEPT_CD
-            ,d.CO_CD
-            ,d.DIV_CD
-            ,d.CALL_YN
-            ,d.CALL_NM
-            ,d.DEPT_CT
-            ,d.DEPT_NM
-            ,d.DEPT_NMK
-            ,d.MGR_NM
-            ,d.DEPT_YN
-            ,d.SHOW_YN
-            ,d.SORT_YN
-            ,d.MDEPT_CD
-            ,c.CO_NM
-            ,w.DIV_NM
-        FROM Department d
-    LEFT JOIN Company c
-           ON d.CO_CD = c.CO_CD
+            c.CO_CD
+             ,c.CO_NM
+             ,w.DIV_CD
+             ,w.DIV_NM
+             ,d.DEPT_CD
+             ,d.DEPT_NM
+             ,d.MDEPT_CD
+             ,d.SORT_YN
+             ,d.DEPT_YN
+         FROM Company c
     LEFT JOIN Workplace w
-           ON d.DIV_CD = w.DIV_CD
-       WHERE
-           d.CO_CD=#{CO_CD}
+           ON c.CO_CD = w.CO_CD
+    LEFT JOIN Department d
+           ON c.CO_CD = d.CO_CD
+          AND d.DIV_CD = w.DIV_CD
+        WHERE
+            c.CO_CD=#{CO_CD}
     </select>
 
     <!--부서정보 가져오기-->
@@ -53,7 +48,7 @@
         WHERE
             CO_CD = #{CO_CD}
         AND DIV_CD = #{DIV_CD}
-        And DEPT_CD = #{DEPT_CD}
+        AND DEPT_CD = #{DEPT_CD}
     </select>
 
     <insert id="insertDepartment" parameterType="com.example.demo.dto.DepartmentDTO">
@@ -94,12 +89,30 @@
                  )
     </insert>
 
+<!--    <update id="updateDepartment" parameterType="com.example.demo.dto.DepartmentDTO">-->
+<!--        UPDATE Department-->
+<!--        <set>-->
+<!--            <if test="CALL_YN != null and CALL_YN != ''">CALL_YN = #{CALL_YN},</if>-->
+<!--            <if test="CALL_NM != null and CALL_NM != ''">CALL_NM = #{CALL_NM},</if>-->
+<!--            <if test="DEPT_CT != null and DEPT_CT != ''">DEPT_CT = #{DEPT_CT},</if>-->
+<!--            <if test="DEPT_NM != null and DEPT_NM != ''">DEPT_NM = #{DEPT_NM},</if>-->
+<!--            <if test="DEPT_NMK != null and DEPT_NMK != ''">DEPT_NMK = #{DEPT_NMK},</if>-->
+<!--            <if test="MGR_NM != null and MGR_NM != ''">MGR_NM = #{MGR_NM},</if>-->
+<!--            <if test="DEPT_YN != null and DEPT_YN != ''">DEPT_YN = #{DEPT_YN},</if>-->
+<!--            <if test="SHOW_YN != null and SHOW_YN != ''">SHOW_YN = #{SHOW_YN},</if>-->
+<!--            <if test="SORT_YN != null and SORT_YN != ''">SORT_YN = #{SORT_YN},</if>-->
+<!--            <if test="MDEPT_CD != null and MDEPT_CD != ''">MDEPT_CD = #{MDEPT_CD},</if>-->
+<!--            <if test="ADDR_CD != null and ADDR_CD != ''">ADDR_CD = #{ADDR_CD},</if>-->
+<!--            <if test="ADDR != null and ADDR != ''">ADDR = #{ADDR},</if>-->
+<!--            <if test="ADDR_NUM != null and ADDR_NUM != ''">ADDR_NUM = #{ADDR_NUM}</if>-->
+<!--        </set>-->
+<!--        WHERE DEPT_CD = #{DEPT_CD} AND CO_CD = #{CO_CD}-->
+<!--    </update>-->
+
     <update id="updateDepartment" parameterType="com.example.demo.dto.DepartmentDTO">
         UPDATE Department
         <set>
-            <if test="DEPT_CD != null">DEPT_CD = #{DEPT_CD},</if>
-            <if test="CO_CD != null">CO_CD = #{CO_CD},</if>
-            <if test="DIV_CD != null">DIV_CD = #{DIV_CD},</if>
+            <if test="DIV_CD != null and DIV_CD != ''">DIV_CD = #{DIV_CD},</if>
             <if test="CALL_YN != null">CALL_YN = #{CALL_YN},</if>
             <if test="CALL_NM != null">CALL_NM = #{CALL_NM},</if>
             <if test="DEPT_CT != null">DEPT_CT = #{DEPT_CT},</if>
@@ -110,14 +123,108 @@
             <if test="SHOW_YN != null">SHOW_YN = #{SHOW_YN},</if>
             <if test="SORT_YN != null">SORT_YN = #{SORT_YN},</if>
             <if test="MDEPT_CD != null">MDEPT_CD = #{MDEPT_CD},</if>
-            <if test="CO_NM != null">CO_NM = #{CO_NM},</if>
-            <if test="DIV_NM != null">DIV_NM = #{DIV_NM},</if>
             <if test="ADDR_CD != null">ADDR_CD = #{ADDR_CD},</if>
             <if test="ADDR != null">ADDR = #{ADDR},</if>
             <if test="ADDR_NUM != null">ADDR_NUM = #{ADDR_NUM}</if>
         </set>
         WHERE DEPT_CD = #{DEPT_CD} AND CO_CD = #{CO_CD}
     </update>
+
+
+    <select id="checkDepartmentDuplicate" parameterType="map">
+        SELECT COUNT(*)
+          FROM Department
+         WHERE CO_CD = #{CO_CD}
+           AND DEPT_CD = #{DEPT_CD}
+    </select>
+
+    <!-- 사원정보 가져오기-->
+    <select id="selectDeptEmpList" resultType="com.example.demo.dto.DeptEmpListDTO">
+        SELECT
+            E.CO_CD AS CO_CD,
+            C.CO_NM AS CO_NM,
+            E.DEPT_CD AS DEPT_CD,
+            D.DEPT_NM AS DEPT_NM,
+            E.USER_YN AS USER_YN,
+            E.USERNAME AS USERNAME,
+            E.KOR_NM AS KOR_NM,
+            E.EMAIL_ADD AS EMAIL_ADD,
+            E.TEL AS TEL,
+            E.JOIN_DT AS JOIN_DT,
+            E.PIC_FILE_ID AS PIC_FILE_ID,
+            E.ENRL_FG AS ENRL_FG,
+            E.PERSONAL_MAIL AS PERSONAL_MAIL
+        FROM Employee E
+                 JOIN Company C ON E.CO_CD = C.CO_CD
+                 JOIN Department D ON E.DEPT_CD = D.DEPT_CD
+        WHERE E.CO_CD = #{CO_CD}
+          AND E.DEPT_CD = #{DEPT_CD}
+          AND (E.ENRL_FG = '0' OR E.ENRL_FG = '1')
+          AND E.USER_YN = '1'
+    </select>
+
+    <!-- 부서 속한 직원찾기 -->
+    <select id="countEmployeeWithCondition" resultType="int">
+        SELECT COUNT(*)
+        FROM Employee E
+        WHERE E.CO_CD = #{CO_CD}
+          AND E.DEPT_CD = #{DEPT_CD}
+          AND E.USER_YN = '1'
+    </select>
+    <!-- 하위부서 찾기 -->
+    <select id="countDepartmentWithCondition" resultType="int">
+        SELECT COUNT(*)
+        FROM Department D
+        WHERE D.CO_CD = #{CO_CD}
+          AND D.MDEPT_CD = #{DEPT_CD}
+          AND D.DEPT_YN = '1'
+    </select>
+
+    <!-- 부서 속한 직원 비활성화 -->
+    <!-- 해당 부서에 속한 직원 비활성화 -->
+    <update id="updateEmployeeUserYNWithDeptCD">
+        UPDATE Employee
+        SET USER_YN = 0
+        WHERE CO_CD = #{CO_CD}
+          AND DEPT_CD = #{DEPT_CD}
+    </update>
+
+    <!-- 하위 부서에 속한 직원 비활성화 -->
+    <update id="updateEmployeeUserYNWithMDeptCD">
+        UPDATE Employee e
+            JOIN Department d ON e.DEPT_CD = d.DEPT_CD
+            SET USER_YN = 0
+        WHERE e.CO_CD = #{CO_CD}
+          AND d.MDEPT_CD = #{DEPT_CD}
+    </update>
+
+    <!-- 부서 및 하위부서 비활성화 -->
+    <update id="updateDepartmentDeptYN">
+        UPDATE Department
+        SET DEPT_YN = 0
+        WHERE CO_CD = #{CO_CD}
+          AND DEPT_CD = #{DEPT_CD};
+
+        SET @updatedRows = ROW_COUNT();
+
+    WHILE @updatedRows > 0 DO
+        UPDATE Department d1
+            JOIN Department d2 ON d1.MDEPT_CD = d2.DEPT_CD
+            SET d1.DEPT_YN = 0
+        WHERE d1.CO_CD = #{CO_CD}
+          AND d2.DEPT_YN = 0
+          AND d1.DEPT_YN != 0;
+
+        SET @updatedRows = ROW_COUNT();
+        END WHILE;
+    </update>
+
+    <!-- 부서삭제 -->
+    <delete id="deleteDepartment" parameterType="com.example.demo.dto.DepartmentRequestDTO">
+        DELETE FROM Department
+        WHERE CO_CD=#{CO_CD} AND DEPT_CD=#{DEPT_CD}
+    </delete>
+
 
 
 
