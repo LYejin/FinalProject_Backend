@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.ChangeHistoryDTO;
 import com.example.demo.dto.ChangeHistoryDetailDTO;
+import com.example.demo.dto.ChangeHistoryFindDTO;
 import com.example.demo.service.ChangeHistoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +42,11 @@ public class ChangeHistoryController {
     }
 
     @PostMapping("ChangeHistorySearch")
-    public ResponseEntity<?> ChangeHistorySearch(@RequestBody ChangeHistoryDTO changeHistoryDTO ){
+    public ResponseEntity<?> changeHistorySearch(@RequestBody ChangeHistoryFindDTO changeHistoryFindDTO){
         List<ChangeHistoryDTO> changeHistorySearchDTOS = null;
-
+        log.info("이력 검색!!!!!!!!!!!!!"+changeHistoryFindDTO);
+        changeHistorySearchDTOS = changeHistoryService.ChangeHistorySearch(changeHistoryFindDTO);
+        log.info("이력 검색(후)!!!!!!!!!!!!!"+changeHistorySearchDTOS );
         return new ResponseEntity<List<ChangeHistoryDTO>>(changeHistorySearchDTOS, HttpStatus.OK);
     }
 
