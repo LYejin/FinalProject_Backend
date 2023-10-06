@@ -6,6 +6,7 @@ import lombok.Data;
 public class WorkplaceDTO {
     private String DIV_CD;      //사업장코드
     private String CO_CD;       //회사코드
+    private String CO_NM;       //회사이름
     private String DIV_YN;      //사용여부
     private String FILL_YN;     //본점여부
     private String DIV_NM;      //사업장이름
