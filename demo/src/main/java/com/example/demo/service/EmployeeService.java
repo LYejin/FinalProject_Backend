@@ -182,7 +182,7 @@ public class EmployeeService {
         employeeDTO.setDEPT_CD(String.valueOf(claims.get("DEPT_CD")));
         try {
             loginUserInfoDTO = employeeDao.loginUserInfo(employeeDTO);
-            log.info("사용자정보:"+loginUserInfoDTO);
+
         }catch (Exception e){
             log.error(e.getMessage());
         }
