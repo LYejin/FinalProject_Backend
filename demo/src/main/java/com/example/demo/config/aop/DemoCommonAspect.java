@@ -117,7 +117,7 @@ public class DemoCommonAspect {
 
     @AfterReturning(pointcut = "serviceMethods() && updateInsertRemoveMethods()", returning = "result")
     public void doAfterReturning(JoinPoint joinPoint, Object result) {
-        System.out.println("AOP★★★★★★★★★★★★★★★★★★" );
+        System.out.println("AOP★★★★★★★★★★★★★★★★★★");
         claims = null;
         a_companyDTO = null;
         a_employeeDTO = null;
@@ -149,7 +149,7 @@ public class DemoCommonAspect {
 
 //        log.info("CO_CD: {}", CO_CD);
 //        log.info("DIV_CD: {}", DIV_CD);
-        log.info("서치 데이터"+changeHistorySearchDTO);
+        log.info("서치 데이터" + changeHistorySearchDTO);
         Map<String, String> resultMap = getCHD_TARGET(changeHistorySearchDTO);
         changeHistoryDTO.setCHD_TARGET_CO_NM(resultMap.get("CHD_TARGET_CO_NM"));
         changeHistoryDTO.setCHD_TARGET_NM(resultMap.get("CHD_TARGET_NM"));
@@ -174,12 +174,11 @@ public class DemoCommonAspect {
                 System.out.println("사원!!!!!!!!!!!!!!!!");
                 changeHistoryDetailDTOS = changeHistoryDetailInfo(b_employeeDTO, a_employeeDTO);
             }
+            Map<String, Object> params = new HashMap<>();
+            params.put("changeHistoryDTO", changeHistoryDTO);
+            params.put("changeHistoryDetailList", changeHistoryDetailDTOS);
+            changeHistoryService.changeHistoryDetailInset(params);
         }
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("changeHistoryDTO", changeHistoryDTO);
-        params.put("changeHistoryDetailList", changeHistoryDetailDTOS);
-        changeHistoryService.changeHistoryDetailInset(params);
 
 
 //        log.info("CO_CD: {}", CO_CD);
@@ -282,16 +281,16 @@ public class DemoCommonAspect {
             Object argument = args[0];
             if (argument instanceof CompanyDTO) {
                 a_companyDTO = (CompanyDTO) args[0];
-                changeHistorySearchDTO = setChangeHistoryValues("CO_CD", a_companyDTO.getCO_CD(), "Company", "CO_NM","null");
+                changeHistorySearchDTO = setChangeHistoryValues("CO_CD", a_companyDTO.getCO_CD(), "Company", "CO_NM", "null");
             } else if (argument instanceof EmployeeDTO) {
                 a_employeeDTO = (EmployeeDTO) args[0];
-                changeHistorySearchDTO = setChangeHistoryValues("USERNAME", a_employeeDTO.getUSERNAME(), "Employee", "KOR_NM","null");
+                changeHistorySearchDTO = setChangeHistoryValues("USERNAME", a_employeeDTO.getUSERNAME(), "Employee", "KOR_NM", "null");
             } else if (argument instanceof WorkplaceDTO) {
                 a_workplaceDTO = (WorkplaceDTO) args[0];
-                changeHistorySearchDTO = setChangeHistoryValues("DIV_CD", a_workplaceDTO.getDIV_CD(), "Workplace", "DIV_NM",a_workplaceDTO.getCO_CD());
+                changeHistorySearchDTO = setChangeHistoryValues("DIV_CD", a_workplaceDTO.getDIV_CD(), "Workplace", "DIV_NM", a_workplaceDTO.getCO_CD());
             } else if (methodName.contains("Company") && argument instanceof String) {
                 CO_CD = (String) args[0];
-                changeHistorySearchDTO = setChangeHistoryValues("CO_CD", CO_CD, "Company", "CO_NM","null");
+                changeHistorySearchDTO = setChangeHistoryValues("CO_CD", CO_CD, "Company", "CO_NM", "null");
             } else if (methodName.contains("Workplace") && argument instanceof Map<?, ?>) {
                 Map<String, String> params = (Map<String, String>) args[0];
                 changeHistorySearchDTO = setChangeHistoryValues("DIV_CD", params.get("DIV_CD"), "Workplace", "DIV_NM", params.get("CO_CD"));
@@ -306,7 +305,7 @@ public class DemoCommonAspect {
         changeHistorySearchDTO.setTABLENAME(tableName);
         changeHistorySearchDTO.setCHD_TARGET(chdTarget);
         changeHistorySearchDTO.setCH_DT(changeHistoryDTO.getCH_DT());
-        if(tableName.equals("Workplace")){
+        if (tableName.equals("Workplace")) {
             changeHistorySearchDTO.setCO_CD(CO_CD);
         }
         return changeHistorySearchDTO;
