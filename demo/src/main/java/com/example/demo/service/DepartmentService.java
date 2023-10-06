@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dao.DepartmentDao;
 import com.example.demo.dto.DepartmentDTO;
+import com.example.demo.dto.DepartmentRequestDTO;
 import com.example.demo.dto.DeptEmpListDTO;
 import com.example.demo.dto.WorkplaceDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -99,15 +100,28 @@ public class DepartmentService {
         return (employeeCount == 0) && (departmentCount == 0);
     }
 
+    //부서삭제(하위부서 및 사원 사용여부 변경)
     @Transactional
-    public String updateDepartmentAndEmployee(Map<String, Object> params) {
+    public int updateDepartmentAndEmployee(Map<String, Object> params) {
         try {
-            departmentDao.updateEmployeeUserYNWithDeptCD(params); // 해당 부서의 직원 상태 변경
-            departmentDao.updateEmployeeUserYNWithMDeptCD(params); // 하위 부서의 직원 상태 변경
-            departmentDao.updateDepartmentDeptYN(params); // 부서 및 하위부서 비활성화
-            return "Success";
+            int employeeUpdateCount1 = departmentDao.updateEmployeeUserYNWithDeptCD(params);
+            int employeeUpdateCount2 = departmentDao.updateEmployeeUserYNWithMDeptCD(params);
+            int departmentUpdateCount = departmentDao.updateDepartmentDeptYN(params);
+
+            return employeeUpdateCount1 + employeeUpdateCount2 + departmentUpdateCount;
         } catch (Exception e) {
-            return "Error: " + e.getMessage();
+            // 음수 값 또는 다른 방식으로 오류 상황을 나타내도록 변경할 수 있습니다.
+            return -1;
+        }
+    }
+
+    //부서삭제
+    public int deleteDepartment(DepartmentRequestDTO departmentRequestDTO) {
+        try {
+            return departmentDao.deleteDepartment(departmentRequestDTO);
+        } catch (Exception e) {
+            // 음수 값 또는 다른 방식으로 오류 상황을 나타내도록 변경할 수 있습니다.
+            return -1;
         }
     }
 

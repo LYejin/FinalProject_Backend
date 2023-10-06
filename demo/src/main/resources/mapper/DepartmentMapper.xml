@@ -219,12 +219,12 @@
         END WHILE;
     </update>
 
-    <delete id="deleteDepartment">
-        DELETE
-        FROM Department
-        WHERE CO_CD = #{CO_CD}
-          AND DEPT_CD = #{DEPT_CD}
+    <!-- 부서삭제 -->
+    <delete id="deleteDepartment" parameterType="com.example.demo.dto.DepartmentRequestDTO">
+        DELETE FROM Department
+        WHERE CO_CD=#{CO_CD} AND DEPT_CD=#{DEPT_CD}
     </delete>
+
 
 
 

@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.DepartmentDTO;
+import com.example.demo.dto.DepartmentRequestDTO;
 import com.example.demo.dto.DeptEmpListDTO;
 import com.example.demo.dto.WorkplaceDTO;
 import com.example.demo.service.DepartmentService;
@@ -105,7 +106,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/update-department-employee")
-    public String updateDepartmentAndEmployee(@RequestBody Map<String, String> body) {
+    public ResponseEntity<String> updateDepartmentAndEmployee(@RequestBody Map<String, String> body) {
         String CO_CD = body.get("CO_CD");
         String DEPT_CD = body.get("DEPT_CD");
 
@@ -113,7 +114,23 @@ public class DepartmentController {
         params.put("CO_CD", CO_CD);
         params.put("DEPT_CD", DEPT_CD);
 
-        return departmentService.updateDepartmentAndEmployee(params);
+        int resultCount = departmentService.updateDepartmentAndEmployee(params);
+        if (resultCount >= 0) {
+            return new ResponseEntity<>("Total rows affected: " + resultCount, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Error occurred.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteDepartment(@RequestBody DepartmentRequestDTO departmentRequestDTO) {
+        int resultCount = departmentService.deleteDepartment(departmentRequestDTO);
+        log.info("Delete Department Controller" +  departmentRequestDTO);
+        if (resultCount >= 0) {
+            return new ResponseEntity<>("Total rows deleted: " + resultCount, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Error occurred.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
