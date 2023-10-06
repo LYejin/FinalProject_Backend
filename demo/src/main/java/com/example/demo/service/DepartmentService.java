@@ -45,9 +45,7 @@ public class DepartmentService {
     }
 
 
-
-
-    // 사업장 추가
+    // 부서 추가
     public int insertDepartment(DepartmentDTO departmentDTO) {
         try {
             int insertResult = departmentDao.insertDepartment(departmentDTO);
@@ -60,18 +58,30 @@ public class DepartmentService {
         }
     }
 
-    // 사업장 수정
+    // 부서 수정
     public int updateDepartment(DepartmentDTO departmentDTO) {
         try {
             int updateResult = departmentDao.updateDepartment(departmentDTO);
-            //log.info("Update Department Service", updateResult, departmentDTO);
             log.info("Update Department Service", updateResult);
+
+            // DEPT_YN 값이 0인 경우 추가 로직 수행
+            if ("0".equals(departmentDTO.getDEPT_YN())) {
+                Map<String, Object> params = new HashMap<>();
+                params.put("CO_CD", departmentDTO.getCO_CD());
+                params.put("DEPT_CD", departmentDTO.getDEPT_CD());
+
+                int additionalResult = updateDepartmentAndEmployee(params);
+
+                updateResult += additionalResult;
+            }
+
             return updateResult;
         } catch (Exception e) {
             log.error("Error while updating Department: ", e);
             return 0;
         }
     }
+
 
     //부서코드 중복검사
     public boolean isDepartmentDuplicate(Map<String, String> params) {
