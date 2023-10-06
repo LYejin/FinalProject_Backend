@@ -1,9 +1,6 @@
 package com.example.demo.dao;
 
-import com.example.demo.dto.ChangeHistoryDTO;
-import com.example.demo.dto.ChangeHistoryDetailDTO;
-import com.example.demo.dto.ChangeHistorySearchDTO;
-import com.example.demo.dto.EmployeeDTO;
+import com.example.demo.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -19,7 +16,7 @@ public interface ChangeHistoryDao {
 
     public List<ChangeHistoryDTO> ChangeHistoryList(String CH_CATEGORY);
 
-    public List<ChangeHistoryDTO> ChangeHistorySearch(ChangeHistoryDTO changeHistoryDTO) ;
+    public List<ChangeHistoryDTO> ChangeHistorySearch(ChangeHistoryFindDTO changeHistoryFindDTO) ;
 
     public List<ChangeHistoryDetailDTO> ChangeHistoryDetailList(ChangeHistoryDTO changeHistoryDTO);
 

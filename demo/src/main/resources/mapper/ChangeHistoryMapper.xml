@@ -4,32 +4,32 @@
 <mapper namespace="com.example.demo.dao.ChangeHistoryDao">
 
 
-
     <select id="CH_NM_Select" resultType="String">
         SELECT CONCAT(KOR_NM, '(', USERNAME, ')') AS CH_NM
         FROM Employee
         WHERE USERNAME = #{USERNAME}
     </select>
 
-    <select id="CHD_TARGET_select" parameterType="com.example.demo.dto.ChangeHistorySearchDTO" resultType="java.util.HashMap">
+    <select id="CHD_TARGET_select" parameterType="com.example.demo.dto.ChangeHistorySearchDTO"
+            resultType="java.util.HashMap">
         <choose>
             <when test="TABLENAME == 'Company'">
                 SELECT c.CO_NM AS CHD_TARGET_NM
             </when>
             <when test="TABLENAME == 'Employee'">
                 SELECT
-                    CONCAT(${CHD_TARGET}, '(', USERNAME, ')') AS CHD_TARGET_NM
-                    ,c.CO_NM AS CHD_TARGET_CO_NM
+                CONCAT(${CHD_TARGET}, '(', USERNAME, ')') AS CHD_TARGET_NM
+                ,c.CO_NM AS CHD_TARGET_CO_NM
             </when>
             <otherwise>
                 SELECT
-                    f.${CHD_TARGET} AS CHD_TARGET_NM
-                    ,c.CO_NM AS CHD_TARGET_CO_NM
+                f.${CHD_TARGET} AS CHD_TARGET_NM
+                ,c.CO_NM AS CHD_TARGET_CO_NM
             </otherwise>
         </choose>
         FROM ${TABLENAME} f
         JOIN Company c
-            ON f.CO_CD = c.CO_CD
+        ON f.CO_CD = c.CO_CD
         WHERE f.${IDENTIFY_COLUMN_NAME} = #{IDENTIFY_VALUE}
         <if test="TABLENAME == 'Workplace'">
             AND f.CO_CD &lt;= #{CO_CD}
@@ -39,28 +39,28 @@
 
     <insert id="changeHistoryInset" parameterType="com.example.demo.dto.ChangeHistoryDTO">
         INSERT INTO
-            Change_History (
-                     EMP_CD
-                    ,CO_CD
-                    ,CH_CATEGORY
-                    ,CH_DT
-                    ,CH_DIVISION
-                    ,CH_IM
-                    ,CH_NM
-                    ,CH_IP
-                    ,CHD_TARGET_NM
-                    ,CHD_TARGET_CO_NM
+        Change_History (
+        EMP_CD
+        ,CO_CD
+        ,CH_CATEGORY
+        ,CH_DT
+        ,CH_DIVISION
+        ,CH_IM
+        ,CH_NM
+        ,CH_IP
+        ,CHD_TARGET_NM
+        ,CHD_TARGET_CO_NM
         ) VALUES (
-                    #{EMP_CD}
-                    ,#{CO_CD}
-                    ,#{CH_CATEGORY}
-                    ,#{CH_DT}
-                    ,#{CH_DIVISION}
-                    ,#{CH_IM}
-                    ,#{CH_NM}
-                    ,#{CH_IP}
-                    ,#{CHD_TARGET_NM}
-                    ,#{CHD_TARGET_CO_NM}
+        #{EMP_CD}
+        ,#{CO_CD}
+        ,#{CH_CATEGORY}
+        ,#{CH_DT}
+        ,#{CH_DIVISION}
+        ,#{CH_IM}
+        ,#{CH_NM}
+        ,#{CH_IP}
+        ,#{CHD_TARGET_NM}
+        ,#{CHD_TARGET_CO_NM}
         );
     </insert>
 
@@ -73,32 +73,32 @@
             AND CH_DT = #{changeHistoryDTO.CH_DT}
             AND CH_NM = #{changeHistoryDTO.CH_NM}
             AND CHD_TARGET_NM = #{changeHistoryDTO.CHD_TARGET_NM}
-<!--            <if test="changeHistoryDTO.CH_NM != null">-->
-<!--            AND CHD_TARGET_CO_NM = #{changeHistoryDTO.CHD_TARGET_CO_NM}-->
-<!--            </if>-->
+            <!--            <if test="changeHistoryDTO.CH_NM != null">-->
+            <!--            AND CHD_TARGET_CO_NM = #{changeHistoryDTO.CHD_TARGET_CO_NM}-->
+            <!--            </if>-->
         </selectKey>
 
         <foreach collection="changeHistoryDetailList" item="detail" separator=";">
             INSERT INTO
-                Change_History_Detail (
-                    CH_CD
-                    ,EMP_CD
-                    ,CO_CD
-                    ,CHD_ITEM
-                    ,CHD_BT
-                    ,CHD_AT
-                    ,CHD_DT,CHD_PIC_AT
-                    ,CHD_PIC_BT
+            Change_History_Detail (
+            CH_CD
+            ,EMP_CD
+            ,CO_CD
+            ,CHD_ITEM
+            ,CHD_BT
+            ,CHD_AT
+            ,CHD_DT,CHD_PIC_AT
+            ,CHD_PIC_BT
             ) VALUES (
-                    #{CH_CD}
-                    ,#{detail.EMP_CD}
-                    ,#{detail.CO_CD}
-                    ,#{detail.CHD_ITEM}
-                    ,#{detail.CHD_BT}
-                    ,#{detail.CHD_AT}
-                    ,#{detail.CHD_DT}
-                    ,#{detail.CHD_PIC_AT}
-                    ,#{detail.CHD_PIC_BT}
+            #{CH_CD}
+            ,#{detail.EMP_CD}
+            ,#{detail.CO_CD}
+            ,#{detail.CHD_ITEM}
+            ,#{detail.CHD_BT}
+            ,#{detail.CHD_AT}
+            ,#{detail.CHD_DT}
+            ,#{detail.CHD_PIC_AT}
+            ,#{detail.CHD_PIC_BT}
             )
         </foreach>
     </insert>
@@ -106,52 +106,63 @@
 
     <select id="ChangeHistoryList" resultType="com.example.demo.dto.ChangeHistoryDTO">
         SELECT
-            CH_CD
-            ,EMP_CD
-            ,CO_CD
-            ,CH_DT
-            ,CH_DIVISION
-            ,CH_IM
-            ,CHD_TARGET_NM
-            ,CH_NM
-            ,CH_IP
-            ,CHD_TARGET_CO_NM
+        CH_CD
+        ,EMP_CD
+        ,CO_CD
+        ,CH_DT
+        ,CH_DIVISION
+        ,CH_IM
+        ,CHD_TARGET_NM
+        ,CH_NM
+        ,CH_IP
+        ,CHD_TARGET_CO_NM
         FROM Change_History
         WHERE CH_CATEGORY = #{CH_CATEGORY}
         ORDER BY CH_CD DESC
     </select>
 
-    <select id="ChangeHistoryDetailList" resultType="com.example.demo.dto.ChangeHistoryDetailDTO" parameterType="com.example.demo.dto.ChangeHistoryDTO">
+    <select id="ChangeHistoryDetailList" resultType="com.example.demo.dto.ChangeHistoryDetailDTO"
+            parameterType="com.example.demo.dto.ChangeHistoryDTO">
         SELECT
-            CHD_CD,
-            CHD_ITEM,
-            CHD_DT,
-            CHD_BT,
-            CHD_AT,
-            CHD_PIC_BT,
-            CHD_PIC_AT
+        CHD_CD,
+        CHD_ITEM,
+        CHD_DT,
+        CHD_BT,
+        CHD_AT,
+        CHD_PIC_BT,
+        CHD_PIC_AT
         FROM Change_History_Detail
         WHERE
-            CH_CD = #{CH_CD}
-            AND EMP_CD = #{EMP_CD}
-            AND CO_CD = #{CO_CD}
+        CH_CD = #{CH_CD}
+        AND EMP_CD = #{EMP_CD}
+        AND CO_CD = #{CO_CD}
     </select>
 
-    <select id="ChangeHistorySearch" resultType="com.example.demo.dto.ChangeHistoryDTO" parameterType="com.example.demo.dto.ChangeHistoryDTO">
+    <select id="ChangeHistorySearch" resultType="com.example.demo.dto.ChangeHistoryDTO"
+            parameterType="com.example.demo.dto.ChangeHistoryFindDTO">
         SELECT
-            CH_CD
-            ,EMP_CD
-            ,CO_CD
-            ,CH_DT
-            ,CH_DIVISION
-            ,CH_IM
-            ,CHD_TARGET_NM
-            ,CH_NM
-            ,CH_IP
-            ,CHD_TARGET_CO_NM
+        CH_CD
+        ,EMP_CD
+        ,CO_CD
+        ,CH_DT
+        ,CH_DIVISION
+        ,CH_IM
+        ,CHD_TARGET_NM
+        ,CH_NM
+        ,CH_IP
+        ,CHD_TARGET_CO_NM
         FROM Change_History
-        WHERE STR_TO_DATE(CH_DT, '%Y-%m-%d') BETWEEN
-        STR_TO_DATE(#{startDate}, '%Y-%m-%d') AND STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+        <where>
+            <foreach collection="columnsToUpdate" item="column" separator="AND">
+                <if test="column != null and !column.equals('') and column != 'CH_CD'">
+                    ${column} LIKE CONCAT('%', #{${column}}, '%')
+                </if>
+            </foreach>
+            <if test="startDate != null and !startDate.equals('')">
+                AND STR_TO_DATE(CH_DT, '%Y-%m-%d') BETWEEN
+                STR_TO_DATE(#{startDate}, '%Y-%m-%d') AND STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+            </if>
+        </where>
         ORDER BY CH_CD DESC
     </select>
 

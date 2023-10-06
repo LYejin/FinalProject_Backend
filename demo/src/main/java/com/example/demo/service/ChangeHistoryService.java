@@ -1,10 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dao.ChangeHistoryDao;
-import com.example.demo.dto.ChangeHistoryDTO;
-import com.example.demo.dto.ChangeHistoryDetailDTO;
-import com.example.demo.dto.ChangeHistorySearchDTO;
-import com.example.demo.dto.CompanyDTO;
+import com.example.demo.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +43,7 @@ public class ChangeHistoryService {
 
     public void changeHistoryInsert(ChangeHistoryDTO  changeHistoryDTO){
         try {
+            log.info("이건 타냐(이력)?");
             changeHistoryDao.changeHistoryInset(changeHistoryDTO);
         }catch (Exception e){
             log.error(e.getMessage());
@@ -55,10 +53,11 @@ public class ChangeHistoryService {
     public void changeHistoryDetailInset(Map<String, Object> params){
 
         try {
-            System.out.println("상세이력 타냐?!!!!!!!!!!!");
+            System.out.println("상세이력 타냐?!!!!!!!!!!!"+params);
             changeHistoryDao.changeHistoryDetailInset(params);
+            System.out.println("상세이력 실행 됨?!!!!!!!!!!!");
         }catch (Exception e){
-            log.error(e.getMessage());
+            log.error("ChangeHistoryDetailList"+    e.getMessage());
         }
     }
 
@@ -74,10 +73,18 @@ public class ChangeHistoryService {
         }
         return changeHistorySearchDTOS;
     }
-    public List<ChangeHistoryDTO> ChangeHistorySearch(ChangeHistoryDTO changeHistoryDTO) {
+    public List<ChangeHistoryDTO> ChangeHistorySearch(ChangeHistoryFindDTO changeHistoryFindDTO) {
         List<ChangeHistoryDTO> changeHistorySearchDTOS = null;
         try {
-            changeHistorySearchDTOS = changeHistoryDao.ChangeHistorySearch(changeHistoryDTO);
+            if(changeHistoryFindDTO.getCH_NM().isEmpty()){
+                changeHistoryFindDTO.setCH_NM(null);
+            }
+            if(changeHistoryFindDTO.getCHD_TARGET_NM().isEmpty()){
+                changeHistoryFindDTO.setCHD_TARGET_NM(null);
+            }
+            findByInputColumnsSearch(changeHistoryFindDTO);
+            log.info("변경 컬럼"+changeHistoryFindDTO);
+            changeHistorySearchDTOS = changeHistoryDao.ChangeHistorySearch(changeHistoryFindDTO);
         }catch (Exception e){
             log.error(e.getMessage());
         }
@@ -110,7 +117,7 @@ public class ChangeHistoryService {
                 // 각 필드마다 실제로 담긴 값 가져오기
                 Object value = field.get(changeHistoryDTO);
                 // 값이 null이 아닌 경우 컬럼 이름 리스트에 추가
-                if (value != null && !(field.getName().equals("searchColumns") || field.getName().equals("searchData"))) {
+                if ((value != null ) && !(field.getName().equals("startDate") || field.getName().equals("endDate"))) {
                     columnsToUpdate.add(field.getName());
                 }
             } catch (IllegalAccessException e) {
@@ -120,6 +127,31 @@ public class ChangeHistoryService {
 
         // columnsToUpdate 목록을 설정하고 DAO 메서드를 호출합니다
         changeHistoryDTO.setColumnsToUpdate(columnsToUpdate);
+    }
+
+    public void findByInputColumnsSearch(ChangeHistoryFindDTO changeHistoryFindDTO){
+        List<String> columnsToUpdate = new ArrayList<>();
+
+        // DTO의 필드를 반복하며 널이 아닌 데이터가 담긴 필드를 columnsToUpdate 목록에 추가
+        //getDeclaredFields() 함수는 해당 클래스에 선언된 모든 필드(멤버 변수)를 배열로 반환
+        Field[] fields = changeHistoryFindDTO.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            // 비공개(private) 필드에 접근 가능하도록 설정
+            field.setAccessible(true);
+            try {
+                // 각 필드마다 실제로 담긴 값 가져오기
+                Object value = field.get(changeHistoryFindDTO);
+                // 값이 null이 아닌 경우 컬럼 이름 리스트에 추가
+                if (value != null && !(field.getName().equals("startDate") || field.getName().equals("endDate"))) {
+                    columnsToUpdate.add(field.getName());
+                }
+            } catch (IllegalAccessException e) {
+                // 필드에 접근 예외가 발생하면 무시
+            }
+        }
+
+        // columnsToUpdate 목록을 설정하고 DAO 메서드를 호출합니다
+        changeHistoryFindDTO.setColumnsToUpdate(columnsToUpdate);
     }
 
 
