@@ -211,6 +211,25 @@ public class AcashFixController {
         }
     }
 
+    @GetMapping("/monthly")
+    public ResponseEntity<List<Map<String, Object>>> getMonthlyAmounts(@RequestParam int inputYear,
+                                                                       @RequestParam String CO_CD,
+                                                                       @RequestParam String DIV_CD,
+                                                                       @RequestParam String DISP_SQ)  {
+        Map<String, Object> params = new HashMap<>();
+        params.put("inputYear", inputYear);
+        params.put("CO_CD", CO_CD);
+        params.put("DIV_CD", DIV_CD);
+        params.put("DISP_SQ", DISP_SQ);
+
+        List<Map<String, Object>> amounts = acashFixService.getMonthlyAmounts(params);
+        if (amounts != null && !amounts.isEmpty()) {
+            return new ResponseEntity<>(amounts, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 
 

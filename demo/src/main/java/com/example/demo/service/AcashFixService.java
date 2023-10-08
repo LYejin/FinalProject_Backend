@@ -235,6 +235,70 @@ public class AcashFixService {
         }
     }
 
+    //월별 금액합계
+    public List<Map<String, Object>> getMonthlyAmounts(Map<String, Object> params) {
+        List<Map<String, Object>> fetchedData = acashFixDao.selectMonthlyAmounts(params);
+        Map<Integer, Double> monthlyAmountMap = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+        for (Map<String, Object> row : fetchedData) {
+            System.out.println("Processing row data: " + row);
+            if (row.get("FR_DT") == null || row.get("TO_DT") == null) {
+                System.out.println("Skipping due to null FR_DT or TO_DT");
+                continue;
+            }
+
+            try {
+                Date frDt = sdf.parse((String) row.get("FR_DT"));
+                Date toDt = sdf.parse((String) row.get("TO_DT"));
+                int dealDd = Integer.parseInt((String) row.get("DEAL_DD"));
+                Integer dealPd = row.get("DEAL_PD") != null ? Integer.parseInt((String) row.get("DEAL_PD")) : null;
+                double cashAm = Double.parseDouble(row.get("CASH_AM").toString());
+
+                Calendar paymentDate = Calendar.getInstance();
+                paymentDate.setTime(frDt);
+                if (paymentDate.get(Calendar.DAY_OF_MONTH) > dealDd) {
+                    paymentDate.add(Calendar.MONTH, 1);
+                }
+                paymentDate.set(Calendar.DAY_OF_MONTH, dealDd);
+
+                while (!paymentDate.getTime().after(toDt)) {
+                    int year = paymentDate.get(Calendar.YEAR);
+                    int month = paymentDate.get(Calendar.MONTH) + 1;
+
+                    if (year == Integer.parseInt(params.get("inputYear").toString())) { // 연도 체크 추가
+                        System.out.println("Payment Date: " + paymentDate.getTime());
+                        System.out.println("Current Month: " + month);
+                        System.out.println("Adding Amount: " + cashAm);
+
+                        if (!paymentDate.getTime().before(frDt) && !paymentDate.getTime().after(toDt)) {
+                            monthlyAmountMap.merge(month, cashAm, Double::sum);
+                        }
+                    }
+
+                    System.out.println("Monthly Amount Map after processing current row: " + monthlyAmountMap);
+
+                    if (dealPd != null) {
+                        paymentDate.add(Calendar.MONTH, dealPd);
+                    } else {
+                        break;
+                    }
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return monthlyAmountMap.entrySet().stream()
+                .map(entry -> {
+                    Map<String, Object> monthData = new HashMap<>();
+                    monthData.put("MONTH", entry.getKey());
+                    monthData.put("TOTAL_AMOUNT", entry.getValue());
+                    return monthData;
+                })
+                .collect(Collectors.toList());
+    }
+
 
 
 
