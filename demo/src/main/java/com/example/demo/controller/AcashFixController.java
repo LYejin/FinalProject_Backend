@@ -178,5 +178,24 @@ public class AcashFixController {
         return null;
     }
 
+    //연간 고정자금 금액
+    @GetMapping("/yearlyAmounts")
+    public List<Map<String, Object>> getYearlyAmounts(@RequestParam int year,
+                                                      @RequestParam String CO_CD,
+                                                      @RequestParam String DIV_CD,
+                                                      @RequestParam String DISP_SQ) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("inputYear", year);
+        params.put("CO_CD", CO_CD);
+        params.put("DIV_CD", DIV_CD);
+        params.put("DISP_SQ", DISP_SQ);
+        return acashFixService.getYearlyAmounts(params);
+    }
+
+
+
+
+
+
 
 }

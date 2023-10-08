@@ -15,15 +15,13 @@
              ,d.SORT_YN
              ,d.DEPT_YN
              ,d.SHOW_YN
-         FROM Company c
-    LEFT JOIN Workplace w
-           ON c.CO_CD = w.CO_CD
-    LEFT JOIN Department d
-           ON c.CO_CD = d.CO_CD
-          AND d.DIV_CD = w.DIV_CD
-        WHERE
-            c.CO_CD=#{CO_CD}
+             ,(SELECT COUNT(*) FROM Employee e WHERE e.CO_CD = c.CO_CD AND e.DEPT_CD = d.DEPT_CD) as EMP_NB  -- 직원 수 계산
+        FROM Company c
+                 LEFT JOIN Workplace w ON c.CO_CD = w.CO_CD
+                 LEFT JOIN Department d ON c.CO_CD = d.CO_CD AND d.DIV_CD = w.DIV_CD
+        WHERE c.CO_CD=#{CO_CD}
     </select>
+
 
     <!--부서정보 가져오기-->
     <select id="selectDepartmentInfoByDEPTCD" resultType="com.example.demo.dto.DepartmentDTO">
