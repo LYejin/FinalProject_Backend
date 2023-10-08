@@ -194,7 +194,7 @@ public class AcashFixService {
 
                 Calendar paymentDate = Calendar.getInstance();
                 paymentDate.setTime(frDt);
-                if (paymentDate.get(Calendar.DAY_OF_MONTH) >= dealDd) {
+                if (paymentDate.get(Calendar.DAY_OF_MONTH) > dealDd) {
                     paymentDate.add(Calendar.MONTH, 1);
                 }
                 paymentDate.set(Calendar.DAY_OF_MONTH, dealDd);
@@ -300,6 +300,70 @@ public class AcashFixService {
     }
 
 
+    public List<Map<String, Object>> getDailyAmounts(Map<String, Object> params) {
+        List<Map<String, Object>> fetchedData = acashFixDao.selectDailyAmounts(params);
+
+        Map<Integer, Double> dailyAmountMap = new TreeMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+        // 기본값 초기화
+        for (int i = 1; i <= 31; i++) {
+            dailyAmountMap.put(i, 0.0);
+        }
+
+        System.out.println("Total number of rows to process: " + fetchedData.size());  // 데이터의 총 개수 출력
+
+        for (Map<String, Object> row : fetchedData) {
+            if (row.get("FR_DT") == null || row.get("TO_DT") == null) continue;
+
+            System.out.println("Processing Row Data: " + row.toString());  // 현재 처리 중인 데이터 출력
+
+            try {
+                Date frDt = sdf.parse((String) row.get("FR_DT"));
+                Date toDt = sdf.parse((String) row.get("TO_DT"));
+                Integer dealDd = Integer.parseInt((String) row.get("DEAL_DD"));
+                Integer dealPd = row.get("DEAL_PD") != null ? Integer.parseInt((String) row.get("DEAL_PD")) : null;
+                double cashAm = Double.parseDouble(row.get("CASH_AM").toString());
+
+                Calendar paymentDate = Calendar.getInstance();
+                paymentDate.setTime(frDt);
+                int inputYear = Integer.parseInt(params.get("inputYear").toString());
+                int inputMonth = Integer.parseInt(params.get("inputMonth").toString()) - 1;
+
+                while (!paymentDate.after(toDt)) {
+                    if (paymentDate.get(Calendar.YEAR) == inputYear && paymentDate.get(Calendar.MONTH) == inputMonth && paymentDate.get(Calendar.DAY_OF_MONTH) == dealDd) {
+                        dailyAmountMap.merge(paymentDate.get(Calendar.DAY_OF_MONTH), cashAm, Double::sum);
+                    }
+
+                    if (dealPd != null) {
+                        if (dealPd == 1) {
+                            paymentDate.add(Calendar.DAY_OF_MONTH, dealPd);
+                        } else if (dealPd > 1) {  // 월별로 주기를 증가시키는 로직
+                            paymentDate.add(Calendar.MONTH, dealPd);
+                        }
+                    } else {
+                        paymentDate.add(Calendar.MONTH, 1);  // 지급 주기가 없는 경우, 다음 달로 이동
+                        paymentDate.set(Calendar.DAY_OF_MONTH, dealDd);
+                    }
+
+                    if (paymentDate.get(Calendar.YEAR) == inputYear && paymentDate.get(Calendar.MONTH) > inputMonth) {
+                        break; // 지정된 월을 넘어갔을 경우 종료
+                    }
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return dailyAmountMap.entrySet().stream()
+                .map(entry -> {
+                    Map<String, Object> dayData = new HashMap<>();
+                    dayData.put("DAY", entry.getKey());
+                    dayData.put("TOTAL_AMOUNT", entry.getValue());
+                    return dayData;
+                })
+                .collect(Collectors.toList());
+    }
 
 
 

@@ -30,5 +30,8 @@ public interface AcashFixDao {
     public List<Map<String, Object>> selectQuarterlyAmounts(Map<String, Object> params);
 
     //월별 금액 합계 조회
-    List<Map<String, Object>> selectMonthlyAmounts(Map<String, Object> params);
+    public List<Map<String, Object>> selectMonthlyAmounts(Map<String, Object> params);
+
+    //일자별 금액 합계 조회
+    List<Map<String, Object>> selectDailyAmounts(Map<String, Object> params);
 }
