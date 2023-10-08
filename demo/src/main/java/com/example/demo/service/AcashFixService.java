@@ -152,7 +152,88 @@ public class AcashFixService {
         }
     }
 
+    //분기별 금액합계
+    public List<Map<String, Object>> getQuarterlyAmounts(Map<String, Object> params) {
+        try {
+            List<Map<String, Object>> results = acashFixDao.selectQuarterlyAmounts(params);
+            log.info("Fetched quarterly amounts: {}", results);
 
+            Map<Integer, Double> quarterlyAmountMap = new HashMap<>();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+            for (Map<String, Object> row : results) {
+                System.out.println("Processing row data: " + row);
+
+                if (row.get("FR_DT") == null || row.get("TO_DT") == null) { // Check if FR_DT and TO_DT are not null
+                    continue;
+                }
+
+                Date frDt = sdf.parse((String) row.get("FR_DT"));
+                Date toDt = sdf.parse((String) row.get("TO_DT"));
+
+                if ((frDt.getYear() + 1900) > 2023) {  // 시작날짜가 2023년 이후면 skip
+                    continue;
+                }
+                if ((toDt.getYear() + 1900) < 2023) {  // 종료날짜가 2023년 이전이면 skip
+                    continue;
+                }
+
+                // 2023년 이전으로 시작하는 데이터는 2023년 1월 1일로 조정
+                if ((frDt.getYear() + 1900) < 2023) {
+                    frDt = sdf.parse("20230101");
+                }
+
+                // 2023년 이후로 종료하는 데이터는 2023년 12월 31일로 조정
+                if ((toDt.getYear() + 1900) > 2023) {
+                    toDt = sdf.parse("20231231");
+                }
+
+                int dealDd = Integer.parseInt((String) row.get("DEAL_DD"));
+                Integer dealPd = row.get("DEAL_PD") != null ? Integer.parseInt((String) row.get("DEAL_PD")) : null;
+                double cashAm = Double.parseDouble(row.get("CASH_AM").toString());
+
+                Calendar paymentDate = Calendar.getInstance();
+                paymentDate.setTime(frDt);
+                if (paymentDate.get(Calendar.DAY_OF_MONTH) >= dealDd) {
+                    paymentDate.add(Calendar.MONTH, 1);
+                }
+                paymentDate.set(Calendar.DAY_OF_MONTH, dealDd);
+
+                while (!paymentDate.getTime().after(toDt)) {
+                    System.out.println("Payment Date: " + paymentDate.getTime());
+                    int quarter = (paymentDate.get(Calendar.MONTH) / 3) + 1;
+                    System.out.println("Current Quarter: " + quarter);
+                    System.out.println("Adding Amount: " + cashAm);
+
+                    if (!paymentDate.getTime().before(frDt) && !paymentDate.getTime().after(toDt)) {
+                        quarterlyAmountMap.merge(quarter, cashAm, Double::sum);
+                    }
+
+                    System.out.println("Quarterly Amount Map after processing current row: " + quarterlyAmountMap);
+
+                    if (dealPd != null) {
+                        paymentDate.add(Calendar.MONTH, dealPd);
+                    } else {
+                        break;
+                    }
+                }
+                System.out.println("Finished processing row data: " + row);
+            }
+
+            List<Map<String, Object>> finalResults = new ArrayList<>();
+            for (int i = 1; i <= 4; i++) {
+                Map<String, Object> resultMap = new HashMap<>();
+                resultMap.put("QUARTER", i);
+                resultMap.put("TOTAL_AMOUNT", quarterlyAmountMap.getOrDefault(i, 0.0));
+                finalResults.add(resultMap);
+            }
+
+            return finalResults;
+        } catch (Exception e) {
+            log.error("Error while fetching quarterly amounts : ", e);
+            return null;
+        }
+    }
 
 
 

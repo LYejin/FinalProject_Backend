@@ -193,7 +193,28 @@
             )
     </select>
 
-    
+    <!-- 분기별 사용금액 -->
+    <select id="selectQuarterlyAmounts" parameterType="map" resultType="hashmap">
+        SELECT
+            a.CO_CD,
+            a.DIV_CD,
+            a.FR_DT,
+            a.DEAL_DD,
+            a.DEAL_PD,
+            a.CASH_AM,
+            a.TO_DT
+        FROM AcashFix a
+        WHERE a.CO_CD = #{CO_CD}
+          AND a.DIV_CD = #{DIV_CD}
+          AND a.DISP_SQ = #{DISP_SQ}
+          AND (
+                (a.FR_DT BETWEEN CONCAT(#{inputYear}, '0101') AND CONCAT(#{inputYear}, '1231'))
+                OR (a.TO_DT BETWEEN CONCAT(#{inputYear}, '0101') AND CONCAT(#{inputYear}, '1231'))
+                OR (a.FR_DT <![CDATA[ <= ]]> CONCAT(#{inputYear}, '0101') AND a.TO_DT >= CONCAT(#{inputYear}, '1231'))
+            )
+    </select>
+
+
 
 
 </mapper>
