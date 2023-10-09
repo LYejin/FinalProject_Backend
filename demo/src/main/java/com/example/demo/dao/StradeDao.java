@@ -135,4 +135,7 @@ public interface StradeDao {
 
     // 금융코드 정보 자동 입력
     List<FinancecodeDTO> financecodeInfo(@Param("FINANCE_CD")String FINANCE_CD);
+
+    // 주류코드 정보 자동 입력
+    List<LiquorcodeDTO> liqcodeInfo(@Param("LIQ_CD")String liqCd);
 }

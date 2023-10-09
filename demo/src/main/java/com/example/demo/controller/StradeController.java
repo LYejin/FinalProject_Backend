@@ -63,7 +63,6 @@ public class StradeController {
 
         List<SGtradeDTO> sgtradeList = new ArrayList<>();
         try {
-            System.out.println("---------------"+ map);
             sgtradeList = stradeService.sgtradeSearchList(map);
         } catch (Exception e) {
             log.error("sgtradeSearchList Controller error : " +
@@ -100,7 +99,6 @@ public class StradeController {
 
         List<SFtradeDTO> sftradeList = new ArrayList<>();
         try {
-            System.out.println("---------------"+ map);
             sftradeList = stradeService.sftradeSearchList(map);
         } catch (Exception e) {
             log.error("sgtradeSearchList Controller error : " +
@@ -214,7 +212,6 @@ public class StradeController {
         try {
             stradeRollManageDTO.setCO_CD(CO_CD);
             stradeRollManageDTO.setINSERT_DT(new Timestamp(System.currentTimeMillis()));
-            System.out.println(stradeRollManageDTO);
             stradeService.stradeRollManageInsert(stradeRollManageDTO);
         } catch (Exception e) {
             log.error("stradeRollManageInsertController Error : stradeRollManageDTO={}, errorMessage={}", stradeRollManageDTO, e.getMessage());
@@ -267,7 +264,6 @@ public class StradeController {
 
         try {
             for (StradeRollManageDTO srmd : list) {
-                System.out.println("--------"+ srmd);
             }
             stradeService.stradeRollInDeptInsert(list);
         } catch (Exception e) {
@@ -280,7 +276,6 @@ public class StradeController {
     @PostMapping("stradeRollManageUpdate")
     public ResponseEntity<String> stradeRollManageUpdate(@RequestBody StradeRollManageDTO stradeRollManageDTO)  {
         log.info("stradeRollManageUpdateController");
-        System.out.println("-------------"+stradeRollManageDTO);
         // 사원이 속한 회사 코드
         Claims claims = getUserInfo(request);
         String CO_CD = String.valueOf(claims.get("CO_CD"));
@@ -324,9 +319,7 @@ public class StradeController {
 
         try {
             empCodeHelpListDTO.setCO_CD(CO_CD);
-            System.out.println("empCodeHelpList : "+ empCodeHelpListDTO);
             empCodeHelpList = stradeService.empCodeHelpList(empCodeHelpListDTO);
-            System.out.println(empCodeHelpList);
         } catch (Exception e) {
             log.error("empCodeHelpListController Error : empCodeHelpList={}, errorMessage={}", empCodeHelpList, e.getMessage());
         }
@@ -345,9 +338,7 @@ public class StradeController {
 
         try {
             deptCodeHelpListDTO.setCO_CD(CO_CD);
-            System.out.println(deptCodeHelpListDTO);
             deptCodeHelpList = stradeService.deptCodeHelpList(deptCodeHelpListDTO);
-            System.out.println(deptCodeHelpList);
         } catch (Exception e) {
             log.error("deptCodeHelpListController Error : deptCodeHelpList={}, errorMessage={}", deptCodeHelpList, e.getMessage());
         }
@@ -369,7 +360,6 @@ public class StradeController {
         try {
             stradeCodeHelpSearchDTO.setCO_CD(CO_CD);
             stradeCodeHelpList = stradeService.stradeCodeHelpList(stradeCodeHelpSearchDTO);
-            System.out.println("stradeCodeHelpList : " + stradeCodeHelpList);
         } catch (Exception e) {
             log.error("stradeCodeHelpListController Error : stradeCodeHelpList={}, errorMessage={}", stradeCodeHelpList, e.getMessage());
         }
@@ -385,14 +375,13 @@ public class StradeController {
 
         try {
             liquorcodeHelpList = stradeService.liquorcodeHelpList(VALUE);
-            System.out.println("liquorcodeHelpList : " + liquorcodeHelpList);
         } catch (Exception e) {
             log.error("stradeCodeHelpListController Error : liquorcodeHelpList={}, errorMessage={}", liquorcodeHelpList, e.getMessage());
         }
         return new ResponseEntity<>(liquorcodeHelpList, HttpStatus.OK);
     }
 
-    // 주류코드도움 모달창 list
+    // 금융코드도움 모달창 list
     @GetMapping("financecodeHelpList")
     public ResponseEntity<List<FinancecodeHelpListDTO>> financecodeHelpList(@RequestParam(value = "VALUE", required = false) String VALUE)  {
         log.info("financecodeHelpListController");
@@ -417,7 +406,6 @@ public class StradeController {
         Claims claims = getUserInfo(request);
         String CO_CD = String.valueOf(claims.get("CO_CD"));
         stradeRollManageDelete.setCO_CD(CO_CD);
-        System.out.println("------------" + stradeRollManageDelete);
         try {
             stradeService.stradeRollManageDelete(stradeRollManageDelete);
         } catch (Exception e) {
@@ -442,10 +430,8 @@ public class StradeController {
             stradeDeleteDTO.setTR_CD(trCd);
             stradeDeleteDTO.setCO_CD(CO_CD);
             stradeDeleteDTO.setTR_FG(trCdListDTO.getTR_FG());
-            System.out.println("sssssssssssssssss"+stradeDeleteDTO);
             stradeDeleteList.add(stradeDeleteDTO);
         }
-        System.out.println("-------------" + stradeDeleteList);
         try {
             stradeUseDataList = stradeService.stradeDelete(stradeDeleteList);
         } catch (Exception e) {
@@ -474,7 +460,7 @@ public class StradeController {
         return new ResponseEntity<>(trCdID, HttpStatus.OK);
     }
 
-    // 그리드 사원코드 자동완성 구현
+    // 주류코드 자동완성 구현
     @GetMapping("financecodeInfo")
     public ResponseEntity<List<FinancecodeDTO>> financecodeInfo(@RequestParam(value = "FINANCE_CD")String financeCD) {
         log.info("financecodeInfoController 실행");
@@ -487,6 +473,21 @@ public class StradeController {
             log.error("financecodeInfoController Error : financeCDList={}, errorMessage={}", financeCDList, e.getMessage());
         }
         return new ResponseEntity<>(financeCDList, HttpStatus.OK);
+    }
+
+    // 금융코드 자동완성 구현
+    @GetMapping("liqcodeInfo")
+    public ResponseEntity<List<LiquorcodeDTO>> liqcodeInfo(@RequestParam(value = "LIQ_CD")String liq_CD) {
+        log.info("liqcodeInfoController 실행");
+
+        List<LiquorcodeDTO> liqCDList = new ArrayList<>();
+
+        try {
+            liqCDList = stradeService.liqcodeInfo(liq_CD);
+        } catch (Exception e) {
+            log.error("liqcodeInfoController Error : liqCDList={}, errorMessage={}", liqCDList, e.getMessage());
+        }
+        return new ResponseEntity<>(liqCDList, HttpStatus.OK);
     }
 
     // 그리드 사원코드 자동완성 구현
@@ -576,7 +577,6 @@ public class StradeController {
     public ResponseEntity<String> gridUseEmpCd(@RequestBody GridEmpCdDTO gridEmpCdDTO) {
         log.info("gridUseEmpCdController 실행");
         String gridEmpCd = null;
-        System.out.println("dkdkdk"+ gridEmpCdDTO);
         // 사원이 속한 회사 코드
         Claims claims = getUserInfo(request);
         String CO_CD = String.valueOf(claims.get("CO_CD"));
