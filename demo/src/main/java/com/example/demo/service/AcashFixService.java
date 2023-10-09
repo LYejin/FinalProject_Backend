@@ -277,15 +277,10 @@ public class AcashFixService {
     public List<Map<String, Object>> getMonthlyAmounts(Map<String, Object> params) {
         List<Map<String, Object>> fetchedData = acashFixDao.selectMonthlyAmounts(params);
         Map<Integer, Double> monthlyAmountMap = new HashMap<>();
+        Map<Integer, Map<String, Double>> monthlyCashCdAmountMap = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
         for (Map<String, Object> row : fetchedData) {
-            System.out.println("Processing row data: " + row);
-            if (row.get("FR_DT") == null || row.get("TO_DT") == null) {
-                System.out.println("Skipping due to null FR_DT or TO_DT");
-                continue;
-            }
-
             try {
                 Date frDt = sdf.parse((String) row.get("FR_DT"));
                 Date toDt = sdf.parse((String) row.get("TO_DT"));
@@ -304,17 +299,14 @@ public class AcashFixService {
                     int year = paymentDate.get(Calendar.YEAR);
                     int month = paymentDate.get(Calendar.MONTH) + 1;
 
-                    if (year == Integer.parseInt(params.get("inputYear").toString())) { // 연도 체크 추가
-                        System.out.println("Payment Date: " + paymentDate.getTime());
-                        System.out.println("Current Month: " + month);
-                        System.out.println("Adding Amount: " + cashAm);
+                    if (year == Integer.parseInt(params.get("inputYear").toString())) {
+                        monthlyAmountMap.merge(month, cashAm, Double::sum);
 
-                        if (!paymentDate.getTime().before(frDt) && !paymentDate.getTime().after(toDt)) {
-                            monthlyAmountMap.merge(month, cashAm, Double::sum);
-                        }
+                        String cashCd = (String) row.get("CASH_CD");
+                        monthlyCashCdAmountMap
+                                .computeIfAbsent(month, k -> new HashMap<>())
+                                .merge(cashCd, cashAm, Double::sum);
                     }
-
-                    System.out.println("Monthly Amount Map after processing current row: " + monthlyAmountMap);
 
                     if (dealPd != null) {
                         paymentDate.add(Calendar.MONTH, dealPd);
@@ -330,12 +322,32 @@ public class AcashFixService {
         return monthlyAmountMap.entrySet().stream()
                 .map(entry -> {
                     Map<String, Object> monthData = new HashMap<>();
-                    monthData.put("MONTH", entry.getKey());
+                    int month = entry.getKey();
+                    monthData.put("MONTH", month);
                     monthData.put("TOTAL_AMOUNT", entry.getValue());
+
+                    // Get top 3 CASH_CDs for this month
+                    Map<String, Double> topCashCdMap = monthlyCashCdAmountMap.get(month).entrySet().stream()
+                            .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()))
+                            .limit(3)
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+                    for (Map.Entry<String, Double> topEntry : topCashCdMap.entrySet()) {
+                        String cashCd = topEntry.getKey();
+                        double totalAmount = topEntry.getValue();
+                        String cashName = fetchedData.stream()
+                                .filter(row -> cashCd.equals(row.get("CASH_CD")))
+                                .map(row -> (String) row.get("CASH_NM"))
+                                .findFirst()
+                                .orElse(cashCd);
+                        monthData.put(cashName, totalAmount);
+                    }
+
                     return monthData;
                 })
                 .collect(Collectors.toList());
     }
+
 
 
     //일자별 금액합계

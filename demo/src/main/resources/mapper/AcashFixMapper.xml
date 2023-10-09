@@ -204,7 +204,7 @@
             a.CASH_AM,
             a.TO_DT,
             a.CASH_CD,
-            c.CASH_NM   -- 추가된 부분
+            c.CASH_NM
         FROM AcashFix a
         JOIN Acashcd c ON a.CASH_CD = c.CASH_CD
         WHERE a.CO_CD = #{CO_CD}
@@ -236,8 +236,11 @@
             a.DEAL_DD,
             a.DEAL_PD,
             a.CASH_AM,
-            a.TO_DT
+            a.TO_DT,
+            a.CASH_CD,
+            c.CASH_NM
         FROM AcashFix a
+        JOIN Acashcd c ON a.CASH_CD = c.CASH_CD
         WHERE a.CO_CD = #{CO_CD}
           AND a.DIV_CD = #{DIV_CD}
           AND a.DISP_SQ = #{DISP_SQ}
