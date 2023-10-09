@@ -89,10 +89,12 @@ public class AcashFixService {
             log.info("Fetched yearly amounts: {}", results);
 
             Map<Integer, Double> totalAmountMap = new HashMap<>();
+            Map<Integer, Integer> paymentCountMap = new HashMap<>();  // 각 연도별 지급 횟수를 카운트하는 맵
+
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
             for (Map<String, Object> row : results) {
-                System.out.println("Row data: " + row);  // 출력 1: 현재 행의 데이터 출력
+                System.out.println("Row data: " + row);
 
                 if (row.get("FR_DT") == null || row.get("TO_DT") == null) {
                     continue;
@@ -120,14 +122,15 @@ public class AcashFixService {
                 paymentDate.set(Calendar.DAY_OF_MONTH, dealDd);
 
                 while (!paymentDate.getTime().after(toDt.getTime())) {
-                    System.out.println("Current Payment Date: " + paymentDate.getTime());  // 출력 2: 현재 지불 날짜 출력
+                    System.out.println("Current Payment Date: " + paymentDate.getTime());
 
                     int paymentYear = paymentDate.get(Calendar.YEAR);
 
                     if (!paymentDate.getTime().before(frDt.getTime()) && !paymentDate.getTime().after(toDt.getTime())) {
                         totalAmountMap.merge(paymentYear, cashAm, Double::sum);
+                        paymentCountMap.merge(paymentYear, 1, Integer::sum);  // 지급 횟수 추가
                     }
-                    System.out.println("Yearly Amount Map: " + totalAmountMap);  // 출력 3: 연도별 합계 출력
+                    System.out.println("Yearly Amount Map: " + totalAmountMap);
 
                     if (dealPd != null) {
                         paymentDate.add(Calendar.MONTH, dealPd);
@@ -142,6 +145,7 @@ public class AcashFixService {
                 Map<String, Object> resultMap = new HashMap<>();
                 resultMap.put("YEAR", i);
                 resultMap.put("TOTAL_AMOUNT", totalAmountMap.getOrDefault(i, 0.0));
+                resultMap.put("PAYMENT_COUNT", paymentCountMap.getOrDefault(i, 0));  // 지급 횟수 추가
                 finalResults.add(resultMap);
             }
 
@@ -152,6 +156,7 @@ public class AcashFixService {
         }
     }
 
+
     //분기별 금액합계
     public List<Map<String, Object>> getQuarterlyAmounts(Map<String, Object> params) {
         try {
@@ -159,6 +164,7 @@ public class AcashFixService {
             log.info("Fetched quarterly amounts: {}", results);
 
             Map<Integer, Double> quarterlyAmountMap = new HashMap<>();
+            Map<Integer, Map<String, Double>> cashCdAmountMap = new HashMap<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
             for (Map<String, Object> row : results) {
@@ -207,6 +213,9 @@ public class AcashFixService {
 
                     if (!paymentDate.getTime().before(frDt) && !paymentDate.getTime().after(toDt)) {
                         quarterlyAmountMap.merge(quarter, cashAm, Double::sum);
+                        cashCdAmountMap
+                                .computeIfAbsent(quarter, k -> new HashMap<>())
+                                .merge((String) row.get("CASH_CD"), cashAm, Double::sum);
                     }
 
                     System.out.println("Quarterly Amount Map after processing current row: " + quarterlyAmountMap);
@@ -218,13 +227,42 @@ public class AcashFixService {
                     }
                 }
                 System.out.println("Finished processing row data: " + row);
+                String cashCd = (String) row.get("CASH_CD");
             }
 
             List<Map<String, Object>> finalResults = new ArrayList<>();
+
             for (int i = 1; i <= 4; i++) {
                 Map<String, Object> resultMap = new HashMap<>();
                 resultMap.put("QUARTER", i);
                 resultMap.put("TOTAL_AMOUNT", quarterlyAmountMap.getOrDefault(i, 0.0));
+
+                Map<String, Double> quarterCashCdAmounts = cashCdAmountMap.getOrDefault(i, new HashMap<>());
+                List<Map.Entry<String, Double>> sortedEntries = quarterCashCdAmounts.entrySet()
+                        .stream()
+                        .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                        .collect(Collectors.toList());
+
+                double etcAmount = quarterlyAmountMap.getOrDefault(i, 0.0);
+                int topCount = 0;  // 상위 3개 항목 카운트
+
+                for (Map.Entry<String, Double> entry : sortedEntries) {
+                    if (topCount < 3) {
+                        String cashCd = entry.getKey();
+                        String cashName = results.stream()
+                                .filter(row -> cashCd.equals(row.get("CASH_CD")))
+                                .map(row -> (String) row.get("CASH_NM"))
+                                .findFirst()
+                                .orElse(cashCd);  // 찾을 수 없는 경우 CASH_CD 반환
+                        resultMap.put(cashName, entry.getValue());
+                        etcAmount -= entry.getValue();
+                        topCount++;
+                    } else {
+                        break;
+                    }
+                }
+
+                resultMap.put("ETC", etcAmount);
                 finalResults.add(resultMap);
             }
 
@@ -300,6 +338,7 @@ public class AcashFixService {
     }
 
 
+    //일자별 금액합계
     public List<Map<String, Object>> getDailyAmounts(Map<String, Object> params) {
         List<Map<String, Object>> fetchedData = acashFixDao.selectDailyAmounts(params);
 

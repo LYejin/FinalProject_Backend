@@ -29,6 +29,8 @@ public interface AcashFixDao {
     // 분기별 금액 합계 조회
     public List<Map<String, Object>> selectQuarterlyAmounts(Map<String, Object> params);
 
+    List<String> selectCashNamesByCashCd(List<String> cashCds);
+
     //월별 금액 합계 조회
     public List<Map<String, Object>> selectMonthlyAmounts(Map<String, Object> params);
 
