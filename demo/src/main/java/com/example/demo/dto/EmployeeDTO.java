@@ -6,7 +6,8 @@ import lombok.*;
 @Data
 public class EmployeeDTO {
 
-
+    private String DIV_NM; // 사업장명
+    private String DEPT_NM; // 부서명
     private String EMP_CD; // 사원계정
     private String CO_CD; // 회사코드
     private String DIV_CD; // 사업장코드
