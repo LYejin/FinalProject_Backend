@@ -56,6 +56,7 @@ public class FunTypeService {
         try {
             funTypeDTO.setCO_CD(CO_CD);
             findByInputColumns(funTypeDTO);
+            log.info("종목검색"+funTypeDTO);
             funTypeDTOS = funTypeDao.searchRow(funTypeDTO);
         }catch (Exception e){
             log.error(e.getMessage());
@@ -236,7 +237,7 @@ public class FunTypeService {
                 // 각 필드마다 실제로 담긴 값 가져오기
                 Object value = field.get(funTypeDTO);
                 // 값이 null이 아닌 경우 컬럼 이름 리스트에 추가
-                if ((value != null) && !(field.getName().equals("searchColumns") || field.getName().equals("searchData"))) {
+                if ((value != null && !value.equals(" ")) && !(field.getName().equals("searchColumns") || field.getName().equals("searchData"))) {
                     columnsToUpdate.add(field.getName());
                 }
             } catch (IllegalAccessException e) {

@@ -145,7 +145,7 @@ public class CompanyService {
                 // 각 필드마다 실제로 담긴 값 가져오기
                 Object value = field.get(companyDTO);
                 // 값이 null이 아닌 경우 컬럼 이름 리스트에 추가
-                if (value != null ) {
+                if (value != null && !value.equals("NaN")) {
                     columnsToUpdate.add(field.getName());
                 }
             } catch (IllegalAccessException e) {
