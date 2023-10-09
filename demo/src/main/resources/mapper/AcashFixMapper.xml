@@ -12,9 +12,7 @@
             ,A.CASH_AM
             ,A.FR_DT
             ,A.TO_DT
-            ,A.PJT_CD
             ,A.DEAL_PD
-            ,A.DEAL_MM
             ,A.DISP_SQ
             ,A.CASH_CD
             ,B.CASH_NM
@@ -174,7 +172,100 @@
         </foreach>
     </delete>
 
+    <!-- 연도별 사용금액 -->
+    <select id="selectYearlyAmounts" parameterType="map" resultType="hashmap">
+        SELECT
+            a.CO_CD,
+            a.DIV_CD,
+            a.FR_DT,
+            a.DEAL_DD,
+            a.DEAL_PD,
+            a.CASH_AM,
+            a.TO_DT
+        FROM AcashFix a
+        WHERE a.CO_CD = #{CO_CD}
+          AND a.DIV_CD = #{DIV_CD}
+          AND a.DISP_SQ = #{DISP_SQ}
+          AND (
+                (a.FR_DT BETWEEN CONCAT(#{inputYear} - 4, '0101') AND CONCAT(#{inputYear}, '1231'))
+                OR (a.TO_DT BETWEEN CONCAT(#{inputYear} - 4, '0101') AND CONCAT(#{inputYear}, '1231'))
+                OR (a.FR_DT <![CDATA[ < ]]> CONCAT(#{inputYear} - 4, '0101') AND a.TO_DT >= CONCAT(#{inputYear}, '1231'))
+            )
+    </select>
+
+    <!-- 분기별 사용금액 -->
+    <select id="selectQuarterlyAmounts" parameterType="map" resultType="hashmap">
+        SELECT
+            a.CO_CD,
+            a.DIV_CD,
+            a.FR_DT,
+            a.DEAL_DD,
+            a.DEAL_PD,
+            a.CASH_AM,
+            a.TO_DT,
+            a.CASH_CD,
+            c.CASH_NM
+        FROM AcashFix a
+        JOIN Acashcd c ON a.CASH_CD = c.CASH_CD
+        WHERE a.CO_CD = #{CO_CD}
+          AND a.DIV_CD = #{DIV_CD}
+          AND a.DISP_SQ = #{DISP_SQ}
+          AND (
+                (a.FR_DT BETWEEN CONCAT(#{inputYear}, '0101') AND CONCAT(#{inputYear}, '1231'))
+                OR (a.TO_DT BETWEEN CONCAT(#{inputYear}, '0101') AND CONCAT(#{inputYear}, '1231'))
+                OR (a.FR_DT <![CDATA[ <= ]]> CONCAT(#{inputYear}, '0101') AND a.TO_DT >= CONCAT(#{inputYear}, '1231'))
+            )
+    </select>
+
+    <select id="selectCashNamesByCashCd" parameterType="list" resultType="string">
+        SELECT CASH_NM
+        FROM Acashcd
+        WHERE CASH_CD IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 
 
+    <!-- 월별 사용금액 -->
+    <select id="selectMonthlyAmounts" resultType="map">
+        SELECT
+            a.CO_CD,
+            a.DIV_CD,
+            a.FR_DT,
+            a.DEAL_DD,
+            a.DEAL_PD,
+            a.CASH_AM,
+            a.TO_DT,
+            a.CASH_CD,
+            c.CASH_NM
+        FROM AcashFix a
+        JOIN Acashcd c ON a.CASH_CD = c.CASH_CD
+        WHERE a.CO_CD = #{CO_CD}
+          AND a.DIV_CD = #{DIV_CD}
+          AND a.DISP_SQ = #{DISP_SQ}
+          AND (
+                (a.FR_DT BETWEEN CONCAT(#{inputYear}, '0101') AND CONCAT(#{inputYear}, '1231'))
+                OR (a.TO_DT BETWEEN CONCAT(#{inputYear}, '0101') AND CONCAT(#{inputYear}, '1231'))
+                OR (a.FR_DT <![CDATA[ <= ]]> CONCAT(#{inputYear}, '0101') AND a.TO_DT >= CONCAT(#{inputYear}, '1231'))
+            )
+    </select>
+
+    <!-- 일별 사용금액 -->
+    <select id="selectDailyAmounts" resultType="map">
+        SELECT
+            a.FR_DT,
+            a.TO_DT,
+            a.DEAL_DD,
+            a.DEAL_PD,
+        SUM(a.CASH_AM) as CASH_AM
+        FROM AcashFix a
+        WHERE a.CO_CD = #{CO_CD}
+          AND a.DIV_CD = #{DIV_CD}
+          AND a.DISP_SQ = #{DISP_SQ}
+          AND a.FR_DT <![CDATA[ <= ]]> LAST_DAY(CONCAT(#{inputYear}, LPAD(#{inputMonth}, 2, '0'), '01'))
+          AND a.TO_DT <![CDATA[ >= ]]> CONCAT(#{inputYear}, LPAD(#{inputMonth}, 2, '0'), '01')
+        GROUP BY a.FR_DT, a.TO_DT, a.DEAL_DD, a.DEAL_PD
+    </select>
 
 </mapper>
