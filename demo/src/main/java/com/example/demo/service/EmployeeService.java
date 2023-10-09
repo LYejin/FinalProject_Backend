@@ -85,6 +85,7 @@ public class EmployeeService {
         EmployeeDTO employeeInfo = null;
         try {
             employeeInfo = employeeDao.employeeDetail(employeeDTO);
+            System.out.println(employeeInfo);
         } catch (Exception e) {
             log.error("employeeDetailService Error : employeeInfo={}, errorMessage={}",employeeInfo,e.getMessage());
         }

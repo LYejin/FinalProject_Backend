@@ -9,5 +9,10 @@
             ,TITLE
             ,LINK
         FROM MainSidebar
+        <where>
+            <if test='ROLE.equals("ROLE_USER")'>
+                ROLE != 'ROLE_ADMIN';
+            </if>
+        </where>
     </select>
 </mapper>

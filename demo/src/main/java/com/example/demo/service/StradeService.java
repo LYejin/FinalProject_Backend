@@ -239,7 +239,7 @@ public class StradeService {
         return liquorcodeHelpList;
     }
 
-    // 주류코드도움 모달창 list
+    // 금융코드도움 모달창 list
     public List<FinancecodeHelpListDTO> financecodeHelpList(String VALUE) {
         log.info("financecodeHelpListtService 실행");
         List<FinancecodeHelpListDTO> financecodeHelpList = new ArrayList<>();
@@ -277,21 +277,15 @@ public class StradeService {
         List<StradeDeleteInfo> stradeUseDataList = new ArrayList<>();
 
         for (StradeDeleteDTO data: stradeDeleteDTO) {
-            System.out.println("kkkkkkkkkk"+data);
             acashFixRow = stradeDao.acashFix(data.getTR_CD());
             if (acashFixRow > 0) {
-                System.out.println("pppp"+data.getTR_CD());
                 StradeDeleteInfo stradeDeleteInfo = new StradeDeleteInfo(data.getTR_CD(),acashFixRow);
                 stradeUseDataList.add(stradeDeleteInfo);
             }
         }
-        System.out.println("listDelete");
         for (StradeDeleteDTO data: stradeDeleteDTO) {
-            System.out.println("jipppppps");
             if (stradeDao.acashFix(data.getTR_CD()) <= 0) {
-                System.out.println("jiiiiii");
                 int deleteRow = 0;
-                System.out.println("----------------"+data.getTR_FG());
                 if (data.getTR_FG().equals("1")) {
                     log.info("일반 거래처 DELETE 실행");
                     deleteRow += stradeDao.gtradeDelete(data);
@@ -302,7 +296,6 @@ public class StradeService {
                 deleteRow += stradeDao.stradeRollManageTotalDelete(data);
                 log.info("stradeDelete row : {}", deleteRow);
                 deleteRow = stradeDao.stradeDelete(data);
-                System.out.println("kkkkkk");
             }
         }
         return stradeUseDataList;
@@ -335,6 +328,19 @@ public class StradeService {
             log.error("financecodeInfoService Error : financeCDList={}, errorMessage={}",financeCDList,e.getMessage());
         }
         return financeCDList;
+    }
+
+    // 금융코드 정보 자동 입력
+    public List<LiquorcodeDTO> liqcodeInfo(String liq_CD) {
+        log.info("liqcodeInfoService");
+        List<LiquorcodeDTO> liqCDList = new ArrayList<>();
+
+        try {
+            liqCDList = stradeDao.liqcodeInfo(liq_CD);
+        } catch (Exception e) {
+            log.error("liqcodeInfoService Error : liqCDList={}, errorMessage={}",liqCDList,e.getMessage());
+        }
+        return liqCDList;
     }
 
     // 거래처 내 사원 정보 자동 입력

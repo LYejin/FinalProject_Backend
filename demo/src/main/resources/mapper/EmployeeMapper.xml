@@ -15,6 +15,7 @@
             e.EMP_CD
             ,e.CO_CD
             ,e.DIV_CD
+            ,e.DEPT_CD
             ,e.USER_YN
             ,e.USE_FG
             ,e.USERNAME
@@ -37,9 +38,18 @@
             ,e.ADDR
             ,e.ADDR_NUM
             ,er.ROLE_NAME
+            ,w.DIV_NM
+            ,d.DEPT_NM
         FROM Employee e
         LEFT OUTER JOIN Employee_Roll er
-        on e.EMP_CD = er.EMP_CD
+            on e.EMP_CD = er.EMP_CD
+        LEFT OUTER JOIN Workplace w
+            on e.CO_CD = w.CO_CD
+          AND e.DIV_CD = w.DIV_CD
+        LEFT OUTER JOIN Department d
+            on e.CO_CD = d.CO_CD
+          AND e.DIV_CD = d.DIV_CD
+          AND e.DEPT_CD = d.DEPT_CD
         <where>
             <choose>
                 <when test="ENRL_FG != null and ENRL_FG.length > 0">
@@ -94,31 +104,41 @@
     <!-- 사원 상세 테이터 1건 출력 -->
     <select id="employeeDetail" parameterType="com.example.demo.dto.EmployeeDTO" resultType="com.example.demo.dto.EmployeeDTO">
         SELECT
-            EMP_CD
-            ,CO_CD
-            ,DIV_CD
-            ,USER_YN
-            ,USE_FG
-            ,USERNAME
-            ,PASSWORD
-            ,KOR_NM
-            ,EMAIL_ADD
-            ,TEL
-            ,GENDER_FG
-            ,JOIN_DT
-            ,RTR_DT
-            ,RSRG_ADD
-            ,PIC_FILE_ID
-            ,ENRL_FG
-            ,PERSONAL_MAIL
-            ,PERSONAL_MAIL_CP
-            ,SALARY_MAIL
-            ,SALARY_MAIL_CP
-            ,HOME_TEL
-            ,ZIPCODE
-            ,ADDR
-            ,ADDR_NUM
-        FROM Employee
+            e.EMP_CD
+            ,e.CO_CD
+            ,e.DIV_CD
+            ,e.DEPT_CD
+            ,e.USER_YN
+            ,e.USE_FG
+            ,e.USERNAME
+            ,e.PASSWORD
+            ,e.KOR_NM
+            ,e.EMAIL_ADD
+            ,e.TEL
+            ,e.GENDER_FG
+            ,e.JOIN_DT
+            ,e.RTR_DT
+            ,e.RSRG_ADD
+            ,e.PIC_FILE_ID
+            ,e.ENRL_FG
+            ,e.PERSONAL_MAIL
+            ,e.PERSONAL_MAIL_CP
+            ,e.SALARY_MAIL
+            ,e.SALARY_MAIL_CP
+            ,e.HOME_TEL
+            ,e.ZIPCODE
+            ,e.ADDR
+            ,e.ADDR_NUM
+            ,w.DIV_NM
+            ,d.DEPT_NM
+        FROM Employee e
+        LEFT OUTER JOIN Workplace w
+            on e.CO_CD = w.CO_CD
+          AND e.DIV_CD = w.DIV_CD
+        LEFT OUTER JOIN Department d
+            on e.CO_CD = d.CO_CD
+          AND e.DIV_CD = d.DIV_CD
+          AND e.DEPT_CD = d.DEPT_CD
         WHERE
             USERNAME = #{USERNAME}
     </select>
@@ -199,6 +219,9 @@
         UPDATE
             Employee
         <set>
+            <if test="DEPT_CD != null and !DEPT_CD.equals('')">
+                DEPT_CD = #{DEPT_CD},
+            </if>
             <if test="DIV_CD != null and !DIV_CD.equals('')">
                 DIV_CD = #{DIV_CD},
             </if>

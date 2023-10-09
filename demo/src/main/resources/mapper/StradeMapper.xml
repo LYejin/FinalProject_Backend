@@ -239,10 +239,13 @@
             ,g.END_DT
             ,g.FOR_YN
             ,g.LIQ_CD
+            ,liq.WHOLESALE
         FROM Strade s
         JOIN Gtrade g
             ON s.TR_CD = g.TR_CD
           AND s.CO_CD = g.CO_CD
+        LEFT OUTER JOIN LIQUORCODE liq
+            ON g.LIQ_CD = liq.LIQ_CD
         WHERE
             s.CO_CD = #{CO_CD, jdbcType=VARCHAR}
           AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
@@ -664,6 +667,18 @@
             <if test="FINANCE_CD != null and !FINANCE_CD.equals('')">
                 FINANCE_CD LIKE CONCAT('%', #{FINANCE_CD}, '%')
             </if>
+    </select>
+
+    <!--  주류코드 정보 자동 입력  -->
+    <select id="liqcodeInfo" resultType="com.example.demo.dto.LiquorcodeDTO">
+        SELECT
+            LIQ_CD
+            ,WHOLESALE
+        FROM LIQUORCODE
+        WHERE
+        <if test="LIQ_CD != null and !LIQ_CD.equals('')">
+            LIQ_CD LIKE CONCAT('%', #{LIQ_CD}, '%')
+        </if>
     </select>
 
     <!--  그리드 내 사원 정보 자동 입력  -->
