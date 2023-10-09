@@ -24,4 +24,5 @@ public class DepartmentDTO {
     private String ADDR_CD;     //우편번호
     private String ADDR;        //주소
     private String ADDR_NUM;    //상세주소
+    private String EMP_NB;      //직원수
 }
