@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.DepartmentDTO;
+import com.example.demo.dto.DepartmentRequestDTO;
+import com.example.demo.dto.DeptEmpListDTO;
 import com.example.demo.dto.WorkplaceDTO;
 import com.example.demo.service.DepartmentService;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +54,6 @@ public class DepartmentController {
         }
     }
 
-
     //부서 추가
     @PostMapping("insert")
     public ResponseEntity<Integer> insertDepartment(@RequestBody DepartmentDTO departmentDTO) {
@@ -80,4 +81,58 @@ public class DepartmentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    //부서코드중복검사
+    @GetMapping("/deptCheck")
+    public boolean checkDuplicate(@RequestParam String coCd, @RequestParam String deptCd) {
+        Map<String, String> params = new HashMap<>();
+        params.put("CO_CD", coCd);
+        params.put("DEPT_CD", deptCd);
+        return departmentService.isDepartmentDuplicate(params);
+    }
+
+
+    @GetMapping("/list")
+    public List<DeptEmpListDTO> getDeptEmpList(@RequestParam String CO_CD, @RequestParam String DEPT_CD) {
+        Map<String, String> params = new HashMap<>();
+        params.put("CO_CD", CO_CD);
+        params.put("DEPT_CD", DEPT_CD);
+        return departmentService.getDeptEmpList(params);
+    }
+
+    @GetMapping("/check-data")
+    public boolean checkDataExistence(@RequestParam String CO_CD, @RequestParam String DEPT_CD) {
+        return departmentService.checkExistence(CO_CD, DEPT_CD);
+    }
+
+    @PutMapping("/update-department-employee")
+    public ResponseEntity<String> updateDepartmentAndEmployee(@RequestBody Map<String, String> body) {
+        String CO_CD = body.get("CO_CD");
+        String DEPT_CD = body.get("DEPT_CD");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("CO_CD", CO_CD);
+        params.put("DEPT_CD", DEPT_CD);
+
+        int resultCount = departmentService.updateDepartmentAndEmployee(params);
+        if (resultCount >= 0) {
+            return new ResponseEntity<>("Total rows affected: " + resultCount, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Error occurred.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteDepartment(@RequestBody DepartmentRequestDTO departmentRequestDTO) {
+        int resultCount = departmentService.deleteDepartment(departmentRequestDTO);
+        log.info("Delete Department Controller" +  departmentRequestDTO);
+        if (resultCount >= 0) {
+            return new ResponseEntity<>("Total rows deleted: " + resultCount, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Error occurred.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
 }

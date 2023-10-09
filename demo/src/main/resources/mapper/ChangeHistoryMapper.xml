@@ -32,7 +32,7 @@
         ON f.CO_CD = c.CO_CD
         WHERE f.${IDENTIFY_COLUMN_NAME} = #{IDENTIFY_VALUE}
         <if test="TABLENAME == 'Workplace'">
-            AND f.CO_CD &lt;= #{CO_CD}
+            AND f.CO_CD     = #{CO_CD}
         </if>
     </select>
 

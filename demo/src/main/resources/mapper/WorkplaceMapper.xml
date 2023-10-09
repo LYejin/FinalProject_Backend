@@ -5,50 +5,54 @@
     <!--사업장 전체목록 가져오기-->
     <select id="selectWorkplaceSearch" parameterType="hashmap" resultType="com.example.demo.dto.WorkplaceDTO">
         SELECT
-        DIV_CD
-        ,CO_CD
-        ,DIV_YN
-        ,FILL_YN
-        ,DIV_NM
-        ,DIV_ADDR
-        ,DIV_TEL
-        ,REG_NB
-        ,DIV_NMK
-        ,BUSINESS
-        ,JONGMOK
-        ,OPEN_DT
-        ,CLOSE_DT
-        ,MAS_NM
-        ,DIV_FAX
-        ,COP_NB
-        ,ADDR_CD
-        ,ADDR_NUM
+        W.DIV_CD
+        ,W.CO_CD
+        ,C.CO_NM
+        ,W.DIV_YN
+        ,W.FILL_YN
+        ,W.DIV_NM
+        ,W.DIV_ADDR
+        ,W.DIV_TEL
+        ,W.REG_NB
+        ,W.DIV_NMK
+        ,W.BUSINESS
+        ,W.JONGMOK
+        ,W.OPEN_DT
+        ,W.CLOSE_DT
+        ,W.MAS_NM
+        ,W.DIV_FAX
+        ,W.COP_NB
+        ,W.ADDR_CD
+        ,W.ADDR_NUM
         FROM
-        Workplace
+        Workplace W
+        LEFT JOIN Company C ON W.CO_CD = C.CO_CD
         <where>
             <if test="(DIV_CD != null or DIV_NM != null)">
                 <if test="DIV_CD != null">
-                    DIV_CD LIKE CONCAT('%', #{DIV_CD}, '%')
+                    W.DIV_CD LIKE CONCAT('%', #{DIV_CD}, '%')
                 </if>
                 <if test="DIV_NM != null">
-                    OR DIV_NM LIKE CONCAT('%', #{DIV_NM}, '%')
+                    OR W.DIV_NM LIKE CONCAT('%', #{DIV_NM}, '%')
                 </if>
             </if>
 
             <if test="CO_CD != null">
-                AND CO_CD = #{CO_CD}
+                AND W.CO_CD = #{CO_CD}
             </if>
 
             <if test="DIV_YN != null">
-                AND DIV_YN = #{DIV_YN}
+                AND W.DIV_YN = #{DIV_YN}
             </if>
         </where>
     </select>
 
 
 
+
     <!--사업장정보 가져오기-->
     <select id="selectWorkplaceInfoByDIVCD" resultType="com.example.demo.dto.WorkplaceDTO">
+
         SELECT
         DIV_CD
         ,CO_CD
@@ -71,6 +75,7 @@
         ,PIC_FILE_ID
         FROM
         Workplace
+
         WHERE
         DIV_CD = #{DIV_CD}
         AND CO_CD = #{CO_CD}
@@ -80,47 +85,47 @@
     <!--사업장 추가하기-->
     <insert id="insertWorkplace" parameterType="com.example.demo.dto.WorkplaceDTO">
         INSERT INTO
-        Workplace (
-        DIV_CD
-        ,CO_CD
-        ,DIV_YN
-        ,FILL_YN
-        ,DIV_NM
-        ,DIV_ADDR
-        ,DIV_TEL
-        ,REG_NB
-        ,DIV_NMK
-        ,BUSINESS
-        ,JONGMOK
-        ,OPEN_DT
-        ,CLOSE_DT
-        ,MAS_NM
-        ,DIV_FAX
-        ,COP_NB
-        ,ADDR_CD
-        ,ADDR_NUM
-        ,PIC_FILE_ID
+            Workplace (
+                       DIV_CD
+                      ,CO_CD
+                      ,DIV_YN
+                      ,FILL_YN
+                      ,DIV_NM
+                      ,DIV_ADDR
+                      ,DIV_TEL
+                      ,REG_NB
+                      ,DIV_NMK
+                      ,BUSINESS
+                      ,JONGMOK
+                      ,OPEN_DT
+                      ,CLOSE_DT
+                      ,MAS_NM
+                      ,DIV_FAX
+                      ,COP_NB
+                      ,ADDR_CD
+                      ,ADDR_NUM
+                      ,PIC_FILE_ID
         ) VALUES (
-        #{DIV_CD}
-        ,#{CO_CD}
-        ,#{DIV_YN}
-        ,#{FILL_YN}
-        ,#{DIV_NM}
-        ,#{DIV_ADDR}
-        ,#{DIV_TEL}
-        ,#{REG_NB}
-        ,#{DIV_NMK}
-        ,#{BUSINESS}
-        ,#{JONGMOK}
-        ,#{OPEN_DT}
-        ,#{CLOSE_DT}
-        ,#{MAS_NM}
-        ,#{DIV_FAX}
-        ,#{COP_NB}
-        ,#{ADDR_CD}
-        ,#{ADDR_NUM}
-        ,#{PIC_FILE_ID}
-        )
+                     #{DIV_CD}
+                 ,#{CO_CD}
+                 ,#{DIV_YN}
+                 ,#{FILL_YN}
+                 ,#{DIV_NM}
+                 ,#{DIV_ADDR}
+                 ,#{DIV_TEL}
+                 ,#{REG_NB}
+                 ,#{DIV_NMK}
+                 ,#{BUSINESS}
+                 ,#{JONGMOK}
+                 ,#{OPEN_DT}
+                 ,#{CLOSE_DT}
+                 ,#{MAS_NM}
+                 ,#{DIV_FAX}
+                 ,#{COP_NB}
+                 ,#{ADDR_CD}
+                 ,#{ADDR_NUM}
+                 ,#{PIC_FILE_ID}
+                 )
     </insert>
 
 

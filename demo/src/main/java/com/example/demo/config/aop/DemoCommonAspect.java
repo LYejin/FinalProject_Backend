@@ -24,13 +24,12 @@ import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 //
 //import org.aspectj.lang.ProceedingJoinPoint;
@@ -232,8 +231,23 @@ public class DemoCommonAspect {
     }
 
     public String getLoopbackIPv4() {
-        InetAddress loopback = InetAddress.getLoopbackAddress();
-        return loopback.getHostAddress();
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = networkInterfaces.nextElement();
+                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                while (inetAddresses.hasMoreElements()) {
+                    InetAddress inetAddress = inetAddresses.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress.getAddress().length == 4) {
+                        // IPv4 주소를 찾았을 때 반환합니다.
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Claims getUserInfo() {
