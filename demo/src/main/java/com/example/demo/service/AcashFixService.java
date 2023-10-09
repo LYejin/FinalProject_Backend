@@ -357,10 +357,21 @@ public class AcashFixService {
         Map<Integer, Double> dailyAmountMap = new TreeMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
+        // inputYear와 inputMonth 값 얻기
+        int inputYear = Integer.parseInt(params.get("inputYear").toString());
+        int inputMonth = Integer.parseInt(params.get("inputMonth").toString());
+
         // 기본값 초기화
-        for (int i = 1; i <= 31; i++) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, inputYear);
+        calendar.set(Calendar.MONTH, inputMonth - 1);  // Java의 Calendar 클래스는 월을 0부터 시작하므로 1을 뺍니다.
+        int lastDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        for (int i = 1; i <= lastDayOfMonth; i++) {
             dailyAmountMap.put(i, 0.0);
         }
+
+
 
         System.out.println("Total number of rows to process: " + fetchedData.size());  // 데이터의 총 개수 출력
 
@@ -378,11 +389,12 @@ public class AcashFixService {
 
                 Calendar paymentDate = Calendar.getInstance();
                 paymentDate.setTime(frDt);
-                int inputYear = Integer.parseInt(params.get("inputYear").toString());
-                int inputMonth = Integer.parseInt(params.get("inputMonth").toString()) - 1;
+//                int inputYear = Integer.parseInt(params.get("inputYear").toString());
+//                int inputMonth = Integer.parseInt(params.get("inputMonth").toString()) - 1;
 
                 while (!paymentDate.after(toDt)) {
-                    if (paymentDate.get(Calendar.YEAR) == inputYear && paymentDate.get(Calendar.MONTH) == inputMonth && paymentDate.get(Calendar.DAY_OF_MONTH) == dealDd) {
+                    System.out.println("Current paymentDate: " + sdf.format(paymentDate.getTime()));
+                    if (paymentDate.get(Calendar.YEAR) == inputYear && paymentDate.get(Calendar.MONTH) == (inputMonth - 1) && paymentDate.get(Calendar.DAY_OF_MONTH) == dealDd) {
                         dailyAmountMap.merge(paymentDate.get(Calendar.DAY_OF_MONTH), cashAm, Double::sum);
                     }
 
@@ -394,12 +406,18 @@ public class AcashFixService {
                         }
                     } else {
                         paymentDate.add(Calendar.MONTH, 1);  // 지급 주기가 없는 경우, 다음 달로 이동
-                        paymentDate.set(Calendar.DAY_OF_MONTH, dealDd);
+                        int lastDayOfNextMonth = paymentDate.getActualMaximum(Calendar.DAY_OF_MONTH);
+                        if (dealDd > lastDayOfNextMonth) {
+                            paymentDate.set(Calendar.DAY_OF_MONTH, lastDayOfNextMonth);
+                        } else {
+                            paymentDate.set(Calendar.DAY_OF_MONTH, dealDd);
+                        }
                     }
 
-                    if (paymentDate.get(Calendar.YEAR) == inputYear && paymentDate.get(Calendar.MONTH) > inputMonth) {
-                        break; // 지정된 월을 넘어갔을 경우 종료
+                    if (paymentDate.get(Calendar.YEAR) > inputYear || (paymentDate.get(Calendar.YEAR) == inputYear && paymentDate.get(Calendar.MONTH) >= inputMonth)) {
+                        break;
                     }
+
                 }
             } catch (ParseException e) {
                 e.printStackTrace();

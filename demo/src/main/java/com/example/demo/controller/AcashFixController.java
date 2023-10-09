@@ -234,15 +234,15 @@ public class AcashFixController {
     public ResponseEntity<List<Map<String, Object>>> getDailyAmounts(
             @RequestParam("DIV_CD") String divCd,
             @RequestParam("CO_CD") String coCd,
-            @RequestParam("Year") String year,
-            @RequestParam("Month") String month,
+            @RequestParam("inputYear") String inputYear,
+            @RequestParam("inputMonth") String inputMonth,
             @RequestParam("DISP_SQ") String dispSq) {
 
         Map<String, Object> params = new HashMap<>();
         params.put("DIV_CD", divCd);
         params.put("CO_CD", coCd);
-        params.put("inputYear", year);
-        params.put("inputMonth", month);
+        params.put("inputYear", inputYear);
+        params.put("inputMonth", inputMonth);
         params.put("DISP_SQ", dispSq);
 
         List<Map<String, Object>> dailyAmounts = acashFixService.getDailyAmounts(params);
