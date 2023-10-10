@@ -163,6 +163,8 @@ public class AcashFixService {
             List<Map<String, Object>> results = acashFixDao.selectQuarterlyAmounts(params);
             log.info("Fetched quarterly amounts: {}", results);
 
+            int inputYear = (Integer) params.get("inputYear");
+
             Map<Integer, Double> quarterlyAmountMap = new HashMap<>();
             Map<Integer, Map<String, Double>> cashCdAmountMap = new HashMap<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -177,21 +179,21 @@ public class AcashFixService {
                 Date frDt = sdf.parse((String) row.get("FR_DT"));
                 Date toDt = sdf.parse((String) row.get("TO_DT"));
 
-                if ((frDt.getYear() + 1900) > 2023) {  // 시작날짜가 2023년 이후면 skip
+                if ((frDt.getYear() + 1900) > inputYear) {  // 시작날짜가 inputYear 이후면 skip
                     continue;
                 }
-                if ((toDt.getYear() + 1900) < 2023) {  // 종료날짜가 2023년 이전이면 skip
+                if ((toDt.getYear() + 1900) < inputYear) {  // 종료날짜가 inputYear 이전이면 skip
                     continue;
                 }
 
                 // 2023년 이전으로 시작하는 데이터는 2023년 1월 1일로 조정
-                if ((frDt.getYear() + 1900) < 2023) {
-                    frDt = sdf.parse("20230101");
+                if ((frDt.getYear() + 1900) < inputYear) {
+                    frDt = sdf.parse(inputYear + "0101");
                 }
 
                 // 2023년 이후로 종료하는 데이터는 2023년 12월 31일로 조정
-                if ((toDt.getYear() + 1900) > 2023) {
-                    toDt = sdf.parse("20231231");
+                if ((toDt.getYear() + 1900) > inputYear) {
+                    toDt = sdf.parse(inputYear + "1231");
                 }
 
                 int dealDd = Integer.parseInt((String) row.get("DEAL_DD"));

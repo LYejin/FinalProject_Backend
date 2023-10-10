@@ -21,7 +21,6 @@
             ,A.FTR_CD
             ,D.TR_NM as FTR_NM
             ,E.BA_NB_TR
-            ,A.EMP_CD
             ,S.BANK_NAME
         FROM
         AcashFix A
@@ -73,10 +72,8 @@
         <if test="TO_DT != null">,TO_DT</if>
         <if test="PJT_CD != null">,PJT_CD</if>
         <if test="DEAL_PD != null">,DEAL_PD</if>
-        <if test="DEAL_MM != null">,DEAL_MM</if>
         <if test="DISP_SQ != null">,DISP_SQ</if>
         <if test="TR_CD != null">,TR_CD</if>
-        <if test="EMP_CD != null">,EMP_CD</if>
         <if test="FTR_CD != null">,FTR_CD</if>
         )
         VALUES
@@ -91,10 +88,8 @@
         <if test="TO_DT != null">,#{TO_DT}</if>
         <if test="PJT_CD != null">,#{PJT_CD}</if>
         <if test="DEAL_PD != null">,#{DEAL_PD}</if>
-        <if test="DEAL_MM != null">,#{DEAL_MM}</if>
         <if test="DISP_SQ != null">,#{DISP_SQ}</if>
         <if test="TR_CD != null">,#{TR_CD}</if>
-        <if test="EMP_CD != null">,#{EMP_CD}</if>
         <if test="FTR_CD != null">,#{FTR_CD}</if>
         )
     </insert>
@@ -135,20 +130,12 @@
                 ,DEAL_PD = #{DEAL_PD}
             </if>
 
-            <if test="DEAL_MM != null and DEAL_MM != ''">
-                ,DEAL_MM = #{DEAL_MM}
-            </if>
-
             <if test="DISP_SQ != null and DISP_SQ != ''">
                 ,DISP_SQ = #{DISP_SQ}
             </if>
 
             <if test="TR_CD != null and TR_CD != ''">
                 ,TR_CD = #{TR_CD}
-            </if>
-
-            <if test="EMP_CD != null and EMP_CD != ''">
-                ,EMP_CD = #{EMP_CD}
             </if>
 
             <if test="FTR_CD != null and FTR_CD != ''">
