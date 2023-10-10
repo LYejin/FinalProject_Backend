@@ -51,7 +51,7 @@ public class StradeController {
         String DEPT_CD = String.valueOf(claims.get("DEPT_CD"));
 
         // 검색 조건들
-        Map<String, String> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("TR_CD", TR_CD);
         map.put("TR_NM", TR_NM);
         map.put("REG_NB", REG_NB);
@@ -60,6 +60,8 @@ public class StradeController {
         map.put("CO_CD", CO_CD);
         map.put("EMP_CD", EMP_CD);
         map.put("DEPT_CD", DEPT_CD);
+
+        System.out.println(map);
 
         List<SGtradeDTO> sgtradeList = new ArrayList<>();
         try {
@@ -88,7 +90,7 @@ public class StradeController {
         String DEPT_CD = String.valueOf(claims.get("DEPT_CD"));
 
         // 검색 조건들
-        Map<String, String> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("TR_CD", TR_CD);
         map.put("TR_NM", TR_NM);
         map.put("BA_NB_TR", BA_NB_TR);
