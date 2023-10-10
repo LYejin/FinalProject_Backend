@@ -163,6 +163,8 @@ public class AcashFixService {
             List<Map<String, Object>> results = acashFixDao.selectQuarterlyAmounts(params);
             log.info("Fetched quarterly amounts: {}", results);
 
+            int inputYear = (Integer) params.get("inputYear");
+
             Map<Integer, Double> quarterlyAmountMap = new HashMap<>();
             Map<Integer, Map<String, Double>> cashCdAmountMap = new HashMap<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -177,21 +179,21 @@ public class AcashFixService {
                 Date frDt = sdf.parse((String) row.get("FR_DT"));
                 Date toDt = sdf.parse((String) row.get("TO_DT"));
 
-                if ((frDt.getYear() + 1900) > 2023) {  // 시작날짜가 2023년 이후면 skip
+                if ((frDt.getYear() + 1900) > inputYear) {  // 시작날짜가 inputYear 이후면 skip
                     continue;
                 }
-                if ((toDt.getYear() + 1900) < 2023) {  // 종료날짜가 2023년 이전이면 skip
+                if ((toDt.getYear() + 1900) < inputYear) {  // 종료날짜가 inputYear 이전이면 skip
                     continue;
                 }
 
                 // 2023년 이전으로 시작하는 데이터는 2023년 1월 1일로 조정
-                if ((frDt.getYear() + 1900) < 2023) {
-                    frDt = sdf.parse("20230101");
+                if ((frDt.getYear() + 1900) < inputYear) {
+                    frDt = sdf.parse(inputYear + "0101");
                 }
 
                 // 2023년 이후로 종료하는 데이터는 2023년 12월 31일로 조정
-                if ((toDt.getYear() + 1900) > 2023) {
-                    toDt = sdf.parse("20231231");
+                if ((toDt.getYear() + 1900) > inputYear) {
+                    toDt = sdf.parse(inputYear + "1231");
                 }
 
                 int dealDd = Integer.parseInt((String) row.get("DEAL_DD"));
@@ -357,10 +359,21 @@ public class AcashFixService {
         Map<Integer, Double> dailyAmountMap = new TreeMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
+        // inputYear와 inputMonth 값 얻기
+        int inputYear = Integer.parseInt(params.get("inputYear").toString());
+        int inputMonth = Integer.parseInt(params.get("inputMonth").toString());
+
         // 기본값 초기화
-        for (int i = 1; i <= 31; i++) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, inputYear);
+        calendar.set(Calendar.MONTH, inputMonth - 1);  // Java의 Calendar 클래스는 월을 0부터 시작하므로 1을 뺍니다.
+        int lastDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        for (int i = 1; i <= lastDayOfMonth; i++) {
             dailyAmountMap.put(i, 0.0);
         }
+
+
 
         System.out.println("Total number of rows to process: " + fetchedData.size());  // 데이터의 총 개수 출력
 
@@ -378,11 +391,12 @@ public class AcashFixService {
 
                 Calendar paymentDate = Calendar.getInstance();
                 paymentDate.setTime(frDt);
-                int inputYear = Integer.parseInt(params.get("inputYear").toString());
-                int inputMonth = Integer.parseInt(params.get("inputMonth").toString()) - 1;
+//                int inputYear = Integer.parseInt(params.get("inputYear").toString());
+//                int inputMonth = Integer.parseInt(params.get("inputMonth").toString()) - 1;
 
                 while (!paymentDate.after(toDt)) {
-                    if (paymentDate.get(Calendar.YEAR) == inputYear && paymentDate.get(Calendar.MONTH) == inputMonth && paymentDate.get(Calendar.DAY_OF_MONTH) == dealDd) {
+                    System.out.println("Current paymentDate: " + sdf.format(paymentDate.getTime()));
+                    if (paymentDate.get(Calendar.YEAR) == inputYear && paymentDate.get(Calendar.MONTH) == (inputMonth - 1) && paymentDate.get(Calendar.DAY_OF_MONTH) == dealDd) {
                         dailyAmountMap.merge(paymentDate.get(Calendar.DAY_OF_MONTH), cashAm, Double::sum);
                     }
 
@@ -394,12 +408,18 @@ public class AcashFixService {
                         }
                     } else {
                         paymentDate.add(Calendar.MONTH, 1);  // 지급 주기가 없는 경우, 다음 달로 이동
-                        paymentDate.set(Calendar.DAY_OF_MONTH, dealDd);
+                        int lastDayOfNextMonth = paymentDate.getActualMaximum(Calendar.DAY_OF_MONTH);
+                        if (dealDd > lastDayOfNextMonth) {
+                            paymentDate.set(Calendar.DAY_OF_MONTH, lastDayOfNextMonth);
+                        } else {
+                            paymentDate.set(Calendar.DAY_OF_MONTH, dealDd);
+                        }
                     }
 
-                    if (paymentDate.get(Calendar.YEAR) == inputYear && paymentDate.get(Calendar.MONTH) > inputMonth) {
-                        break; // 지정된 월을 넘어갔을 경우 종료
+                    if (paymentDate.get(Calendar.YEAR) > inputYear || (paymentDate.get(Calendar.YEAR) == inputYear && paymentDate.get(Calendar.MONTH) >= inputMonth)) {
+                        break;
                     }
+
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
