@@ -4,7 +4,7 @@
 
     <!-- 거래처 권한이 있고 조회권한이 '부'인 조건   -->
     <sql id="stradeRoll">
-        s.TR_CD IN (
+        AND (s.TR_CD IN (
             SELECT
                 TR_CD
             FROM StradeRollManage
@@ -13,7 +13,7 @@
              AND (EMP_CD=#{EMP_CD, jdbcType=VARCHAR}
                OR DEPT_CD=#{DEPT_CD, jdbcType=VARCHAR})
         )
-        OR s.VIEW_YN = '0'
+        OR s.VIEW_YN = '0')
     </sql>
 
     <!--  해당 거래처의 권한이 있는 사원들의 EMP_CD   -->
@@ -68,12 +68,11 @@
             ON s.TR_CD = g.TR_CD
           AND s.CO_CD = g.CO_CD
         <where>
-            <include refid="stradeRoll" />
-            <if test="TR_CD != null and !TR_NM.equals('')">
+            <if test="TR_CD != null and !TR_CD.equals('')">
                 AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
             </if>
             <if test="TR_NM != null and !TR_NM.equals('')">
-                AND s.TR_NM = #{TR_NM}, jdbcType=VARCHAR
+                AND s.TR_NM = #{TR_NM, jdbcType=VARCHAR}
             </if>
             <if test="REG_NB != null and !REG_NB.equals('')">
                 AND g.REG_NB = #{REG_NB, jdbcType=VARCHAR}
@@ -84,6 +83,7 @@
             <if test="USE_YN != null and !USE_YN.equals('')">
                 AND s.USE_YN = #{USE_YN, jdbcType=VARCHAR}
             </if>
+            <include refid="stradeRoll" />
         </where>
     </select>
 
@@ -110,8 +110,7 @@
         LEFT OUTER JOIN FINANCECODE fn
             ON f.BANK_CD = fn.FINANCE_CD
         <where>
-            <include refid="stradeRoll" />
-            <if test="TR_CD != null and !TR_NM.equals('')">
+            <if test="TR_CD != null and !TR_CD.equals('')">
                 AND s.TR_CD = #{TR_CD, jdbcType=VARCHAR}
             </if>
             <if test="TR_NM != null and !TR_NM.equals('')">
@@ -123,6 +122,7 @@
             <if test="USE_YN != null and !USE_YN.equals('')">
                 AND s.USE_YN = #{USE_YN, jdbcType=VARCHAR}
             </if>
+            <include refid="stradeRoll" />
         </where>
     </select>
 
