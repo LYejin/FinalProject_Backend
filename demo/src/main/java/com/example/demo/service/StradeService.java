@@ -28,13 +28,13 @@ public class StradeService {
         String stradeSeq = null;
 
         if (sgftradeDTO.getTR_MA().equals("auto")) {
-            System.out.println(sgftradeDTO.getTR_MA());
+            System.out.println("dkdkdk"+sgftradeDTO.getTR_MA());
             StradeSeqDTO stradeSeqDTO = new StradeSeqDTO(sgftradeDTO.getTR_FG(), sgftradeDTO.getCO_CD());
-            System.out.println(stradeSeqDTO);
+            System.out.println("dkdkdk"+stradeSeqDTO);
             stradeSeq = getStradeSeq(stradeSeqDTO);
-            System.out.println(stradeSeq);
+            System.out.println("dkdkdk"+stradeSeq);
             sgftradeDTO.setTR_CD(stradeSeq);
-            System.out.println(sgftradeDTO);
+            System.out.println("dkdkdk"+sgftradeDTO);
         }
 
         if (sgftradeDTO.getTR_FG().equals("1")) {
@@ -51,7 +51,7 @@ public class StradeService {
     }
 
     // 전체 일반 거래처 리스트 출력 및 검색 결과 출력
-    public List<SGtradeDTO> sgtradeSearchList(Map<String, String> map) {
+    public List<SGtradeDTO> sgtradeSearchList(Map<String, Object> map) {
         log.info("sgtradeSearchListService 실행");
         List<SGtradeDTO> sgtradeList = new ArrayList<>();
         try {
@@ -64,7 +64,7 @@ public class StradeService {
     }
 
     // 전체 금융 거래처 리스트 출력 및 검색 결과 출력
-    public List<SFtradeDTO> sftradeSearchList(Map<String, String> map) {
+    public List<SFtradeDTO> sftradeSearchList(Map<String, Object> map) {
         log.info("sftradeSearchListService 실행");
         List<SFtradeDTO> sftradeList = new ArrayList<>();
         try {
@@ -394,10 +394,10 @@ public class StradeService {
     public String gridUseEmpCd(GridEmpCdDTO gridEmpCdDTO) {
         log.info("gridUseEmpCdService");
         String gridUseEmpCd = null;
-        System.out.println(gridEmpCdDTO);
+        System.out.println("ppppp"+gridEmpCdDTO);
         try {
             gridUseEmpCd = stradeDao.gridUseEmpCd(gridEmpCdDTO);
-            System.out.println(gridUseEmpCd);
+            System.out.println("ppppp"+gridUseEmpCd);
             if (gridUseEmpCd != null) {
                 return "사용중";
             }
@@ -434,7 +434,7 @@ public class StradeService {
         System.out.println("ooooo"+BA_NB_TR);
         try {
             baNbTrVal = stradeDao.baNbTrVal(CO_CD, BA_NB_TR);
-            System.out.println(baNbTrVal);
+            System.out.println("llll"+baNbTrVal);
             if (baNbTrVal != null) {
                 return true;
             }

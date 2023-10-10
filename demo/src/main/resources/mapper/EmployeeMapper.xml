@@ -252,7 +252,7 @@
             <if test="RSRG_ADD != null and !RSRG_ADD.equals('')">
                 RSRG_ADD = #{RSRG_ADD},
             </if>
-            <if test="PIC_FILE_ID != null and !PIC_FILE_ID.equals('')">
+            <if test="PIC_FILE_ID != null">
                 PIC_FILE_ID = #{PIC_FILE_ID},
             </if>
             <if test="ENRL_FG != null and !ENRL_FG.equals('')">
