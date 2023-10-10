@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -25,27 +26,26 @@ public class CompanyService {
     private CompanyDao companyDao;
 
     //검색
-    public List<CompanyDTO> companySelect(CompanyDTO companyDTO){
+    public List<CompanyDTO> companySelect(CompanyDTO companyDTO) {
         List<CompanyDTO> companyDTOS = null;
         try {
             findByInputColumns(companyDTO);
             companyDTOS = companyDao.companySelect(companyDTO);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
         return companyDTOS;
     }
 
 
-
-    public  CompanyDTO companyDetail(String co_CD){
+    public CompanyDTO companyDetail(String co_CD) {
         CompanyDTO companyDTO = null;
         try {
             companyDTO = companyDao.companyDetail(co_CD);
 
             companyDTO.setPPL_NB(AESUtil.decrypt(companyDTO.getPPL_NB()));
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
 
@@ -53,39 +53,45 @@ public class CompanyService {
     }
 
     //추가
-    public void companyInsert(CompanyDTO companyDTO){
+    public void companyInsert(CompanyDTO companyDTO) {
 
-        if(!companyDTO.getPIC_FILE_ID().isEmpty()) {
+        if (!companyDTO.getPIC_FILE_ID().isEmpty()) {
             int index = companyDTO.getPIC_FILE_ID().indexOf("data");
             String data = companyDTO.getPIC_FILE_ID().substring(index);
-                companyDTO.setPIC_FILE_ID(data);
+            companyDTO.setPIC_FILE_ID(data);
         }
 
         try {
             findByInputColumns(companyDTO);
             companyDTO.setPPL_NB(AESUtil.encrypt(companyDTO.getPPL_NB()));
             companyDao.companyInsert(companyDTO);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
 
     //
-    public void companyUpdate(CompanyDTO companyDTO){
-
+    public void companyUpdate(CompanyDTO companyDTO) {
+        log.info("갱신된 데이터(전)!!!!!!!!!!!" + companyDTO);
         try {
-            if(companyDTO.getPPL_NB() != null){
+            if (companyDTO.getPPL_NB() != null) {
                 companyDTO.setPPL_NB(AESUtil.encrypt(companyDTO.getPPL_NB()));
-                log.info("업데이트!!!"+AESUtil.encrypt(companyDTO.getPPL_NB()));
-            }
-            if(companyDTO.getPIC_FILE_ID() != null && companyDTO.getPIC_FILE_ID().isEmpty()){
-                companyDTO.setPIC_FILE_ID(null);
+                log.info("업데이트!!!" + AESUtil.encrypt(companyDTO.getPPL_NB()));
             }
 
+            if(companyDTO.getPIC_FILE_ID() != null){
+                if(companyDTO.getPIC_FILE_ID().isEmpty()){
+                    companyDTO.setPIC_FILE_ID(null);
+                }else if(companyDTO.getPIC_FILE_ID().equals("none")){
+                    companyDTO.setPIC_FILE_ID("");
+                }
+            }
+
+            log.info("갱신된 데이터(중3)!!!!!!!!!!!" + companyDTO);
             findByInputColumns(companyDTO);  //데이터 입력된 필드 확인해주는 함수
-            log.info("갱신된 데이터", companyDTO.getColumnsToUpdate());
+            log.info("갱신된 데이터(후)!!!!!!!!!!!" + companyDTO);
             companyDao.companyUpdate(companyDTO);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
 
@@ -93,46 +99,46 @@ public class CompanyService {
 
     //삭제
     @Transactional
-    public void companyRemove(String CO_CD){
+    public void companyRemove(String CO_CD) {
 
         try {
             companyDao.companyRemove(CO_CD);
             companyDao.workplaceRemove(CO_CD);
             companyDao.employeeRemove(CO_CD);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
 
     }
+
     public String companyDup(CompanyDTO companyDTO) {
-        String dup= null;
+        String dup = null;
 
         try {
-            if(companyDTO.getPPL_NB() != null){
+            if (companyDTO.getPPL_NB() != null) {
                 companyDTO.setPPL_NB(AESUtil.encrypt(companyDTO.getPPL_NB()));
             }
 
             findByInputColumns(companyDTO);
             dup = companyDao.companyDup(companyDTO);
 
-            if(dup.contains("==")){
+            if (dup.contains("==")) {
                 dup = AESUtil.decrypt(dup);
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
 
-        if(dup != null){
+        if (dup != null) {
             return dup;
-        }else{
+        } else {
             return null;
         }
     }
 
 
-
-    public void findByInputColumns(CompanyDTO companyDTO){
+    public void findByInputColumns(CompanyDTO companyDTO) {
         List<String> columnsToUpdate = new ArrayList<>();
 
         // DTO의 필드를 반복하며 널이 아닌 데이터가 담긴 필드를 columnsToUpdate 목록에 추가
