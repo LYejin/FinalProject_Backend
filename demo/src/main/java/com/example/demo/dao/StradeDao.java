@@ -14,10 +14,10 @@ public interface StradeDao {
     int insertStradeAndGtradeProcedure(SGtradeDTO sgtradeDTO);
 
     // 일반 거래처 리스트
-    List<SGtradeDTO> sgtradeSearchList(Map<String, String> map);
+    List<SGtradeDTO> sgtradeSearchList(Map<String, Object> map);
 
     // 금융 거래처 리스트
-    List<SFtradeDTO> sftradeSearchList(Map<String, String> map);
+    List<SFtradeDTO> sftradeSearchList(Map<String, Object> map);
 
     // 일반 거래처 디테일 정보
     SGtradeDTO sgtradeDetail(Map<String, String> map);
