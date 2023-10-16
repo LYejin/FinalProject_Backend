@@ -254,4 +254,6 @@ public class AcashFixController {
         return new ResponseEntity<>(dailyAmounts, HttpStatus.OK);
     }
 
+
+
 }
