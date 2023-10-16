@@ -110,6 +110,28 @@ public class DepartmentService {
         return (employeeCount == 0) && (departmentCount == 0);
     }
 
+//    public boolean checkExistence(String CO_CD, String DEPT_CD) {
+//        Map<String, Object> params = new HashMap<>();
+//        params.put("CO_CD", CO_CD);
+//        params.put("DEPT_CD", DEPT_CD);
+//
+//        int employeeCount = departmentDao.countEmployeeWithCondition(params);
+//
+//        // employeeCount가 0이 아니면 바로 false 반환
+//        if (employeeCount != 0) {
+//            return false;
+//        }
+//
+//        int departmentCount = departmentDao.countDepartmentWithCondition(params);
+//
+//        // departmentCount가 0이 아니면 바로 false 반환
+//        if (departmentCount != 0) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
+
     //부서삭제(하위부서 및 사원 사용여부 변경)
     @Transactional
     public int updateDepartmentAndEmployee(Map<String, Object> params) {

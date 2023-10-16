@@ -255,4 +255,7 @@
         GROUP BY a.FR_DT, a.TO_DT, a.DEAL_DD, a.DEAL_PD
     </select>
 
+
+
+
 </mapper>

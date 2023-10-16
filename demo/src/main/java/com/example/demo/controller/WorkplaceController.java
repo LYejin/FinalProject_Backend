@@ -1,13 +1,21 @@
 package com.example.demo.controller;
 
+import com.example.demo.config.jwt.JwtProperties;
 import com.example.demo.dto.WorkplaceDTO;
 import com.example.demo.service.WorkplaceService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +32,8 @@ public class WorkplaceController {
     public WorkplaceController(WorkplaceService workplaceService) {
         this.workplaceService = workplaceService;
     }
+    @Autowired
+    private HttpServletRequest request;
 
     //사업장 목록
     @GetMapping("getList")
@@ -48,6 +58,37 @@ public class WorkplaceController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public Claims getUserInfo() {
+        String username = null;
+        try {
+            String header = request.getHeader(JwtProperties.HEADER_STRING);
+            header = URLDecoder.decode(header, "UTF-8");
+
+            String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
+
+
+            SecretKey key = Keys.hmacShaKeyFor(JwtProperties.getSecretKey());
+
+            Jws<Claims> claimsJws = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+
+            Claims claims = claimsJws.getBody();
+            username = String.valueOf(claims.get("username"));
+
+
+            return claims;
+
+        } catch (Exception e) {
+            log.error("Token validation failed: " + e.getMessage());
+        }
+        return null;
+    }
+
+
+
 
     //사업장 상세
 //    @GetMapping("getWorkpInfo/{divCd}")
@@ -87,7 +128,7 @@ public class WorkplaceController {
     public ResponseEntity<Integer> InsertWorkplace(@RequestBody WorkplaceDTO workplaceDTO) {
         try {
             int result = workplaceService.workplaceInsert(workplaceDTO);
-            //log.info("Inserted Workplace Controller", workplaceDTO, result);
+            log.info("Inserted Workplace Controller Detail", workplaceDTO, result);
             log.info("Insert Workplace Controller");
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
@@ -124,6 +165,14 @@ public class WorkplaceController {
             log.error("Error while deleting workplace with DIV_CD: {} and CO_CD: {}", DIV_CD, CO_CD, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/workPCheck")
+    public boolean checkDuplicate(@RequestParam String coCd, @RequestParam String divCd) {
+        Map<String, String> params = new HashMap<>();
+        params.put("CO_CD", coCd);
+        params.put("DIV_CD", divCd);
+        return workplaceService.isWorkpDuplicate(params);
     }
 
 
