@@ -86,4 +86,17 @@ public class WorkplaceService {
         return removeResult;
     }
 
+    public boolean isWorkpDuplicate(Map<String, String> params) {
+        try {
+            int count = workplaceDao.checkWorkpDuplicate(params);
+            return count > 0;
+        } catch (Exception e) {
+            log.error("Error while check DepartmentCD: ", e);
+            return false;
+        }
+    }
+
+
+
+
 }
