@@ -19,13 +19,11 @@ public class AcashFixDTO {
     private String TR_CD;       //거래처코드
     private String FTR_CD;      //금융거래처 코드
 
-
-
-//    private String CASH_NM;   //자금등록 이름
-//    private String TR_NM;     //일반거래처 이름
-//    private String FTR_NM;    //금융거래처 이름
-//    private String BA_NB_TR;  //계좌번호
-//    private String BANK_NAME; //은행이름
+    private String CASH_NM;   //자금등록 이름
+    private String TR_NM;     //일반거래처 이름
+    private String FTR_NM;    //금융거래처 이름
+    private String BA_NB_TR;  //계좌번호
+    private String BANK_NAME; //은행이름
 //    private String EMP_CD;      //입력자?
 //    private String DEAL_MM;
 }

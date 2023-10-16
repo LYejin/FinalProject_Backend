@@ -181,9 +181,10 @@ public class AcashFixController {
     //연간 고정자금 금액
     @GetMapping("/yearlyAmounts")
     public List<Map<String, Object>> getYearlyAmounts(@RequestParam int inputYear,
-                                                      @RequestParam String CO_CD,
                                                       @RequestParam String DIV_CD,
                                                       @RequestParam String DISP_SQ) {
+        Claims claims = getUserInfo();
+        String CO_CD = String.valueOf(claims.get("CO_CD"));
         Map<String, Object> params = new HashMap<>();
         params.put("inputYear", inputYear);
         params.put("CO_CD", CO_CD);
@@ -194,9 +195,10 @@ public class AcashFixController {
 
     @GetMapping("/quarterly")
     public ResponseEntity<List<Map<String, Object>>> getQuarterlyAmounts(@RequestParam int inputYear,
-                                                                         @RequestParam String CO_CD,
                                                                          @RequestParam String DIV_CD,
                                                                          @RequestParam String DISP_SQ) {
+        Claims claims = getUserInfo();
+        String CO_CD = String.valueOf(claims.get("CO_CD"));
         Map<String, Object> params = new HashMap<>();
         params.put("inputYear", inputYear);
         params.put("CO_CD", CO_CD);
@@ -213,9 +215,10 @@ public class AcashFixController {
 
     @GetMapping("/monthly")
     public ResponseEntity<List<Map<String, Object>>> getMonthlyAmounts(@RequestParam int inputYear,
-                                                                       @RequestParam String CO_CD,
                                                                        @RequestParam String DIV_CD,
                                                                        @RequestParam String DISP_SQ)  {
+        Claims claims = getUserInfo();
+        String CO_CD = String.valueOf(claims.get("CO_CD"));
         Map<String, Object> params = new HashMap<>();
         params.put("inputYear", inputYear);
         params.put("CO_CD", CO_CD);
@@ -233,16 +236,18 @@ public class AcashFixController {
     @GetMapping("/dailyAmount")
     public ResponseEntity<List<Map<String, Object>>> getDailyAmounts(
             @RequestParam("DIV_CD") String divCd,
-            @RequestParam("CO_CD") String coCd,
-            @RequestParam("Year") String year,
-            @RequestParam("Month") String month,
+            @RequestParam("inputYear") String inputYear,
+            @RequestParam("inputMonth") String inputMonth,
             @RequestParam("DISP_SQ") String dispSq) {
+
+        Claims claims = getUserInfo();
+        String coCd = String.valueOf(claims.get("CO_CD"));
 
         Map<String, Object> params = new HashMap<>();
         params.put("DIV_CD", divCd);
         params.put("CO_CD", coCd);
-        params.put("inputYear", year);
-        params.put("inputMonth", month);
+        params.put("inputYear", inputYear);
+        params.put("inputMonth", inputMonth);
         params.put("DISP_SQ", dispSq);
 
         List<Map<String, Object>> dailyAmounts = acashFixService.getDailyAmounts(params);

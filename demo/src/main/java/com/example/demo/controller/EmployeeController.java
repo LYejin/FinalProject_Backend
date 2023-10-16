@@ -239,7 +239,11 @@ public class EmployeeController {
                 dataURL = "data:" + mimeType + ";base64," + base64Image;  // "data:" URI 스킴을 포함한 Base64 데이터 생성
                 photoImg = dataURL;
             }
+
+
+            log.info("이미지!!!"+image +employeeDTO);
             employeeDTO.setPIC_FILE_ID(photoImg);
+
             employeeService.employeeUpdate(employeeDTO);
         } catch (Exception e) {
             log.error("employeeUpdateController Error : image={},employeeDTO={}, errorMessage={}", image, employeeDTO, e.getMessage());

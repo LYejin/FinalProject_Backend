@@ -225,6 +225,15 @@
         AND CO_CD = #{CO_CD}
     </update>
 
+    <select id="checkWorkpDuplicate" parameterType="map">
+        SELECT COUNT(*)
+        FROM Workplace
+        WHERE CO_CD = #{CO_CD}
+          AND DIV_CD = #{DIV_CD}
+    </select>
+
+
+
 
 
 </mapper>
