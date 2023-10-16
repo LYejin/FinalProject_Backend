@@ -232,13 +232,6 @@
           AND DIV_CD = #{DIV_CD}
     </select>
 
-    <select id="selectWorkplaceSearch" resultType="com.example.demo.dto.WorkplaceDTO">
-            SELECT
-                DIV_CD,
-                DIV_NM,
-            FROM Workplace
-            WHERE CO_CD = #{CO_CD}
-    </select>
 
 
 
