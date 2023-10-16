@@ -27,5 +27,6 @@ public interface WorkplaceDao {
     //사업장 삭제
     public int deleteWorkplace(Map<String, String> params);
 
+    public int checkWorkpDuplicate(Map<String, String> params);
 
 }

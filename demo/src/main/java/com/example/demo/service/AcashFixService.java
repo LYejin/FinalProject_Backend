@@ -186,12 +186,10 @@ public class AcashFixService {
                     continue;
                 }
 
-                // 2023년 이전으로 시작하는 데이터는 2023년 1월 1일로 조정
                 if ((frDt.getYear() + 1900) < inputYear) {
                     frDt = sdf.parse(inputYear + "0101");
                 }
 
-                // 2023년 이후로 종료하는 데이터는 2023년 12월 31일로 조정
                 if ((toDt.getYear() + 1900) > inputYear) {
                     toDt = sdf.parse(inputYear + "1231");
                 }
@@ -279,7 +277,6 @@ public class AcashFixService {
     public List<Map<String, Object>> getMonthlyAmounts(Map<String, Object> params) {
         List<Map<String, Object>> fetchedData = acashFixDao.selectMonthlyAmounts(params);
         Map<Integer, Double> monthlyAmountMap = new HashMap<>();
-        Map<Integer, Map<String, Double>> monthlyCashCdAmountMap = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
         for (Map<String, Object> row : fetchedData) {
@@ -303,11 +300,6 @@ public class AcashFixService {
 
                     if (year == Integer.parseInt(params.get("inputYear").toString())) {
                         monthlyAmountMap.merge(month, cashAm, Double::sum);
-
-                        String cashCd = (String) row.get("CASH_CD");
-                        monthlyCashCdAmountMap
-                                .computeIfAbsent(month, k -> new HashMap<>())
-                                .merge(cashCd, cashAm, Double::sum);
                     }
 
                     if (dealPd != null) {
@@ -321,34 +313,99 @@ public class AcashFixService {
             }
         }
 
+        // 1월부터 12월까지의 데이터를 초기화 (데이터가 없는 월은 0으로 설정)
+        for (int i = 1; i <= 12; i++) {
+            monthlyAmountMap.putIfAbsent(i, 0.0);
+        }
+
         return monthlyAmountMap.entrySet().stream()
                 .map(entry -> {
                     Map<String, Object> monthData = new HashMap<>();
-                    int month = entry.getKey();
-                    monthData.put("MONTH", month);
+                    monthData.put("MONTH", entry.getKey());
                     monthData.put("TOTAL_AMOUNT", entry.getValue());
-
-                    // Get top 3 CASH_CDs for this month
-                    Map<String, Double> topCashCdMap = monthlyCashCdAmountMap.get(month).entrySet().stream()
-                            .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()))
-                            .limit(3)
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
-                    for (Map.Entry<String, Double> topEntry : topCashCdMap.entrySet()) {
-                        String cashCd = topEntry.getKey();
-                        double totalAmount = topEntry.getValue();
-                        String cashName = fetchedData.stream()
-                                .filter(row -> cashCd.equals(row.get("CASH_CD")))
-                                .map(row -> (String) row.get("CASH_NM"))
-                                .findFirst()
-                                .orElse(cashCd);
-                        monthData.put(cashName, totalAmount);
-                    }
-
                     return monthData;
                 })
                 .collect(Collectors.toList());
     }
+
+//    public List<Map<String, Object>> getMonthlyAmounts(Map<String, Object> params) {
+//        List<Map<String, Object>> fetchedData = acashFixDao.selectMonthlyAmounts(params);
+//        Map<Integer, Double> monthlyAmountMap = new HashMap<>();
+//        Map<Integer, Map<String, Double>> monthlyCashCdAmountMap = new HashMap<>();
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+//
+//        for (int i = 1; i <= 12; i++) {
+//            monthlyAmountMap.put(i, 0.0);
+//            monthlyCashCdAmountMap.put(i, new HashMap<>());
+//        }
+//
+//        for (Map<String, Object> row : fetchedData) {
+//            try {
+//                Date frDt = sdf.parse((String) row.get("FR_DT"));
+//                Date toDt = sdf.parse((String) row.get("TO_DT"));
+//                int dealDd = Integer.parseInt((String) row.get("DEAL_DD"));
+//                Integer dealPd = row.get("DEAL_PD") != null ? Integer.parseInt((String) row.get("DEAL_PD")) : null;
+//                double cashAm = Double.parseDouble(row.get("CASH_AM").toString());
+//
+//                Calendar paymentDate = Calendar.getInstance();
+//                paymentDate.setTime(frDt);
+//                if (paymentDate.get(Calendar.DAY_OF_MONTH) > dealDd) {
+//                    paymentDate.add(Calendar.MONTH, 1);
+//                }
+//                paymentDate.set(Calendar.DAY_OF_MONTH, dealDd);
+//
+//                while (!paymentDate.getTime().after(toDt)) {
+//                    int year = paymentDate.get(Calendar.YEAR);
+//                    int month = paymentDate.get(Calendar.MONTH) + 1;
+//
+//                    if (year == Integer.parseInt(params.get("inputYear").toString())) {
+//                        monthlyAmountMap.merge(month, cashAm, Double::sum);
+//
+//                        String cashCd = (String) row.get("CASH_CD");
+//                        monthlyCashCdAmountMap
+//                                .computeIfAbsent(month, k -> new HashMap<>())
+//                                .merge(cashCd, cashAm, Double::sum);
+//                    }
+//
+//                    if (dealPd != null) {
+//                        paymentDate.add(Calendar.MONTH, dealPd);
+//                    } else {
+//                        break;
+//                    }
+//                }
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        return monthlyAmountMap.entrySet().stream()
+//                .map(entry -> {
+//                    Map<String, Object> monthData = new HashMap<>();
+//                    int month = entry.getKey();
+//                    monthData.put("MONTH", month);
+//                    monthData.put("TOTAL_AMOUNT", entry.getValue());
+//
+//                    // Get top 3 CASH_CDs for this month
+//                    Map<String, Double> topCashCdMap = monthlyCashCdAmountMap.get(month).entrySet().stream()
+//                            .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()))
+//                            .limit(3)
+//                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+//
+//                    for (Map.Entry<String, Double> topEntry : topCashCdMap.entrySet()) {
+//                        String cashCd = topEntry.getKey();
+//                        double totalAmount = topEntry.getValue();
+//                        String cashName = fetchedData.stream()
+//                                .filter(row -> cashCd.equals(row.get("CASH_CD")))
+//                                .map(row -> (String) row.get("CASH_NM"))
+//                                .findFirst()
+//                                .orElse(cashCd);
+//                        monthData.put(cashName, totalAmount);
+//                    }
+//
+//                    return monthData;
+//                })
+//                .collect(Collectors.toList());
+//    }
 
 
 
